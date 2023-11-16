@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="app">
+            <div>Value: {{value}}</div>
+            <button data-click="handleClick">Click</button>
+        </div>
+        <script>
+            const template = document.getElementById("app");
+            const templateHTML = template.innerHTML;
+            const templateText = template.textContent;
+
+            function zz() {
+                let value = 1;
+
+                const render = () => {
+                    const regex = /{{(.*?)}}/g;
+                    const app = document.getElementById("app");
+                    let match;
+                    let newContent = templateHTML;
+
+                    while ((match = regex.exec(templateText)) !== null) {
+                        const re = new RegExp(`${escapeRegExp(match[0])}`, "g");
+                        newContent = newContent.replace(re, eval(match[1]));
+                    }
+
+                    app.innerHTML = newContent;
+
+                    app.querySelectorAll("[data-click]").forEach((element) => {
+                        const callback = element.dataset.click;
+                        if (typeof callbacks[callback] !== "function") {
+                            throw new Error(`Function ${callback} not found`);
+                        }
+
+                        element.addEventListener("click", callbacks[callback]);
+                    });
+                };
+
+                const callbacks = {
+                    handleClick: () => {
+                        value++;
+                        console.log("clicked", value);
+                        render();
+                    },
+                };
+
+                render();
+            }
+
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            }
+
+            zz();
+        </script>
+    </body>
+</html>
