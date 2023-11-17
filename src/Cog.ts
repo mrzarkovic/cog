@@ -11,35 +11,46 @@ document.addEventListener("DOMContentLoaded", () => {
         const tree = new Map<HTMLElement, ElementTemplate>();
 
         const render = () => {
-            const regex = /{{(.*?)}}/g;
+            const regex = /{{|}}/g;
 
             for (const [htmlElement, elementTemplate] of tree) {
                 let match: RegExpExecArray | null;
-                const matches: string[] = [];
+                const stack: number[] = [];
                 let newContent = elementTemplate;
 
+                // cleanup all chidren html elements first to avoid checking twice for parent and child
+                // <div>{{ foo }}<span>{{ bar }}</span></div>
                 while ((match = regex.exec(elementTemplate)) !== null) {
-                    if (
-                        matches.filter((m) => match && m.includes(match[0]))
-                            .length > 0
-                    ) {
-                        continue;
-                    }
-                    console.log(match[0]);
-                    matches.push(match[0]);
-                    const re = new RegExp(`${escapeRegExp(match[0])}`, "g");
-                    const value = htmlToText(match[1]);
+                    if (match[0] === "{{") {
+                        stack.push(match.index);
+                    } else if (match[0] === "}}" && stack.length > 0) {
+                        const start = stack.pop();
+                        const end = match.index;
 
-                    try {
-                        newContent = newContent.replace(
-                            re,
-                            eval(value) ?? value
-                        );
-                    } catch (e: unknown) {
-                        if (e instanceof Error) {
-                            console.error(
-                                `Template {{${value}}} error: ${e.message}`
+                        if (stack.length === 0 && start !== undefined) {
+                            // This is the outermost {{ }}
+                            const htmlValue = elementTemplate.slice(
+                                start + 2,
+                                end
                             );
+                            const re = new RegExp(
+                                `${escapeRegExp(`{{${htmlValue}}}`)}`,
+                                "g"
+                            );
+                            const value = htmlToText(htmlValue);
+
+                            try {
+                                newContent = newContent.replace(
+                                    re,
+                                    eval(value) ?? value
+                                );
+                            } catch (e: unknown) {
+                                if (e instanceof Error) {
+                                    console.error(
+                                        `Template {{${value}}} error: ${e.message}`
+                                    );
+                                }
+                            }
                         }
                     }
                 }
