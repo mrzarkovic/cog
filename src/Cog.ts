@@ -12,15 +12,13 @@ type ReactiveNode = {
     template: string;
 };
 
+type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
+
 const cog: Cog = (function () {
     const tree: ReactiveNode[] = [];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const state: Record<string, any> = {};
-    const appElement = document.getElementById("app");
-
-    if (!appElement) {
-        throw new Error("No app element found!");
-    }
+    let appElement: HTMLElement | null = null;
 
     const render = () => {
         // console.log(state);
@@ -67,8 +65,8 @@ const cog: Cog = (function () {
                                 return `const ${variable} = state["${variable}"];`;
                             })
                             .join("\n")}
-                        return ${value}
-                    }`)()(state);
+                            return ${value}
+                        }`)()(state);
 
                     if (Array.isArray(evaluated)) {
                         evaluated = evaluated.join("");
@@ -84,7 +82,9 @@ const cog: Cog = (function () {
             updatedContent += restOfContent;
 
             if (updatedContent !== element.innerHTML) {
+                removeAllEventListeners(element);
                 element.innerHTML = updatedContent;
+                addAllEventListeners(element);
             }
         }
     };
@@ -95,7 +95,7 @@ const cog: Cog = (function () {
 
         const result = document.evaluate(
             xpath,
-            appElement,
+            appElement as Node,
             null,
             XPathResult.ORDERED_NODE_ITERATOR_TYPE,
             null
@@ -132,33 +132,66 @@ const cog: Cog = (function () {
         }, 0);
     }
 
-    function addEventListeners() {
-        appElement?.querySelectorAll("[data-click]").forEach((element) => {
-            element.addEventListener("click", (e) => {
-                const target = <HTMLElement>e.target;
-                const clickEvent = target.dataset.click;
+    function addAllEventListeners(parent?: HTMLElement) {
+        addEventListeners(parent, "click");
+        addEventListeners(parent, "change");
+    }
 
-                if (clickEvent) {
-                    try {
-                        Function(`return (state) => {
-                            ${Object.keys(state)
-                                .map((variable) => {
-                                    return `const ${variable} = state["${variable}"];`;
-                                })
-                                .join("\n")}
-                            ${clickEvent}
-                        }`)()(state);
-                    } catch (e) {
-                        console.log(e);
-                    }
-                }
-            });
+    function removeAllEventListeners(parent?: HTMLElement) {
+        removeEventListeners(parent, "click");
+        removeEventListeners(parent, "change");
+    }
+
+    function addEventListeners(parent?: HTMLElement, eventName = "click") {
+        parent?.querySelectorAll(`[data-${eventName}]`).forEach((element) => {
+            const handler = eventHandler(eventName, element);
+            element.addEventListener(eventName, handler);
+            (element as ElementWithHandler)[`${eventName}Handler`] = handler;
         });
     }
 
+    function removeEventListeners(parent?: HTMLElement, eventName = "click") {
+        parent?.querySelectorAll(`[data-${eventName}]`).forEach((element) => {
+            const handler = (element as ElementWithHandler)[
+                `${eventName}Handler`
+            ];
+            if (handler) {
+                element.removeEventListener(eventName, handler);
+            }
+        });
+    }
+
+    const eventHandler = (eventName = "click", element: Element) =>
+        function (e: Event) {
+            const handler = element.getAttribute(`data-${eventName}`);
+            if (handler) {
+                try {
+                    Function(`return (state) => {
+                        ${Object.keys(state)
+                            .map((variable) => {
+                                return `const ${variable} = state["${variable}"];`;
+                            })
+                            .join("\n")}
+                            ${handler}
+                        }`)()(state);
+                } catch (e: unknown) {
+                    if (e instanceof Error) {
+                        throw new Error(
+                            `${e.message}: data-${eventName}=${handler}`
+                        );
+                    }
+                }
+            }
+            e.preventDefault();
+        };
+
     document.addEventListener("DOMContentLoaded", () => {
+        appElement = document.querySelector("#app");
+        if (!appElement) {
+            throw new Error("No app element found!");
+        }
         loadElements();
-        addEventListeners();
+        addAllEventListeners(appElement);
         render();
     });
 

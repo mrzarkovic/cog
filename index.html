@@ -13,10 +13,25 @@
     <body>
         <div id="app" class="flex justify-center h-full w-full">
             <div class="max-w-xl grow pt-40 px-10">
-                <div>Counter: {{ counter }}</div>
-                <button data-click="increment()" class="btn btn-primary">
-                    Increment
-                </button>
+                <input type="text" id="input" data-input="todo" />
+                <button data-click="save()">Save</button>
+                <div class="p-4">
+                    {{ todos.map((todo, i) => `
+                    <div class="p-2">
+                        <label for="todo${i}" class="flex items-center">
+                            <input
+                                type="checkbox"
+                                id="todo${i}"
+                                data-checked="${todo.done}"
+                                data-change="toggleTodo(${i})"
+                            />
+                            <span class="pl-2"
+                                >${todo.text} <span>${todo.done}</span></span
+                            >
+                        </label>
+                    </div>
+                    `) }}
+                </div>
             </div>
         </div>
         <script src="/lib/cog.js"></script>
