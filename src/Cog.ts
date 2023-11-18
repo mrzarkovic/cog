@@ -4,50 +4,79 @@ type Cog = {
 type CogWindow = typeof window & {
     Cog: Cog;
 };
-type ElementTemplate = string;
+type ReactiveNode = {
+    element: HTMLElement;
+    template: string;
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     (window as CogWindow).Cog = (function () {
-        const tree = new Map<HTMLElement, ElementTemplate>();
+        const tree: ReactiveNode[] = [];
 
         const render = () => {
-            for (const [htmlElement, elementTemplate] of tree) {
-                let hasTemplateExpression = true;
+            for (const { element, template } of tree) {
                 let updatedContent = "";
-                let restOfContent = elementTemplate;
+                let restOfContent = template;
+                let hasTemplateExpression = true;
 
                 while (hasTemplateExpression) {
                     const start = restOfContent.indexOf("{{");
-                    const end = restOfContent.indexOf("}}");
+                    let end = -1;
+                    let stack = 0;
 
-                    if (start === -1 || end === -1) {
+                    for (let i = start; i < restOfContent.length; i++) {
+                        if (restOfContent.slice(i, i + 2) === "{{") {
+                            stack++;
+                            i++;
+                        } else if (restOfContent.slice(i, i + 2) === "}}") {
+                            stack--;
+                            i++;
+                        }
+
+                        if (stack === 0) {
+                            end = i;
+                            break;
+                        }
+                    }
+
+                    if (start === -1 || end === -1 || start >= end) {
                         hasTemplateExpression = false;
                         break;
                     }
 
-                    const htmlValue = restOfContent.slice(start + 2, end);
+                    const htmlValue = restOfContent.slice(start + 2, end - 1);
+                    // console.log(htmlValue);
                     const before = restOfContent.slice(0, start);
-                    const after = restOfContent.slice(end + 2);
-                    const value = htmlToText(htmlValue);
-
-                    updatedContent += `${before}${eval(value) ?? value}`;
+                    const after = restOfContent.slice(end + 1);
+                    const value = htmlToText(htmlValue); // this part strips child html elements
+                    // console.log(value);
+                    try {
+                        let evaluated = eval(value);
+                        // console.log(evaluated);
+                        if (Array.isArray(evaluated)) {
+                            evaluated = evaluated.join("");
+                        }
+                        updatedContent += `${before}${evaluated ?? value}`;
+                    } catch (e) {
+                        updatedContent += `${before}${value}`;
+                    }
                     restOfContent = after;
                 }
+                updatedContent += restOfContent;
 
-                if (updatedContent !== htmlElement.innerHTML) {
-                    htmlElement.innerHTML = updatedContent;
+                if (updatedContent !== element.innerHTML) {
+                    element.innerHTML = updatedContent;
                 }
             }
         };
 
         const loadElements = () => {
-            const xpath = ".//*[contains(., '{{') and contains(., '}}')]";
-            // "//*[contains(text(), '{{') and contains(text(), '}}')]";
+            const xpath =
+                ".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]";
             const appElement = document.getElementById("app");
 
             if (!appElement) {
-                console.error('Element with id "app" not found');
-                return;
+                throw new Error("No app element found");
             }
 
             const result = document.evaluate(
@@ -59,15 +88,25 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             let element = <HTMLElement>result.iterateNext();
             while (element) {
-                console.log("found", element);
-                tree.set(element, element.innerHTML);
+                // console.log("Found", element.innerHTML);
+                tree.push({ element, template: element.innerHTML });
                 element = <HTMLElement>result.iterateNext();
             }
         };
 
+        function escapeHtml(html: string) {
+            return (
+                html
+                    // .replace(/"(?=[^<>]*>)/g, "&quot;")
+                    // .replace(/'(?!<[^<>]*>)/g, "&#039;")
+                    .replace(/<(?=[^<>]*>)/g, "&lt;")
+                    .replace(/(?<=[^<>]*)>/g, "&gt;")
+            );
+        }
+
         function htmlToText(html: string) {
             const tmp = document.createElement("div");
-            tmp.innerHTML = html;
+            tmp.innerHTML = escapeHtml(html);
 
             return tmp.textContent || tmp.innerText || "";
         }

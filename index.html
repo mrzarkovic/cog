@@ -13,7 +13,7 @@
                 });
             }
 
-            async function logMovies() {
+            async function logProducts() {
                 const response = await fetch("https://dummyjson.com/products");
                 const json = await response.json();
                 Cog.spin(() => {
@@ -21,17 +21,41 @@
                 });
             }
         </script>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        <div id="app">
-            <div>Counter: {{counter}}</div>
-            <div>
-                <code>{{ // {{ 3 + 5 }} }} {{ counter }}</code>3 + 5 = {{ 3 + 5
-                }} {{counter}}
+        <div id="app" class="flex justify-center h-full w-full">
+            <div class="max-w-xl grow pt-40">
+                <div>
+                    Counter: {{ counter }}
+                    <button onclick="handleClick()" class="btn">
+                        Increment
+                    </button>
+                </div>
+                <p>Simple expression:</p>
+                <div>3 + 5 = {{ 3 + 5 }}</div>
+                <div class="border border-rose-500 my-6 p-2">
+                    {{
+                    <p class="text-rose-500">// "text"</p>
+                    }}
+                </div>
+                <p>Comment:</p>
+                <code>{{ // 3 + 5 = {{ 3 + 5 }} }}</code>
+                <p>Content from API:</p>
+                <div>
+                    {{ products.map(p => { return `
+                    <span>${p.title}</span>
+                    `; }) }}
+                </div>
+                <button onclick="logProducts()" class="btn">
+                    Load products
+                </button>
             </div>
-            <button onclick="handleClick()">Click</button>
-            <div>{{products.map(p => p.title)}}</div>
-            <button onclick="logMovies()">Log Movies</button>
         </div>
         <script src="/lib/Cog.js"></script>
     </body>
