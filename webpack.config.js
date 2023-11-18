@@ -2,10 +2,10 @@ const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-    entry: "./src/Cog.ts", // The entry point of your library
+    entry: "./src/index.ts", // The entry point of your library
     output: {
         path: path.resolve(__dirname, "lib"), // The output directory
-        filename: "Cog.js", // The name of the output file
+        filename: "cog.js", // The name of the output file
     },
     module: {
         rules: [

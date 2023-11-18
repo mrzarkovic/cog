@@ -1,18 +1,29 @@
 type Cog = {
-    spin: (fn?: () => void) => void;
-};
-type CogWindow = typeof window & {
-    Cog: Cog;
+    variable: <T>(
+        name: string,
+        value: T
+    ) => {
+        set: (newVal: T) => void;
+        value: T;
+    };
 };
 type ReactiveNode = {
     element: HTMLElement;
     template: string;
 };
 
-(window as CogWindow).Cog = (function () {
+const cog: Cog = (function () {
     const tree: ReactiveNode[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const state: Record<string, any> = {};
+    const appElement = document.getElementById("app");
+
+    if (!appElement) {
+        throw new Error("No app element found!");
+    }
 
     const render = () => {
+        // console.log(state);
         for (const { element, template } of tree) {
             let updatedContent = "";
             let restOfContent = template;
@@ -50,14 +61,23 @@ type ReactiveNode = {
                 const value = htmlToText(htmlValue); // this part strips child html elements
                 // console.log(value);
                 try {
-                    let evaluated = eval(value);
-                    // console.log(evaluated);
+                    let evaluated = Function(`return (state) => {
+                        ${Object.keys(state)
+                            .map((variable) => {
+                                return `const ${variable} = state["${variable}"];`;
+                            })
+                            .join("\n")}
+                        return ${value}
+                    }`)()(state);
+
                     if (Array.isArray(evaluated)) {
                         evaluated = evaluated.join("");
                     }
                     updatedContent += `${before}${evaluated ?? value}`;
-                } catch (e) {
-                    updatedContent += `${before}${value}`;
+                } catch (e: unknown) {
+                    if (e instanceof Error) {
+                        throw new Error(`${e.message} {{${value}}}`);
+                    }
                 }
                 restOfContent = after;
             }
@@ -72,11 +92,6 @@ type ReactiveNode = {
     const loadElements = () => {
         const xpath =
             ".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]";
-        const appElement = document.getElementById("app");
-
-        if (!appElement) {
-            throw new Error("No app element found");
-        }
 
         const result = document.evaluate(
             xpath,
@@ -110,15 +125,57 @@ type ReactiveNode = {
         return tmp.textContent || tmp.innerText || "";
     }
 
-    loadElements();
-    render();
+    function updateState<T>(name: string, value: T) {
+        setTimeout(() => {
+            state[name] = value;
+            render();
+        }, 0);
+    }
+
+    function addEventListeners() {
+        appElement?.querySelectorAll("[data-click]").forEach((element) => {
+            element.addEventListener("click", (e) => {
+                const target = <HTMLElement>e.target;
+                const clickEvent = target.dataset.click;
+
+                if (clickEvent) {
+                    try {
+                        Function(`return (state) => {
+                            ${Object.keys(state)
+                                .map((variable) => {
+                                    return `const ${variable} = state["${variable}"];`;
+                                })
+                                .join("\n")}
+                            ${clickEvent}
+                        }`)()(state);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            });
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadElements();
+        addEventListeners();
+        render();
+    });
 
     return {
-        spin: (fn?: () => void) => {
-            setTimeout(() => {
-                typeof fn === "function" && fn();
-                render();
-            }, 0);
+        variable: <T>(name: string, value: T) => {
+            state[name] = value;
+
+            return {
+                set: (newVal: T) => {
+                    updateState(name, newVal);
+                },
+                get value() {
+                    return state[name];
+                },
+            };
         },
     };
 })();
+
+export const { variable } = cog;

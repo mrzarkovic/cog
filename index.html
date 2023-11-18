@@ -3,24 +3,6 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Cog.js</title>
-        <script>
-            let counter = 0;
-            let products = [];
-
-            function handleClick() {
-                Cog.spin(() => {
-                    counter++;
-                });
-            }
-
-            async function logProducts() {
-                const response = await fetch("https://dummyjson.com/products");
-                const json = await response.json();
-                Cog.spin(() => {
-                    products = json.products;
-                });
-            }
-        </script>
         <link
             href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
             rel="stylesheet"
@@ -30,33 +12,13 @@
     </head>
     <body>
         <div id="app" class="flex justify-center h-full w-full">
-            <div class="max-w-xl grow pt-40">
-                <div>
-                    Counter: {{ counter }}
-                    <button onclick="handleClick()" class="btn">
-                        Increment
-                    </button>
-                </div>
-                <p>Simple expression:</p>
-                <div>3 + 5 = {{ 3 + 5 }}</div>
-                <div class="border border-rose-500 my-6 p-2">
-                    {{
-                    <p class="text-rose-500">// "text"</p>
-                    }}
-                </div>
-                <p>Comment:</p>
-                <code>{{ // 3 + 5 = {{ 3 + 5 }} }}</code>
-                <p>Content from API:</p>
-                <div>
-                    {{ products.map(p => { return `
-                    <span>${p.title}</span>
-                    `; }) }}
-                </div>
-                <button onclick="logProducts()" class="btn">
-                    Load products
+            <div class="max-w-xl grow pt-40 px-10">
+                <div>Counter: {{ counter }}</div>
+                <button data-click="increment()" class="btn btn-primary">
+                    Increment
                 </button>
             </div>
         </div>
-        <script src="/lib/Cog.js"></script>
+        <script src="/lib/cog.js"></script>
     </body>
 </html>
