@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog.js</title>
+        <meta
+            name="description"
+            content="Cog.js is a simple templating engine for JavaScript."
+        />
+        <script>
+            var todoInput = null;
+            document.addEventListener("DOMContentLoaded", () => {
+                todoInput = document.querySelector("[data-input=todo]");
+            });
+
+            const todos = ["make website", "make todo app", "make Cog.js"];
+            let editingId = -1;
+            const isEditing = () => editingId > -1;
+
+            function handleAddTodo() {
+                todoInput.value && todos.push(todoInput.value);
+                clearInput();
+                Cog.spin();
+            }
+
+            function handleEditTodo(todoEl) {
+                const todoId = todoEl.getAttribute("data-id");
+                editingId = todoId;
+                todoInput.value = todos[todoId];
+                Cog.spin();
+            }
+
+            function handleCancel() {
+                clearInput();
+                Cog.spin();
+            }
+
+            function handleUpdateTodo() {
+                todos.splice(editingId, 1, todoInput.value);
+                clearInput();
+                Cog.spin();
+            }
+
+            const clearInput = () => {
+                todoInput.value = "";
+                editingId = -1;
+            };
+        </script>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="flex justify-center h-full w-full">
+            <div class="max-w-xl grow pt-40">
+                <label for="todo" class="label">Todo:</label>
+                <div class="flex items-center">
+                    <input
+                        id="todo"
+                        type="text"
+                        data-input="todo"
+                        class="input input-bordered"
+                    />
+                    <div class="pl-2">
+                        {{ isEditing() ? `<button
+                            class="btn btn-primary"
+                            onclick="handleUpdateTodo()"
+                        >
+                            Save</button
+                        ><button class="btn" onclick="handleCancel()">
+                            Cancel</button
+                        >` :`
+                        <button
+                            class="btn btn-primary"
+                            onclick="handleAddTodo()"
+                        >
+                            Add
+                        </button>
+                        ` }}
+                    </div>
+                </div>
+                <div class="py-4">
+                    {{ todos.map((todo, id) => `
+                    <div class="flex items-center py-2">
+                        <input type="checkbox" class="checkbox" />
+                        <span
+                            class="pl-2"
+                            onclick="handleEditTodo(this)"
+                            data-id="${id}"
+                        >
+                            ${todo}
+                        </span>
+                    </div>
+                    `) }}
+                </div>
+            </div>
+        </div>
+        <script src="/lib/Cog.js"></script>
+    </body>
+</html>
