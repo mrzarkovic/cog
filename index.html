@@ -25,7 +25,10 @@
     <body>
         <div id="app">
             <div>Counter: {{counter}}</div>
-            <div>3 + 5 = {{ 3 + 5 }} <code>{{ // {{ 3 + 5 }} }}</code></div>
+            <div>
+                <code>{{ // {{ 3 + 5 }} }} {{ counter }}</code>3 + 5 = {{ 3 + 5
+                }} {{counter}}
+            </div>
             <button onclick="handleClick()">Click</button>
             <div>{{products.map(p => p.title)}}</div>
             <button onclick="logMovies()">Log Movies</button>

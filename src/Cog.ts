@@ -11,75 +11,59 @@ document.addEventListener("DOMContentLoaded", () => {
         const tree = new Map<HTMLElement, ElementTemplate>();
 
         const render = () => {
-            const regex = /{{|}}/g;
-
             for (const [htmlElement, elementTemplate] of tree) {
-                let match: RegExpExecArray | null;
-                const stack: number[] = [];
-                let newContent = elementTemplate;
+                let hasTemplateExpression = true;
+                let updatedContent = "";
+                let restOfContent = elementTemplate;
 
-                // cleanup all chidren html elements first to avoid checking twice for parent and child
-                // <div>{{ foo }}<span>{{ bar }}</span></div>
-                while ((match = regex.exec(elementTemplate)) !== null) {
-                    if (match[0] === "{{") {
-                        stack.push(match.index);
-                    } else if (match[0] === "}}" && stack.length > 0) {
-                        const start = stack.pop();
-                        const end = match.index;
+                while (hasTemplateExpression) {
+                    const start = restOfContent.indexOf("{{");
+                    const end = restOfContent.indexOf("}}");
 
-                        if (stack.length === 0 && start !== undefined) {
-                            // This is the outermost {{ }}
-                            const htmlValue = elementTemplate.slice(
-                                start + 2,
-                                end
-                            );
-                            const re = new RegExp(
-                                `${escapeRegExp(`{{${htmlValue}}}`)}`,
-                                "g"
-                            );
-                            const value = htmlToText(htmlValue);
-
-                            try {
-                                newContent = newContent.replace(
-                                    re,
-                                    eval(value) ?? value
-                                );
-                            } catch (e: unknown) {
-                                if (e instanceof Error) {
-                                    console.error(
-                                        `Template {{${value}}} error: ${e.message}`
-                                    );
-                                }
-                            }
-                        }
+                    if (start === -1 || end === -1) {
+                        hasTemplateExpression = false;
+                        break;
                     }
+
+                    const htmlValue = restOfContent.slice(start + 2, end);
+                    const before = restOfContent.slice(0, start);
+                    const after = restOfContent.slice(end + 2);
+                    const value = htmlToText(htmlValue);
+
+                    updatedContent += `${before}${eval(value) ?? value}`;
+                    restOfContent = after;
                 }
-                if (newContent !== htmlElement.innerHTML) {
-                    htmlElement.innerHTML = newContent;
+
+                if (updatedContent !== htmlElement.innerHTML) {
+                    htmlElement.innerHTML = updatedContent;
                 }
             }
         };
 
         const loadElements = () => {
-            const xpath =
-                "//*[contains(text(), '{{') and contains(text(), '}}')]";
+            const xpath = ".//*[contains(., '{{') and contains(., '}}')]";
+            // "//*[contains(text(), '{{') and contains(text(), '}}')]";
+            const appElement = document.getElementById("app");
+
+            if (!appElement) {
+                console.error('Element with id "app" not found');
+                return;
+            }
+
             const result = document.evaluate(
                 xpath,
-                document,
+                appElement,
                 null,
                 XPathResult.ORDERED_NODE_ITERATOR_TYPE,
                 null
             );
             let element = <HTMLElement>result.iterateNext();
             while (element) {
+                console.log("found", element);
                 tree.set(element, element.innerHTML);
                 element = <HTMLElement>result.iterateNext();
             }
         };
-
-        function escapeRegExp(string: string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        }
 
         function htmlToText(html: string) {
             const tmp = document.createElement("div");
