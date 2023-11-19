@@ -1,4 +1,4 @@
-type Cog = {
+interface Cog {
     variable: <T>(
         name: string,
         value: T
@@ -6,23 +6,28 @@ type Cog = {
         set: (newVal: T) => void;
         value: T;
     };
-};
+}
+
+type HTMLString = string;
+
 type ReactiveNode = {
     element: HTMLElement;
-    template: string;
+    template: HTMLString;
 };
 
 type ChangedElement = {
     element: HTMLElement;
-    content: string | null;
+    content: HTMLString | null;
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type State = Record<string, any>;
 
 type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
 
-const cog: Cog = (function () {
+const Cog: Cog = (function () {
     const tree: ReactiveNode[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const state: Record<string, any> = {};
+    const state: State = {};
     let appElement: HTMLElement | null = null;
 
     const evaluate = (value: string) =>
@@ -32,6 +37,50 @@ const cog: Cog = (function () {
                 .join("\n")}; return ${value}}`
         )();
 
+    function evaluateExpression(value: string, state: State): string {
+        try {
+            let evaluated = evaluate(value)(state);
+
+            if (Array.isArray(evaluated)) {
+                evaluated = evaluated.join("");
+            }
+
+            return evaluated ?? value;
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                throw new Error(
+                    `Failed to create function from expression "${value}": ${e.message}`
+                );
+            }
+
+            return value;
+        }
+    }
+
+    function findNextTemplateExpression(htmlText: string): {
+        start: number;
+        end: number;
+    } {
+        const start = htmlText.indexOf("{{");
+        let stack = 0;
+
+        for (let i = start; i < htmlText.length; i++) {
+            if (htmlText.slice(i, i + 2) === "{{") {
+                stack++;
+                i++;
+            } else if (htmlText.slice(i, i + 2) === "}}") {
+                stack--;
+                i++;
+            }
+
+            if (stack === 0) {
+                return { start, end: i };
+            }
+        }
+
+        return { start, end: -1 };
+    }
+
     const render = () => {
         tree.map(({ element, template }) => {
             let updatedContent = "";
@@ -39,24 +88,8 @@ const cog: Cog = (function () {
             let hasTemplateExpression = true;
 
             while (hasTemplateExpression) {
-                const start = restOfContent.indexOf("{{");
-                let end = -1;
-                let stack = 0;
-
-                for (let i = start; i < restOfContent.length; i++) {
-                    if (restOfContent.slice(i, i + 2) === "{{") {
-                        stack++;
-                        i++;
-                    } else if (restOfContent.slice(i, i + 2) === "}}") {
-                        stack--;
-                        i++;
-                    }
-
-                    if (stack === 0) {
-                        end = i;
-                        break;
-                    }
-                }
+                const { start, end } =
+                    findNextTemplateExpression(restOfContent);
 
                 if (start === -1 || end === -1 || start >= end) {
                     hasTemplateExpression = false;
@@ -69,18 +102,9 @@ const cog: Cog = (function () {
                 const after = restOfContent.slice(end + 1);
                 const value = htmlToText(htmlValue);
 
-                try {
-                    let evaluated = evaluate(value)(state);
+                const evaluated = evaluateExpression(value, state);
+                updatedContent += `${before}${evaluated}`;
 
-                    if (Array.isArray(evaluated)) {
-                        evaluated = evaluated.join("");
-                    }
-                    updatedContent += `${before}${evaluated ?? value}`;
-                } catch (e: unknown) {
-                    if (e instanceof Error) {
-                        throw new Error(`${e.message} {{${value}}}`);
-                    }
-                }
                 restOfContent = after;
             }
             updatedContent += restOfContent;
@@ -112,51 +136,41 @@ const cog: Cog = (function () {
                 oldNode.nodeType === Node.ELEMENT_NODE &&
                 newNode.nodeType === Node.ELEMENT_NODE
             ) {
-                const oldTextNodes = Array.from(oldNode.childNodes).filter(
-                    (node) => node.nodeType === Node.TEXT_NODE
-                );
-                const newTextNodes = Array.from(newNode.childNodes).filter(
-                    (node) => node.nodeType === Node.TEXT_NODE
-                );
-
-                const textContentChanged = oldTextNodes.some(
-                    (oldTextNode, index) => {
-                        const newTextNode = newTextNodes[index];
-                        return (
-                            newTextNode &&
-                            oldTextNode.textContent !== newTextNode.textContent
-                        );
+                let textContentChanged = false;
+                for (let i = 0; i < oldNode.childNodes.length; i++) {
+                    const oldChild = oldNode.childNodes[i];
+                    const newChild = newNode.childNodes[i];
+                    if (
+                        oldChild.nodeType === Node.TEXT_NODE &&
+                        newChild &&
+                        newChild.nodeType === Node.TEXT_NODE
+                    ) {
+                        if (oldChild.textContent !== newChild.textContent) {
+                            textContentChanged = true;
+                            break;
+                        }
                     }
-                );
+                }
 
                 if (textContentChanged) {
                     return [{ element: oldNode, content: newNode.innerHTML }];
                 }
 
-                const oldAttributes = Array.from(oldNode.attributes);
-                const newAttributes = Array.from(newNode.attributes);
-
                 const attributesChanged =
-                    oldAttributes.length !== newAttributes.length ||
-                    oldAttributes.some((attr, index) => {
-                        const newAttr = newAttributes[index];
-                        return (
-                            attr.name !== newAttr.name ||
-                            attr.value !== newAttr.value
-                        );
-                    });
+                    oldNode.attributes.toString() !==
+                    newNode.attributes.toString();
 
                 if (attributesChanged) {
                     return [{ element: oldNode, content: newNode.innerHTML }];
                 } else {
-                    const changedChildren = Array.from(oldNode.childNodes)
-                        .map((oldChild, index) =>
-                            compareNodes(
-                                oldChild as HTMLElement,
-                                newNode.childNodes[index] as HTMLElement
-                            )
-                        )
-                        .flat();
+                    let changedChildren: ChangedElement[] = [];
+                    for (let i = 0; i < oldNode.childNodes.length; i++) {
+                        const changes = compareNodes(
+                            oldNode.childNodes[i] as HTMLElement,
+                            newNode.childNodes[i] as HTMLElement
+                        );
+                        changedChildren = changedChildren.concat(changes);
+                    }
                     return changedChildren;
                 }
             }
@@ -165,6 +179,7 @@ const cog: Cog = (function () {
 
         return compareNodes(oldElement, newElement);
     }
+
     const loadElements = () => {
         const xpath =
             ".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]";
@@ -277,4 +292,4 @@ const cog: Cog = (function () {
     };
 })();
 
-export const { variable } = cog;
+export const { variable } = Cog;
