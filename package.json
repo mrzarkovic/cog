@@ -1,6 +1,6 @@
 {
     "name": "@mzrk/cog",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "A lightweight, powerful reactive UI library with zero dependencies.",
     "main": "index.js",
     "scripts": {
