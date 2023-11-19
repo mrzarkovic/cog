@@ -24,8 +24,9 @@ type ChangedElement = {
 type State = Record<string, any>;
 
 type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
+type DocumentWithHandler = Document & { onLoadHandler: () => void };
 
-const Cog: Cog = (function () {
+export const Cog = function (): Cog {
     const tree: ReactiveNode[] = [];
     const state: State = {};
     let appElement: HTMLElement | null = null;
@@ -49,7 +50,7 @@ const Cog: Cog = (function () {
         } catch (e: unknown) {
             if (e instanceof Error) {
                 throw new Error(
-                    `Failed to create function from expression "${value}": ${e.message}`
+                    `Failed to create function from expression {{${value}}}: ${e.message}`
                 );
             }
 
@@ -271,7 +272,7 @@ const Cog: Cog = (function () {
             e.preventDefault();
         };
 
-    document.addEventListener("DOMContentLoaded", () => {
+    const onLoad = () => {
         appElement = document.querySelector("#app");
         if (!appElement) {
             throw new Error("No app element found!");
@@ -279,7 +280,14 @@ const Cog: Cog = (function () {
         loadElements();
         addAllEventListeners(appElement);
         render();
-    });
+    };
+
+    const onLoadHandler = (document as DocumentWithHandler)["onLoadHandler"];
+    if (onLoadHandler) {
+        document.removeEventListener("DOMContentLoaded", onLoadHandler);
+    }
+    document.addEventListener("DOMContentLoaded", onLoad);
+    (document as DocumentWithHandler)["onLoadHandler"] = onLoad;
 
     return {
         variable: <T>(name: string, value: T) => {
@@ -295,6 +303,6 @@ const Cog: Cog = (function () {
             };
         },
     };
-})();
+};
 
-export const { variable } = Cog;
+export const { variable } = Cog();
