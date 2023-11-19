@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  '@mzrk/cog':
-    specifier: 0.0.1
-    version: 0.0.1
-
 devDependencies:
   '@babel/core':
     specifier: ^7.23.3
@@ -1369,10 +1364,6 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
-
-  /@mzrk/cog@0.0.1:
-    resolution: {integrity: sha512-t5fnzylvIlITR617PoRfOAjeo5Cyf2BGkmUQqfm40R7q8UoDCfGCbQ6KnM9krRFZDscpmpakZKlu9ydflKybVQ==}
-    dev: false
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
