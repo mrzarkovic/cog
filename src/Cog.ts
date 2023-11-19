@@ -12,6 +12,11 @@ type ReactiveNode = {
     template: string;
 };
 
+type ChangedElement = {
+    element: HTMLElement;
+    content: string | null;
+};
+
 type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
 
 const cog: Cog = (function () {
@@ -20,9 +25,15 @@ const cog: Cog = (function () {
     const state: Record<string, any> = {};
     let appElement: HTMLElement | null = null;
 
+    const evaluate = (value: string) =>
+        Function(
+            `return (state, value) => {${Object.keys(state)
+                .map((variable) => `const ${variable} = state["${variable}"];`)
+                .join("\n")}; return ${value}}`
+        )();
+
     const render = () => {
-        // console.log(state);
-        for (const { element, template } of tree) {
+        tree.map(({ element, template }) => {
             let updatedContent = "";
             let restOfContent = template;
             let hasTemplateExpression = true;
@@ -53,20 +64,13 @@ const cog: Cog = (function () {
                 }
 
                 const htmlValue = restOfContent.slice(start + 2, end - 1);
-                // console.log(htmlValue);
+
                 const before = restOfContent.slice(0, start);
                 const after = restOfContent.slice(end + 1);
-                const value = htmlToText(htmlValue); // this part strips child html elements
-                // console.log(value);
+                const value = htmlToText(htmlValue);
+
                 try {
-                    let evaluated = Function(`return (state) => {
-                        ${Object.keys(state)
-                            .map((variable) => {
-                                return `const ${variable} = state["${variable}"];`;
-                            })
-                            .join("\n")}
-                            return ${value}
-                        }`)()(state);
+                    let evaluated = evaluate(value)(state);
 
                     if (Array.isArray(evaluated)) {
                         evaluated = evaluated.join("");
@@ -81,14 +85,86 @@ const cog: Cog = (function () {
             }
             updatedContent += restOfContent;
 
-            if (updatedContent !== element.innerHTML) {
-                removeAllEventListeners(element);
-                element.innerHTML = updatedContent;
-                addAllEventListeners(element);
+            const changedElements = findChangedElements(
+                element,
+                updatedContent
+            );
+
+            if (changedElements.length > 0) {
+                changedElements.map(({ element, content }) => {
+                    removeAllEventListeners(element);
+                    element.innerHTML = content ?? "";
+                    addAllEventListeners(element);
+                });
             }
-        }
+        });
     };
 
+    function findChangedElements(oldElement: HTMLElement, newHtml: string) {
+        const newElement = oldElement.cloneNode() as HTMLElement;
+        newElement.innerHTML = newHtml;
+
+        function compareNodes(
+            oldNode: HTMLElement,
+            newNode: HTMLElement
+        ): ChangedElement[] {
+            if (
+                oldNode.nodeType === Node.ELEMENT_NODE &&
+                newNode.nodeType === Node.ELEMENT_NODE
+            ) {
+                const oldTextNodes = Array.from(oldNode.childNodes).filter(
+                    (node) => node.nodeType === Node.TEXT_NODE
+                );
+                const newTextNodes = Array.from(newNode.childNodes).filter(
+                    (node) => node.nodeType === Node.TEXT_NODE
+                );
+
+                const textContentChanged = oldTextNodes.some(
+                    (oldTextNode, index) => {
+                        const newTextNode = newTextNodes[index];
+                        return (
+                            newTextNode &&
+                            oldTextNode.textContent !== newTextNode.textContent
+                        );
+                    }
+                );
+
+                if (textContentChanged) {
+                    return [{ element: oldNode, content: newNode.innerHTML }];
+                }
+
+                const oldAttributes = Array.from(oldNode.attributes);
+                const newAttributes = Array.from(newNode.attributes);
+
+                const attributesChanged =
+                    oldAttributes.length !== newAttributes.length ||
+                    oldAttributes.some((attr, index) => {
+                        const newAttr = newAttributes[index];
+                        return (
+                            attr.name !== newAttr.name ||
+                            attr.value !== newAttr.value
+                        );
+                    });
+
+                if (attributesChanged) {
+                    return [{ element: oldNode, content: newNode.innerHTML }];
+                } else {
+                    const changedChildren = Array.from(oldNode.childNodes)
+                        .map((oldChild, index) =>
+                            compareNodes(
+                                oldChild as HTMLElement,
+                                newNode.childNodes[index] as HTMLElement
+                            )
+                        )
+                        .flat();
+                    return changedChildren;
+                }
+            }
+            return [];
+        }
+
+        return compareNodes(oldElement, newElement);
+    }
     const loadElements = () => {
         const xpath =
             ".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]";
@@ -101,21 +177,17 @@ const cog: Cog = (function () {
             null
         );
         let element = <HTMLElement>result.iterateNext();
+
         while (element) {
-            // console.log("Found", element.innerHTML);
             tree.push({ element, template: element.innerHTML });
             element = <HTMLElement>result.iterateNext();
         }
     };
 
     function escapeHtml(html: string) {
-        return (
-            html
-                // .replace(/"(?=[^<>]*>)/g, "&quot;")
-                // .replace(/'(?!<[^<>]*>)/g, "&#039;")
-                .replace(/<(?=[^<>]*>)/g, "&lt;")
-                .replace(/(?<=[^<>]*)>/g, "&gt;")
-        );
+        return html
+            .replace(/<(?=[^<>]*>)/g, "&lt;")
+            .replace(/(?<=[^<>]*)>/g, "&gt;");
     }
 
     function htmlToText(html: string) {
@@ -164,16 +236,10 @@ const cog: Cog = (function () {
     const eventHandler = (eventName = "click", element: Element) =>
         function (e: Event) {
             const handler = element.getAttribute(`data-${eventName}`);
+
             if (handler) {
                 try {
-                    Function(`return (state) => {
-                        ${Object.keys(state)
-                            .map((variable) => {
-                                return `const ${variable} = state["${variable}"];`;
-                            })
-                            .join("\n")}
-                            ${handler}
-                        }`)()(state);
+                    evaluate(handler)(state);
                 } catch (e: unknown) {
                     if (e instanceof Error) {
                         throw new Error(

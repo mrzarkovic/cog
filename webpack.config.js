@@ -36,7 +36,6 @@ module.exports = {
                 test: /\.js(\?.*)?$/i,
                 terserOptions: {
                     mangle: {
-                        reserved: ["Cog"],
                         toplevel: true,
                         eval: true,
                         keep_fnames: false,
