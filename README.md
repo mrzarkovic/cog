@@ -98,7 +98,7 @@ In the HTML, you can use `{{ variableName }}` to bind a variable to the text c
 
 The `data-click` attribute binds the `incrementCount` function to the click event of the button. When the button is clicked, the `incrementCount` function in the state is called, which updates the `count` variable and triggers a re-render of the UI.
 
-# Contributions
+## Contributions
 
 Hey there! If you're interested in the Cog project, I'd love to have you on board. Here's how you can help out:
 
@@ -112,8 +112,8 @@ Hey there! If you're interested in the Cog project, I'd love to have you on boar
 
 Thanks for considering contributing to Cog!
 
-# License
+## License
 
 [MIT](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2023-present, Milos Zarkovic## Setup
+Copyright (c) 2023-present, Milos Zarkovic

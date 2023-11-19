@@ -230,27 +230,32 @@ const Cog: Cog = (function () {
     }
 
     function addEventListeners(parent?: HTMLElement, eventName = "click") {
-        parent?.querySelectorAll(`[data-${eventName}]`).forEach((element) => {
-            const handler = eventHandler(eventName, element);
-            element.addEventListener(eventName, handler);
-            (element as ElementWithHandler)[`${eventName}Handler`] = handler;
-        });
+        parent
+            ?.querySelectorAll(`[data-on:${eventName}]`)
+            .forEach((element) => {
+                const handler = eventHandler(eventName, element);
+                element.addEventListener(eventName, handler);
+                (element as ElementWithHandler)[`${eventName}Handler`] =
+                    handler;
+            });
     }
 
     function removeEventListeners(parent?: HTMLElement, eventName = "click") {
-        parent?.querySelectorAll(`[data-${eventName}]`).forEach((element) => {
-            const handler = (element as ElementWithHandler)[
-                `${eventName}Handler`
-            ];
-            if (handler) {
-                element.removeEventListener(eventName, handler);
-            }
-        });
+        parent
+            ?.querySelectorAll(`[data-on:${eventName}]`)
+            .forEach((element) => {
+                const handler = (element as ElementWithHandler)[
+                    `${eventName}Handler`
+                ];
+                if (handler) {
+                    element.removeEventListener(eventName, handler);
+                }
+            });
     }
 
     const eventHandler = (eventName = "click", element: Element) =>
         function (e: Event) {
-            const handler = element.getAttribute(`data-${eventName}`);
+            const handler = element.getAttribute(`data-on:${eventName}`);
 
             if (handler) {
                 try {
@@ -258,7 +263,7 @@ const Cog: Cog = (function () {
                 } catch (e: unknown) {
                     if (e instanceof Error) {
                         throw new Error(
-                            `${e.message}: data-${eventName}=${handler}`
+                            `${e.message}: data-on:${eventName}=${handler}`
                         );
                     }
                 }
