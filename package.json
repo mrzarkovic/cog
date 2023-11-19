@@ -1,6 +1,6 @@
 {
     "name": "@mzrk/cog",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "A lightweight, powerful reactive UI library with zero dependencies.",
     "main": "index.js",
     "scripts": {
@@ -16,6 +16,10 @@
     ],
     "author": "Milos Zarkovic <mzarkovicm@gmail.com>",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mrzarkovic/Cog"
+    },
     "devDependencies": {
         "@babel/core": "^7.23.3",
         "@babel/preset-env": "^7.23.3",
@@ -28,5 +32,8 @@
         "typescript": "^5.2.2",
         "webpack": "^5.89.0",
         "webpack-cli": "^5.1.4"
+    },
+    "dependencies": {
+        "@mzrk/cog": "0.0.1"
     }
 }

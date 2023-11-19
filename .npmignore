@@ -1,0 +1,11 @@
+src/
+node_modules/
+.babelrc
+.eslintrc.js
+.eslintignore
+.gitignore
+.npmrc
+.nvmrc
+*.html
+webpack.config.js
+tsconfig.json

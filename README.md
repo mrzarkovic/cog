@@ -22,7 +22,11 @@ HTML - but with the added power of reactive expressions. This makes it easy to u
 
 ## Installation
 
-To install the library, you can download the `cog.ts` file and include it in your project.
+You can install Cog via npm:
+
+```bash
+npm install @mzrk/cog
+```
 
 ## Basic concepts
 
@@ -34,7 +38,7 @@ The function returns an object with a `set` method and a `value` getter. The
 
 ```js
 // index.js
-import { variable } from "Cog";
+import { variable } from "@mzrk/cog";
 
 const { set, value } = variable("meaningOfLife", 41);
 ```
@@ -77,7 +81,7 @@ In this example, `countVariable` and `incrementCountVariable` are reactive v
 
 ```js
 // index.js
-import { variable } from 'Cog';
+import { variable } from '@mzrk/cog';
 
 const countVariable = variable('count', 0);
 const incrementCountVariable = variable('incrementCount', () => {
