@@ -91,7 +91,7 @@ In the HTML, you can use `{{ variableName }}` to bind a variable to the text c
 <!-- index.html -->
 <div>
     <div>{{ count }}</div>
-    <button data-click="incrementCount()">Increment</button>
+    <button data-on:click="incrementCount()">Increment</button>
 </div>
 <script src="index.js"></script>
 ```
