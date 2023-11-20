@@ -9,7 +9,7 @@ function getExampleDOM() {
     <div id="app">
     <div>My App</div>
     <div>Counter: {{ counter }}</div>
-    <button data-on:click="increment()">Increment</button>
+    <button data-on="click" data-handler="increment()">Increment</button>
     </div>`;
     const button = div.querySelector("button");
 
@@ -23,7 +23,7 @@ describe("variable", () => {
     beforeEach(() => {
         container = getExampleDOM();
         document.body.appendChild(container);
-        variable = Cog().variable;
+        variable = Cog(document).variable;
     });
 
     afterEach(() => {
@@ -49,8 +49,14 @@ describe("variable", () => {
     });
 
     test("Variable update", async () => {
-        variable("counter", 1);
+        const counter = variable("counter", 0);
+        variable("increment", () => {
+            counter.set(counter.value + 1);
+        });
         dispatchDOMContentLoaded();
+
+        const button = getByText(container, /Increment/);
+        button.click();
 
         await waitFor(() => {
             expect(getByText(container, /Counter: 1/)).toBeInTheDocument();
