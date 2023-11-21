@@ -1,5 +1,6 @@
 lib
 node_modules
 .eslintrc.js
-webpack.config.js
+*.config.js
 *.html
+__tests__

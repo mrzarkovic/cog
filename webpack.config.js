@@ -42,7 +42,7 @@ module.exports = {
                     },
                     keep_fnames: false,
                     compress: {
-                        drop_console: true,
+                        drop_console: false,
                     },
                     output: {
                         comments: false,

@@ -1,4 +1,4 @@
-import { variable } from "cog";
+import { variable } from "./src/cog";
 
 const todos = variable("todos", [{ text: "hello", done: false }]);
 variable("test", "hello world");
@@ -13,6 +13,11 @@ variable("save", () => {
     }
 });
 
+const counter = variable("counter", 0);
+variable("increment", () => {
+    counter.set(counter.value + 1);
+});
+
 variable("toggleTodo", (index: number) => {
     const newTodos = [...todos.value];
     newTodos[index].done = !newTodos[index].done;
@@ -20,7 +25,7 @@ variable("toggleTodo", (index: number) => {
 });
 
 variable("Checkbox", ({ index = -1, checked = false }) => {
-    return `<input type="checkbox" id="todo${index}" data-change="toggleTodo(${index})" ${
+    return `<input type="checkbox" id="todo${index}" data-on="change" data-handler="toggleTodo(${index})" ${
         checked ? "checked" : ""
     } />`;
 });

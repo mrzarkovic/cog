@@ -13,8 +13,12 @@
     <body>
         <div id="app" class="flex justify-center h-full w-full">
             <div class="max-w-xl grow pt-40 px-10">
+                <div>Counter: {{ counter }}</div>
+                <button class="btn" data-on="click" data-handler="increment()">
+                    Increment
+                </button>
                 <input type="text" id="input" data-input="todo" />
-                <button data-click="save()">Save</button>
+                <button data-on="click" data-handler="save()">Save</button>
                 <div class="p-4">
                     {{ todos.map((todo, i) => `
                     <div class="p-2">
