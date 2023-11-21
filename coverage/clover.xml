@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1700591273781" clover="3.2.0">
-  <project timestamp="1700591273781" name="All files">
-    <metrics statements="130" coveredstatements="130" conditionals="37" coveredconditionals="29" methods="27" coveredmethods="27" elements="194" coveredelements="186" complexity="0" loc="130" ncloc="130" packages="1" files="1" classes="1"/>
+<coverage generated="1700608036624" clover="3.2.0">
+  <project timestamp="1700608036624" name="All files">
+    <metrics statements="129" coveredstatements="129" conditionals="37" coveredconditionals="29" methods="27" coveredmethods="27" elements="193" coveredelements="185" complexity="0" loc="129" ncloc="129" packages="1" files="1" classes="1"/>
     <file name="cog.ts" path="C:\Users\mzark\code\cog\src\cog.ts">
-      <metrics statements="130" coveredstatements="130" conditionals="37" coveredconditionals="29" methods="27" coveredmethods="27"/>
+      <metrics statements="129" coveredstatements="129" conditionals="37" coveredconditionals="29" methods="27" coveredmethods="27"/>
       <line num="31" count="1" type="stmt"/>
       <line num="32" count="9" type="stmt"/>
       <line num="33" count="9" type="stmt"/>
@@ -106,34 +106,33 @@
       <line num="276" count="2" type="stmt"/>
       <line num="277" count="1" type="stmt"/>
       <line num="279" count="1" type="stmt"/>
-      <line num="288" count="1" type="stmt"/>
-      <line num="289" count="6" type="stmt"/>
+      <line num="286" count="1" type="stmt"/>
+      <line num="287" count="6" type="stmt"/>
+      <line num="288" count="6" type="stmt"/>
       <line num="290" count="6" type="stmt"/>
-      <line num="292" count="6" type="stmt"/>
-      <line num="295" count="7" type="cond" truecount="2" falsecount="0"/>
-      <line num="296" count="4" type="stmt"/>
-      <line num="298" count="7" type="cond" truecount="2" falsecount="0"/>
-      <line num="299" count="1" type="stmt"/>
-      <line num="301" count="6" type="stmt"/>
+      <line num="293" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="294" count="4" type="stmt"/>
+      <line num="296" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="297" count="1" type="stmt"/>
+      <line num="299" count="6" type="stmt"/>
+      <line num="304" count="1" type="stmt"/>
+      <line num="305" count="1" type="stmt"/>
       <line num="306" count="1" type="stmt"/>
-      <line num="307" count="1" type="stmt"/>
-      <line num="308" count="1" type="stmt"/>
-      <line num="312" count="6" type="stmt"/>
-      <line num="313" count="4" type="stmt"/>
-      <line num="314" count="3" type="stmt"/>
-      <line num="315" count="3" type="stmt"/>
-      <line num="318" count="6" type="stmt"/>
-      <line num="319" count="6" type="cond" truecount="2" falsecount="0"/>
-      <line num="320" count="5" type="stmt"/>
-      <line num="322" count="6" type="stmt"/>
+      <line num="310" count="6" type="stmt"/>
+      <line num="311" count="4" type="stmt"/>
+      <line num="312" count="3" type="stmt"/>
+      <line num="313" count="3" type="stmt"/>
+      <line num="316" count="6" type="stmt"/>
+      <line num="317" count="6" type="cond" truecount="2" falsecount="0"/>
+      <line num="318" count="5" type="stmt"/>
+      <line num="320" count="6" type="stmt"/>
+      <line num="321" count="6" type="stmt"/>
       <line num="323" count="6" type="stmt"/>
-      <line num="325" count="6" type="stmt"/>
+      <line num="325" count="3" type="stmt"/>
       <line num="327" count="3" type="stmt"/>
-      <line num="329" count="3" type="stmt"/>
-      <line num="331" count="1" type="stmt"/>
-      <line num="334" count="1" type="stmt"/>
-      <line num="341" count="1" type="stmt"/>
-      <line num="343" count="1" type="stmt"/>
+      <line num="329" count="1" type="stmt"/>
+      <line num="332" count="1" type="stmt"/>
+      <line num="339" count="1" type="stmt"/>
     </file>
   </project>
 </coverage>

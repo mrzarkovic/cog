@@ -240,7 +240,7 @@ export function addEventListeners(
     eventName = "click",
     state: State
 ) {
-    parent.querySelectorAll(`[data-on=${eventName}]`).forEach((element) => {
+    parent.querySelectorAll(`[data-on-${eventName}]`).forEach((element) => {
         const handler = makeEventHandler(eventName, element, state);
         element.addEventListener(eventName, handler);
         (element as ElementWithHandler)[`${eventName}Handler`] = handler;
@@ -251,7 +251,7 @@ export function removeEventListeners(
     parent?: HTMLElement,
     eventName = "click"
 ) {
-    parent?.querySelectorAll(`[data-on=${eventName}]`).forEach((element) => {
+    parent?.querySelectorAll(`[data-on-${eventName}]`).forEach((element) => {
         const handler = (element as ElementWithHandler)[`${eventName}Handler`];
         if (handler) {
             element.removeEventListener(eventName, handler);
@@ -264,7 +264,7 @@ const makeEventHandler = (
     element: Element,
     state: State
 ) => {
-    const handler = element.getAttribute(`data-handler`);
+    const handler = element.getAttribute(`data-on-${eventName}`);
     if (!handler) {
         throw new Error("Missing data-handler attribute");
     }
@@ -277,9 +277,7 @@ const makeEventHandler = (
             e.preventDefault();
         } catch (e: unknown) {
             throw new Error(
-                `${
-                    (e as Error).message
-                }: data-on=${eventName} data-handler=${handler}`
+                `${(e as Error).message}: data-on-${eventName}=${handler}`
             );
         }
     };
