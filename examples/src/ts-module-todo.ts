@@ -1,7 +1,6 @@
-import { variable } from "../lib/cog";
+import { variable } from "../../lib/cog";
 
 const todos = variable("todos", [{ text: "hello", done: false }]);
-variable("test", "hello world");
 
 variable("save", () => {
     const todo: HTMLInputElement | null =
@@ -11,11 +10,6 @@ variable("save", () => {
         todos.set([...todos.value, { text: todo.value, done: false }]);
         todo.value = "";
     }
-});
-
-const counter = variable("counter", 0);
-variable("increment", () => {
-    counter.set(counter.value + 1);
 });
 
 variable("toggleTodo", (index: number) => {
@@ -28,4 +22,9 @@ variable("Checkbox", ({ index = -1, checked = false }) => {
     return `<input type="checkbox" id="todo${index}" data-on="change" data-handler="toggleTodo(${index})" ${
         checked ? "checked" : ""
     } />`;
+});
+
+const counter = variable("counter", 0);
+variable("increment", () => {
+    counter.set(counter.value + 1);
 });

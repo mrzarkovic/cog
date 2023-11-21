@@ -1,12 +1,8 @@
 const path = require("path");
+const fs = require("fs");
 const TerserPlugin = require("terser-webpack-plugin");
 
-module.exports = {
-    entry: "./src/index.ts", // The entry point of your library
-    output: {
-        path: path.resolve(__dirname, "lib"), // The output directory
-        filename: "cog.js", // The name of the output file
-    },
+const common = {
     module: {
         rules: [
             {
@@ -53,3 +49,37 @@ module.exports = {
         ],
     },
 };
+
+// Get a list of all files in the examples directory
+const exampleFiles = fs.readdirSync(path.resolve(__dirname, "examples", "src"));
+
+// Create an entry object where the keys are the file names without the extension
+// and the values are the paths to the files
+const exampleEntries = exampleFiles.reduce((entries, file) => {
+    const fileNameWithoutExt = path.basename(file, path.extname(file));
+    entries[fileNameWithoutExt] = `./examples/src/${file}`;
+    return entries;
+}, {});
+
+module.exports = [
+    Object.assign({}, common, {
+        entry: {
+            cog: "./src/cog.ts",
+        },
+        output: {
+            path: path.resolve(__dirname, "lib"),
+            filename: "[name].js",
+            library: "Cog",
+            libraryTarget: "umd",
+        },
+    }),
+    Object.assign({}, common, {
+        entry: exampleEntries,
+        output: {
+            path: path.resolve(__dirname, "examples", "dist"),
+            filename: "[name].js",
+            library: "[name]",
+            libraryTarget: "umd",
+        },
+    }),
+];
