@@ -115,8 +115,7 @@ describe("loadTree", () => {
 describe("eventListeners", () => {
     test("add/remove event listeners from elements", () => {
         const parent = document.createElement("div");
-        parent.innerHTML =
-            "<button data-on='click' data-handler='mock()'>Click</button>";
+        parent.innerHTML = "<button data-on-click='mock()'>Click</button>";
         const button = getByText(parent, "Click");
 
         const mock = jest.fn();
@@ -135,8 +134,7 @@ describe("eventListeners", () => {
 
     test("handle event listeners that reference undefined variables", () => {
         const parent = document.createElement("div");
-        parent.innerHTML =
-            "<button data-on='click' data-handler='mock()'>Click</button>";
+        parent.innerHTML = "<button data-on-click='mock()'>Click</button>";
         const button = getByText(parent, "Click");
         const state = {};
         addEventListeners(parent, "click", state);
@@ -149,7 +147,7 @@ describe("eventListeners", () => {
 
     test("handle no handler attribute", () => {
         const parent = document.createElement("div");
-        parent.innerHTML = "<button data-on='click'>Click</button>";
+        parent.innerHTML = "<button data-on-click>Click</button>";
         const state = {};
         expect(() => addEventListeners(parent, "click", state)).toThrow();
     });
@@ -169,7 +167,7 @@ describe("api", () => {
     });
 
     test("fail if no #app element", () => {
-        Cog(document);
+        init(document);
         dispatchDOMContentLoaded();
         const errorPromise = getWindowErrorPromise();
 
@@ -221,7 +219,7 @@ describe("api", () => {
     });
 
     test("read variable", () => {
-        const variable = Cog(document).variable;
+        const variable = init(document).variable;
         const name = variable("name", "John");
 
         expect(name.value).toEqual("John");

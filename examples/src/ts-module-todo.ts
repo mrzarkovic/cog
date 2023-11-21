@@ -19,7 +19,7 @@ variable("toggleTodo", (index: number) => {
 });
 
 variable("Checkbox", ({ index = -1, checked = false }) => {
-    return `<input type="checkbox" id="todo${index}" data-on="change" data-handler="toggleTodo(${index})" ${
+    return `<input type="checkbox" id="todo${index}" data-on-change="toggleTodo(${index})" ${
         checked ? "checked" : ""
     } />`;
 });

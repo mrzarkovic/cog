@@ -1,28 +1,34 @@
-# Cog - Reactive UI Library
+# Cog - Reactive Expression Library
 
-Cog is a simple reactive UI library for building web applications. It allows you to create reactive variables and bind them to HTML templates. It's designed to provide a reactive programming experience without the need for complex syntax or extensive libraries.
+**Cog** is a simple reactive expression library for building web applications. It's a UI library that allows you to create reactive variables and bind them to HTML templates. It's designed to provide a reactive programming experience without the need for complex syntax or extensive libraries.
 
 ```html
+<!-- index.html -->
+
 <div>Counter: {{ counter }}</div>
-<button data-on:click="increment()">Increment</button>
+<button onclick="increment()">Increment</button>
 ```
 
 ```js
+// index.js
+
 const counter = variable("counter", 0);
-varaible("increment", () => counter.set(counter.value + 1));
+function increment() {
+    counter.set(counter.value + 1);
+}
 ```
 
 ### Beginner-friendly
 
-With zero dependencies (~5kb), Cog is a beginner-friendly solution that keeps things simple. It uses plain HTML for templates, making it intuitive for those who are new to JavaScript or coming from a background of HTML and CSS.
+With zero dependencies and no extra tooling needed, **Cog** is a beginner-friendly library that keeps things simple. It uses plain HTML for templates, making it intuitive for those who are new to JavaScript or coming from a background of HTML and CSS.
 
-> When you see HTML in a Cog application, it really is just HTML! 🤯
+> When you see HTML in a **Cog** application, it really is just HTML! 🤯
 
 HTML - but with the added power of reactive expressions. This makes it easy to understand and learn, while still providing the reactivity that makes modern web apps feel smooth and responsive.
 
 ## Installation
 
-You can install Cog via npm:
+You can install **Cog** via npm:
 
 ```bash
 npm install @mzrk/cog
@@ -32,12 +38,13 @@ npm install @mzrk/cog
 
 ### `variable`
 
-`variable` is a function that creates a new reactive variable. It is used to create a state variable within the `state` object of the `Cog` library. It takes a name and an initial value as arguments, and adds an entry to the `state` object with the given name and value.
+`variable` is a function that creates a new reactive variable. It is used to create a state variable within the `state` object of the **Cog** library. It takes a name and an initial value as arguments, and adds an entry to the `state` object with the given name and value.
 
 The function returns an object with a `set` method and a `value` getter. The `set` method allows you to update the value of the state variable from your JavaScript code. It takes a new value as an argument, and updates the state variable with this new value. The `value` getter allows you to retrieve the current value of the state variable from your JavaScript code.
 
 ```js
 // index.js
+
 import { variable } from "@mzrk/cog";
 
 const { set, value } = variable("meaningOfLife", 41);
@@ -51,56 +58,65 @@ The `state` object is a key-value store that holds the current state of all re
 
 ```html
 <!-- index.html -->
+
 <div>{{ meaningOfLife + 1 }}</div>
-<!-- <div>42</div> -->
 ```
 
 When an expression is evaluated, it's done so in the context of the `state` object. This means that any variables referenced in the expression are looked up in the `state` object.
 
 ```js
-// Cog.js
+// Cog.js under the hood
+
 const state = {
     meaningOfLife: 41,
 };
 const expression = "meaningOfLife + 1";
-evaluate(expression, state); // 42
+evaluateExpression(expression, state); // 42
 ```
 
-The `evaluate` function basically defines variables from the state in the scope of execution of the evaluated expression.
+Cog calls the `evaluateExpression` function internally when rendering UI with reactive variables. It creates a new function with values from the state in it's scope and executes the expression.
 
 ```js
-{
+// Example function created by evaluateExpression
+const func = () => {
     const meaningOfLife = 41; // variable form the state
+
     return meaningOfLife + 1; // expression
-}
+}();
 ```
 
 ## Usage
 
-In this example, `countVariable` and `incrementCountVariable` are reactive variables. `count` and `incrementCount` are the names of the state variables used in the HTML template.
+In this example, `countVariable` is a reactive variable. `count` is the name of the state variable used in the HTML template.
 
 ```js
 // index.js
-import { variable } from '@mzrk/cog';
 
-const countVariable = variable('count', 0);
-const incrementCountVariable = variable('incrementCount', () => {
-	countVariable.set(countVariable.value + 1));
+import { variable } from "@mzrk/cog";
+
+// Initialize reactive variable 'count'
+const countVariable = variable("count", 0);
+
+// Your typical callback function, nothing fancy
+function incrementCount(e) {
+    // Get count value and update it using count setter
+    countVariable.set(countVariable.value + 1);
 }
 ```
 
-In the HTML, you can use `{{ variableName }}` to bind a variable to the text content of an element. You can also use `data-eventName="expression"` to bind an event handler to an element. The expression is evaluated in the context of the current state when the event is triggered.
+In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
 
 ```html
 <!-- index.html -->
+
 <div>
     <div>{{ count }}</div>
-    <button data-on:click="incrementCount()">Increment</button>
+    <button onclick="incrementCount()">Increment</button>
 </div>
 <script src="index.js"></script>
 ```
 
-The `data-click` attribute binds the `incrementCount` function to the click event of the button. When the button is clicked, the `incrementCount` function in the state is called, which updates the `count` variable and triggers a re-render of the UI.
+When the button is clicked, the `incrementCount` function is called, which updates the `count` variable and triggers a re-render of the UI.
 
 ## Contributions
 
