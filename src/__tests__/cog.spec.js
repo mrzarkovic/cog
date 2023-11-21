@@ -1,13 +1,12 @@
 import "@testing-library/jest-dom";
 import {
-    Cog,
+    init,
     evaluateExpression,
     findNextTemplateExpression,
     render,
     loadTree,
     addEventListeners,
     removeEventListeners,
-    variable,
 } from "../cog";
 import { getByText, waitFor } from "@testing-library/dom";
 
@@ -182,7 +181,7 @@ describe("api", () => {
         element.innerHTML = "<div id='app'></div>";
         document.body.appendChild(element);
 
-        Cog(document);
+        init(document);
 
         dispatchDOMContentLoaded();
 
@@ -194,7 +193,7 @@ describe("api", () => {
         element.innerHTML = "<div id='app'><div>Hello {{ name }}!</div></div>";
         document.body.appendChild(element);
 
-        const variable = Cog(document).variable;
+        const variable = init(document).variable;
         variable("name", "John");
 
         dispatchDOMContentLoaded();
@@ -209,7 +208,7 @@ describe("api", () => {
         element.innerHTML = "<div id='app'><div>Hello {{ name }}!</div></div>";
         document.body.appendChild(element);
 
-        const variable = Cog(document).variable;
+        const variable = init(document).variable;
         const name = variable("name", "John");
 
         dispatchDOMContentLoaded();

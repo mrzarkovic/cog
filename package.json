@@ -2,10 +2,11 @@
     "name": "@mzrk/cog",
     "version": "0.0.3",
     "description": "A lightweight, powerful reactive UI library with zero dependencies.",
-    "main": "index.js",
+    "main": "lib/cog.js",
+    "types": "lib/cog.d.ts",
     "scripts": {
         "dev": "webpack --watch",
-        "build": "webpack",
+        "build": "webpack && tsc --emitDeclarationOnly",
         "test": "jest"
     },
     "keywords": [

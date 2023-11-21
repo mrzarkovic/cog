@@ -1,18 +1,20 @@
 {
     "compilerOptions": {
-        "target": "ES2017", // Target ES2017 for modern browsers
-        "module": "None", // No module system
-        "declaration": true, // Generate .d.ts files for TypeScript users
-        "outDir": "./lib", // Output directory for compiled JavaScript files
-        "strict": true, // Enable all strict type-checking options
-        "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
-        "lib": ["ES2020", "DOM"], // Include standard library files in the compilation
-        "skipLibCheck": true, // Skip type checking of declaration files
-        "noUnusedLocals": true, // Report errors on unused locals
-        "noUnusedParameters": true, // Report errors on unused parameters
-        "noImplicitReturns": true, // Report error when not all code paths in function return a value
-        "noFallthroughCasesInSwitch": true // Report errors for fallthrough cases in switch statement
+        "target": "ES2017",
+        "module": "None",
+        "declaration": true,
+        "outDir": "./lib",
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["ES2020", "DOM"],
+        "skipLibCheck": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true
     },
-    "include": ["src"], // The files to be included in the compilation
-    "exclude": ["node_modules"] // The files to be excluded from the compilation
+    "include": ["src"],
+    "exclude": ["node_modules"]
 }

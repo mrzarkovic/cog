@@ -285,7 +285,7 @@ const makeEventHandler = (
     };
 };
 
-export const Cog = (document: Document): Cog => {
+export const init = (document: Document): Cog => {
     const state: State = {};
     let tree: DOMTree = [];
 
@@ -338,6 +338,4 @@ export const Cog = (document: Document): Cog => {
     };
 };
 
-const cog = Cog(document);
-
-export const { variable } = cog;
+export const { variable } = init(document);

@@ -8,45 +8,6 @@
             name="description"
             content="Cog.js is a simple templating engine for JavaScript."
         />
-        <script>
-            var todoInput = null;
-            document.addEventListener("DOMContentLoaded", () => {
-                todoInput = document.querySelector("[data-input=todo]");
-            });
-
-            const todos = ["make website", "make todo app", "make Cog.js"];
-            let editingId = -1;
-            const isEditing = () => editingId > -1;
-
-            function handleAddTodo() {
-                todoInput.value && todos.push(todoInput.value);
-                clearInput();
-                Cog.spin();
-            }
-
-            function handleEditTodo(todoEl) {
-                const todoId = todoEl.getAttribute("data-id");
-                editingId = todoId;
-                todoInput.value = todos[todoId];
-                Cog.spin();
-            }
-
-            function handleCancel() {
-                clearInput();
-                Cog.spin();
-            }
-
-            function handleUpdateTodo() {
-                todos.splice(editingId, 1, todoInput.value);
-                clearInput();
-                Cog.spin();
-            }
-
-            const clearInput = () => {
-                todoInput.value = "";
-                editingId = -1;
-            };
-        </script>
         <link
             href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
             rel="stylesheet"
@@ -99,6 +60,52 @@
                 </div>
             </div>
         </div>
-        <script src="/lib/Cog.js"></script>
+        <script src="/lib/cog.js"></script>
+        <script>
+            const { variable } = Cog;
+
+            const todos = variable("todos", [
+                "make website",
+                "make todo app",
+                "make Cog.js",
+            ]);
+            const editingId = variable("editingId", -1);
+
+            variable("isEditing", () => editingId.value > -1);
+
+            function handleAddTodo() {
+                if (todoInput.value) {
+                    todos.set([...todos.value, todoInput.value]);
+                }
+                clearInput();
+            }
+
+            function handleEditTodo(todoEl) {
+                const todoId = todoEl.getAttribute("data-id");
+                editingId.set(todoId);
+                todoInput.value = todos.value[todoId];
+            }
+
+            function handleCancel() {
+                clearInput();
+            }
+
+            function handleUpdateTodo() {
+                const newTodos = [...todos.value];
+                newTodos.splice(editingId.value, 1, todoInput.value);
+                todos.set(newTodos);
+                clearInput();
+            }
+
+            const clearInput = () => {
+                todoInput.value = "";
+                editingId.set(-1);
+            };
+
+            let todoInput;
+            document.addEventListener("DOMContentLoaded", () => {
+                todoInput = document.querySelector("[data-input=todo]");
+            });
+        </script>
     </body>
 </html>
