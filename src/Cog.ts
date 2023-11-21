@@ -19,7 +19,8 @@ type DOMTree = ReactiveNode[];
 
 type ChangedElement = {
     element: HTMLElement;
-    content: HTMLString | null;
+    content: HTMLString;
+    attributes?: Record<string, string>[];
 };
 
 type State = Record<string, unknown>;
@@ -34,7 +35,8 @@ const createExpressionScope = (expression: string, state: State) => {
 
     return Function(functionBody)();
 };
-function evaluateExpression(expression: string, state: State): string {
+
+export function evaluateExpression(expression: string, state: State): string {
     try {
         const expressionWithScope = createExpressionScope(expression, state);
         let evaluated = expressionWithScope(state);
@@ -43,19 +45,17 @@ function evaluateExpression(expression: string, state: State): string {
             evaluated = evaluated.join("");
         }
 
-        return evaluated ?? expression;
+        return evaluated;
     } catch (e: unknown) {
-        if (e instanceof Error) {
-            throw new Error(
-                `Failed to create function from expression {{${expression}}}: ${e.message}`
-            );
-        }
-
-        return expression;
+        throw new Error(
+            `Failed to create function from expression {{${expression}}}: ${
+                (e as Error).message
+            }`
+        );
     }
 }
 
-function findNextTemplateExpression(htmlText: string): {
+export function findNextTemplateExpression(htmlText: string): {
     start: number;
     end: number;
 } {
@@ -79,7 +79,7 @@ function findNextTemplateExpression(htmlText: string): {
     return { start, end: -1 };
 }
 
-const render = (tree: DOMTree, state: State) => {
+export const render = (tree: DOMTree, state: State) => {
     let treeNodeIndex = 0;
 
     for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
@@ -92,13 +92,12 @@ const render = (tree: DOMTree, state: State) => {
         while (hasTemplateExpression) {
             const { start, end } = findNextTemplateExpression(restOfContent);
 
-            if (start === -1 || end === -1 || start >= end) {
+            if (end === -1) {
                 hasTemplateExpression = false;
                 break;
             }
 
             const htmlValue = restOfContent.slice(start + 2, end - 1);
-
             const before = restOfContent.slice(0, start);
             const after = restOfContent.slice(end + 1);
             const value = htmlToText(htmlValue);
@@ -115,7 +114,18 @@ const render = (tree: DOMTree, state: State) => {
         if (changedElements.length > 0) {
             changedElements.map(({ element, content }) => {
                 removeAllEventListeners(element);
-                element.innerHTML = content ?? "";
+                // if (attributes) {
+                //     let i = 0;
+                //     for (i; i < attributes.length; i++) {
+                //         const attribute = attributes[i];
+                //         const name = Object.keys(attribute)[0];
+                //         const value = attribute[name];
+                //         element.setAttribute(name, value);
+                //     }
+                // } else
+                // if (content) {
+                element.innerHTML = content;
+                // }
                 addAllEventListeners(element, state);
             });
         }
@@ -135,6 +145,20 @@ function htmlToText(html: string) {
     return tmp.textContent || tmp.innerText || "";
 }
 
+// const getDifferentAttributes = (oldNode: Element, newNode: Element) => {
+//     const differentAttributes: Record<string, string>[] = [];
+//     for (let i = 0; i < oldNode.attributes.length; i++) {
+//         const oldAttribute = oldNode.attributes[i];
+//         const newAttribute = newNode.attributes[i];
+//         if (oldAttribute.value !== newAttribute.value) {
+//             differentAttributes.push({
+//                 [oldAttribute.name]: newAttribute.value,
+//             });
+//         }
+//     }
+//     return differentAttributes;
+// };
+
 function findChangedElements(oldElement: HTMLElement, newHtml: string) {
     const newElement = oldElement.cloneNode() as HTMLElement;
     newElement.innerHTML = newHtml;
@@ -143,54 +167,43 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
         oldNode: HTMLElement,
         newNode: HTMLElement
     ): ChangedElement[] {
-        if (
-            oldNode.nodeType === Node.ELEMENT_NODE &&
-            newNode.nodeType === Node.ELEMENT_NODE
-        ) {
-            let textContentChanged = false;
-            for (let i = 0; i < oldNode.childNodes.length; i++) {
-                const oldChild = oldNode.childNodes[i];
-                const newChild = newNode.childNodes[i];
-                if (
-                    oldChild.nodeType === Node.TEXT_NODE &&
-                    newChild &&
-                    newChild.nodeType === Node.TEXT_NODE
-                ) {
-                    if (oldChild.textContent !== newChild.textContent) {
-                        textContentChanged = true;
-                        break;
-                    }
+        let textContentChanged = false;
+
+        for (let i = 0; i < oldNode.childNodes.length; i++) {
+            const oldChild = oldNode.childNodes[i];
+            const newChild = newNode.childNodes[i];
+            if (
+                oldChild.nodeType === Node.TEXT_NODE &&
+                newChild &&
+                newChild.nodeType === Node.TEXT_NODE
+            ) {
+                if (oldChild.textContent !== newChild.textContent) {
+                    textContentChanged = true;
+                    break;
                 }
-            }
-
-            if (textContentChanged) {
-                return [{ element: oldNode, content: newNode.innerHTML }];
-            }
-
-            const attributesChanged =
-                oldNode.attributes.toString() !== newNode.attributes.toString();
-
-            if (attributesChanged) {
-                return [{ element: oldNode, content: newNode.innerHTML }];
-            } else {
-                let changedChildren: ChangedElement[] = [];
-                for (let i = 0; i < oldNode.childNodes.length; i++) {
-                    const changes = compareNodes(
-                        oldNode.childNodes[i] as HTMLElement,
-                        newNode.childNodes[i] as HTMLElement
-                    );
-                    changedChildren = changedChildren.concat(changes);
-                }
-                return changedChildren;
             }
         }
-        return [];
+
+        if (textContentChanged) {
+            return [{ element: oldNode, content: newNode.innerHTML }];
+        } else {
+            let changedChildren: ChangedElement[] = [];
+            for (let i = 0; i < oldNode.childNodes.length; i++) {
+                const changes = compareNodes(
+                    oldNode.childNodes[i] as HTMLElement,
+                    newNode.childNodes[i] as HTMLElement
+                );
+                changedChildren = changedChildren.concat(changes);
+            }
+
+            return changedChildren;
+        }
     }
 
     return compareNodes(oldElement, newElement);
 }
 
-const loadTree = (rootElement: Node): DOMTree => {
+export const loadTree = (rootElement: Node): DOMTree => {
     const tree: DOMTree = [];
     const xpath =
         ".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]";
@@ -222,7 +235,7 @@ function removeAllEventListeners(parent?: HTMLElement) {
     removeEventListeners(parent, "change");
 }
 
-function addEventListeners(
+export function addEventListeners(
     parent: HTMLElement,
     eventName = "click",
     state: State
@@ -234,7 +247,10 @@ function addEventListeners(
     });
 }
 
-function removeEventListeners(parent?: HTMLElement, eventName = "click") {
+export function removeEventListeners(
+    parent?: HTMLElement,
+    eventName = "click"
+) {
     parent?.querySelectorAll(`[data-on=${eventName}]`).forEach((element) => {
         const handler = (element as ElementWithHandler)[`${eventName}Handler`];
         if (handler) {
@@ -247,24 +263,27 @@ const makeEventHandler = (
     eventName = "click",
     element: Element,
     state: State
-) =>
-    function (e: Event) {
-        const handler = element.getAttribute(`data-handler`);
+) => {
+    const handler = element.getAttribute(`data-handler`);
+    if (!handler) {
+        throw new Error("Missing data-handler attribute");
+    }
 
-        if (handler) {
-            try {
-                const handlerWithScope = createExpressionScope(handler, state);
-                handlerWithScope(state);
-            } catch (e: unknown) {
-                if (e instanceof Error) {
-                    throw new Error(
-                        `${e.message}: data-on=${eventName} data-handler=${handler}`
-                    );
-                }
-            }
+    const handlerWithScope = createExpressionScope(handler, state);
+
+    return function (e: Event) {
+        try {
+            handlerWithScope(state);
+            e.preventDefault();
+        } catch (e: unknown) {
+            throw new Error(
+                `${
+                    (e as Error).message
+                }: data-on=${eventName} data-handler=${handler}`
+            );
         }
-        e.preventDefault();
     };
+};
 
 export const Cog = (document: Document): Cog => {
     const state: State = {};
