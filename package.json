@@ -1,6 +1,6 @@
 {
     "name": "@mzrk/cog",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "A lightweight, powerful reactive UI library with zero dependencies.",
     "main": "lib/cog.js",
     "types": "lib/cog.d.ts",

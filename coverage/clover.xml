@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1700608036624" clover="3.2.0">
-  <project timestamp="1700608036624" name="All files">
+<coverage generated="1700611965743" clover="3.2.0">
+  <project timestamp="1700611965743" name="All files">
     <metrics statements="129" coveredstatements="129" conditionals="37" coveredconditionals="29" methods="27" coveredmethods="27" elements="193" coveredelements="185" complexity="0" loc="129" ncloc="129" packages="1" files="1" classes="1"/>
     <file name="cog.ts" path="C:\Users\mzark\code\cog\src\cog.ts">
       <metrics statements="129" coveredstatements="129" conditionals="37" coveredconditionals="29" methods="27" coveredmethods="27"/>
