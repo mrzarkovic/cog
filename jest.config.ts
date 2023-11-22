@@ -12,6 +12,7 @@ const config: Config = {
             statements: 100,
         },
     },
+    coverageReporters: ["json-summary"],
 };
 
 export default config;

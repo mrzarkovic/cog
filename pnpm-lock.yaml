@@ -35,6 +35,9 @@ devDependencies:
   eslint-plugin-html:
     specifier: ^7.1.0
     version: 7.1.0
+  istanbul-badges-readme:
+    specifier: 1.8.5
+    version: 1.8.5
   jest:
     specifier: 29.7.0
     version: 29.7.0(@types/node@20.9.2)(ts-node@10.9.1)
@@ -3672,6 +3675,11 @@ packages:
   /isobject@3.0.1:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /istanbul-badges-readme@1.8.5:
+    resolution: {integrity: sha512-VEh90ofuufPZIbLeDF2g14wpe0sebhirG0xHooYKpNPYOkGXm6y+HJFotQqIzCg0NmbCnlKnOPL1B2oxG7/piA==}
+    hasBin: true
     dev: true
 
   /istanbul-lib-coverage@3.2.2:
