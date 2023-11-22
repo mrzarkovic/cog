@@ -161,11 +161,11 @@ So, gear up and let Cog drive your coding journey with less cognitive friction a
 
 ## Contributions
 
-Hey there! If you're interested in the Cog project, I'd love to have you on board. Here's how you can help out:
+Hey there! If you're interested in the Cog project, we'd love to have you on board. Here's how you can help out:
 
--   **Bug Reports**: Found a bug? Let me know! Just create an issue in the GitHub repository with the details and steps to reproduce it.
+-   **Bug Reports**: Found a bug? Let us know! Just create an issue in the GitHub repository with the details and steps to reproduce it.
 
--   **Feature Requests**: Got a cool idea for a new feature or improvement? I'm all ears. Drop an issue describing your idea.
+-   **Feature Requests**: Got a cool idea for a new feature or improvement? We're all ears. Drop an issue describing your idea.
 
 -   **Code Contributions**: If you're up for contributing code, go ahead and create a pull request. Just make sure your code follows the existing style and includes tests where needed.
 
