@@ -1,4 +1,9 @@
-# Cog - Reactive Expression Library
+# Cog - Reactive Expressions
+
+![](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?max=8000&softmax=5000)
+![](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=5000&softmax=3000)
+![](https://img.shields.io/badge/dependencies-0-blue)
+![](https://img.shields.io/badge/version-0.0.4-red)
 
 **Cog** is a simple reactive expression library for building web applications. It's a UI library that allows you to create reactive variables and bind them to HTML templates. It's designed to provide a reactive programming experience without the need for complex syntax or extensive libraries.
 
