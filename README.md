@@ -10,8 +10,10 @@ Cog is a simple, beginner-friendly reactive expression library for building web 
 ```html
 <!-- index.html -->
 
-<div>Counter: {{ counter }}</div>
-<button onclick="increment()">Increment</button>
+<div id="app">
+    <div>Counter: {{ counter }}</div>
+    <button onclick="increment()">Increment</button>
+</div>
 ```
 
 ```js
@@ -82,10 +84,12 @@ function incrementCount(e) {
 
 In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
 
+_It's important to wrap your application inside a `<div>` with an `id` of "app". This is because Cog uses this div as the root element for your application._
+
 ```html
 <!-- index.html -->
 
-<div>
+<div id="app">
     <div>{{ count }}</div>
     <button onclick="incrementCount()">Increment</button>
 </div>
