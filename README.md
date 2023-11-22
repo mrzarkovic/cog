@@ -5,7 +5,7 @@
 ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat&logo=jest)
 ![](https://img.shields.io/badge/version-0.0.4-red)
 
-Cog is a simple reactive expression library for building web applications. It's a UI library that allows you to create reactive variables and bind them to HTML templates. It's designed to provide a reactive programming experience without the need for complex syntax or extensive libraries.
+Cog is a simple, beginner-friendly reactive expression library for building web applications, designed to provide a reactive programming experience using plain HTML and vanilla JavaScript with zero dependencies.
 
 ```html
 <!-- index.html -->
@@ -29,7 +29,7 @@ With zero dependencies and no extra tooling needed, Cog is a beginner-friendly l
 
 > When you see HTML in a **Cog** application, it really is just HTML! 🤯
 
-HTML - but with the added power of reactive expressions. This makes it easy to understand and learn, while still providing the reactivity that makes modern web apps feel smooth and responsive.
+Just HTML, but with the added power of reactive expressions. This makes it easy to understand and learn, while still providing the reactivity that makes modern web apps feel smooth and responsive.
 
 ## Installation
 
@@ -144,6 +144,16 @@ const func = () => {
     return meaningOfLife + 1; // expression
 }();
 ```
+
+## The Motivation Behind Cog
+
+The primary motivation behind the creation of Cog is to help those who are just getting into web development. We understand that the learning curve can be steep when you're starting out, especially with the multitude of complex libraries and frameworks available today.
+
+Cog aims to flatten this learning curve. It's designed to be a stepping stone to bigger, more complex libraries and frameworks. With Cog, you can focus on learning the core concepts of reactive programming without getting overwhelmed by additional dependencies or complex tooling. All you need is vanilla JavaScript.
+
+Moreover, Cog is not just about coding; it's about reducing your cognitive efforts. Just like a cog in a machine, our library plays a small but crucial role in the larger mechanism of web development. It helps you keep the wheels of your learning journey turning smoothly, without getting stuck on the complexities of state management.
+
+So, gear up and let Cog drive your coding journey with less cognitive friction and more fun!
 
 ## Contributions
 
