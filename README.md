@@ -5,7 +5,7 @@
 ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat&logo=jest)
 ![](https://img.shields.io/badge/version-0.0.4-red)
 
-**Cog** is a simple reactive expression library for building web applications. It's a UI library that allows you to create reactive variables and bind them to HTML templates. It's designed to provide a reactive programming experience without the need for complex syntax or extensive libraries.
+Cog is a simple reactive expression library for building web applications. It's a UI library that allows you to create reactive variables and bind them to HTML templates. It's designed to provide a reactive programming experience without the need for complex syntax or extensive libraries.
 
 ```html
 <!-- index.html -->
@@ -25,7 +25,7 @@ function increment() {
 
 ### Beginner-friendly
 
-With zero dependencies and no extra tooling needed, **Cog** is a beginner-friendly library that keeps things simple. It uses plain HTML for templates, making it intuitive for those who are new to JavaScript or coming from a background of HTML and CSS.
+With zero dependencies and no extra tooling needed, Cog is a beginner-friendly library that keeps things simple. It uses plain HTML for templates, making it intuitive for those who are new to JavaScript or coming from a background of HTML and CSS.
 
 > When you see HTML in a **Cog** application, it really is just HTML! 🤯
 
@@ -33,11 +33,66 @@ HTML - but with the added power of reactive expressions. This makes it easy to u
 
 ## Installation
 
-You can install **Cog** via npm:
+You can install Cog via npm:
 
 ```bash
 npm install @mzrk/cog
 ```
+
+Or with `<script>` tag in your index.html
+
+```html
+<script src="https://unpkg.com/@mzrk/cog@0.0.4/lib/cog.js"></script>
+<script>
+    // Use Cog global in your code
+    const { variable } = Cog;
+</script>
+```
+
+## Usage
+
+In this example, `countVariable` is a reactive variable. `count` is the name of the state variable used in the HTML template.
+
+```js
+// index.js
+
+import { variable } from "@mzrk/cog";
+```
+
+Or if you used `<script>` tag you can get `variable` from global Cog object.
+
+```js
+// index.js or <script> tag after cog.js library
+
+const { variable } = Cog;
+```
+
+Then you can write your counter logic.
+
+```js
+// Initialize reactive variable 'count'
+const countVariable = variable("count", 0);
+
+// Your typical callback function, nothing fancy
+function incrementCount(e) {
+    // Get count value and update it using count setter
+    countVariable.set(countVariable.value + 1);
+}
+```
+
+In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
+
+```html
+<!-- index.html -->
+
+<div>
+    <div>{{ count }}</div>
+    <button onclick="incrementCount()">Increment</button>
+</div>
+<script src="index.js"></script>
+```
+
+When the button is clicked, the `incrementCount` function is called, which updates the `count` variable and triggers a re-render of the UI.
 
 ## Basic concepts
 
@@ -89,39 +144,6 @@ const func = () => {
     return meaningOfLife + 1; // expression
 }();
 ```
-
-## Usage
-
-In this example, `countVariable` is a reactive variable. `count` is the name of the state variable used in the HTML template.
-
-```js
-// index.js
-
-import { variable } from "@mzrk/cog";
-
-// Initialize reactive variable 'count'
-const countVariable = variable("count", 0);
-
-// Your typical callback function, nothing fancy
-function incrementCount(e) {
-    // Get count value and update it using count setter
-    countVariable.set(countVariable.value + 1);
-}
-```
-
-In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
-
-```html
-<!-- index.html -->
-
-<div>
-    <div>{{ count }}</div>
-    <button onclick="incrementCount()">Increment</button>
-</div>
-<script src="index.js"></script>
-```
-
-When the button is clicked, the `incrementCount` function is called, which updates the `count` variable and triggers a re-render of the UI.
 
 ## Contributions
 
