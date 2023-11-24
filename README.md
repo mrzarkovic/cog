@@ -3,7 +3,7 @@
 ![](https://img.shields.io/badge/dependencies-0-blue)
 ![](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=5000&softmax=3000)
 ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat&logo=jest)
-![](https://img.shields.io/badge/version-0.0.4-red)
+![](https://img.shields.io/badge/version-0.0.5-red)
 
 Cog is a simple, beginner-friendly reactive expression library for building web applications, designed to provide a reactive programming experience using plain HTML and vanilla JavaScript with zero dependencies.
 
@@ -38,7 +38,7 @@ Just HTML, but with the added power of reactive expressions. This makes it easy 
 Just add `<script>` tag to your `index.html`
 
 ```html
-<script src="https://unpkg.com/@mzrk/cog@0.0.4/lib/cog.js"></script>
+<script src="https://unpkg.com/@mzrk/cog@latest/lib/cog.js"></script>
 ```
 
 Or you can install it via `npm` package manager:
