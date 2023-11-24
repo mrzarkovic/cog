@@ -76,7 +76,7 @@ function incrementCount(e) {
 }
 ```
 
-In the HTML, you can use `{{ count }}` construct to bind a variable to the text content of an element.
+In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
 
 ```html
 <!-- index.html -->
@@ -91,6 +91,56 @@ In the HTML, you can use `{{ count }}` construct to bind a variable to the tex
 ```
 
 When the button is clicked, the `incrementCount` function is called, which updates the `count` variable and triggers a re-render of the UI.
+
+### Event Handlers in Modules
+
+When using the Cog library with JavaScript modules, functions defined inside a module are not automatically available in the global scope. This means that they cannot be directly used as event handlers in your HTML, as the HTML only has access to the global scope.
+
+#### Using Global Scope
+
+You can explicitly add your functions to the global `window` object, which will make them available in the global scope and therefore usable as event handlers in your HTML.
+
+```js
+// In your JavaScript module
+function increment() {
+    counter.set(counter.value + 1);
+}
+
+// Add the function to the global window object
+window.increment = increment;
+```
+
+Now, you can use `increment` as an `onclick` handler in your HTML:
+
+```html
+<button onclick="increment()">Increment</button>
+```
+
+This way, even though you're using modules, you can still use your functions as event handlers in your HTML.
+
+#### Without Global Scope
+
+When using JavaScript modules, you can avoid adding your functions to the global scope by implementing your own event listeners and handlers. This can be done by using `document.querySelector` or similar methods to get the HTML element, and then defining your own callbacks.
+
+```js
+import { variable } from "@mzrk/cog";
+
+const counter = variable("counter", 0);
+
+function increment() {
+    counter.set(counter.value + 1);
+}
+
+// Get the button element
+const button = document.querySelector("button");
+
+// Add an event listener to the button
+button.addEventListener("click", increment);
+```
+
+In this example, we're using `document.querySelector` to get the button element from the HTML. We then use `addEventListener` to add a 'click' event listener to the button. The `increment` function will be called whenever the button is clicked.
+
+This way, you can use your functions as event handlers without adding them to the global scope.
 
 ## Basic concepts
 
