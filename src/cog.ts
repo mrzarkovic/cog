@@ -3,8 +3,9 @@ interface Cog {
         name: string,
         value: T
     ) => {
+        set value(newVal: T);
+        get value(): T;
         set: (newVal: T) => void;
-        value: T;
     };
 }
 
@@ -325,11 +326,14 @@ export const init = (document: Document): Cog => {
             state[name] = value;
 
             return {
-                set: (newVal: T) => {
+                set value(newVal: T) {
                     updateState(name, newVal);
                 },
                 get value() {
                     return state[name] as T;
+                },
+                set: (newVal: T) => {
+                    updateState(name, newVal);
                 },
             };
         },
