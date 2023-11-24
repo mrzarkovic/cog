@@ -1,7 +1,8 @@
 interface Cog {
     variable: <T>(name: string, value: T) => {
+        set value(newVal: T);
+        get value(): T;
         set: (newVal: T) => void;
-        value: T;
     };
 }
 type HTMLString = string;
@@ -22,7 +23,7 @@ export declare function addEventListeners(parent: HTMLElement, eventName: string
 export declare function removeEventListeners(parent?: HTMLElement, eventName?: string): void;
 export declare const init: (document: Document) => Cog;
 export declare const variable: <T>(name: string, value: T) => {
-    set: (newVal: T) => void;
     value: T;
+    set: (newVal: T) => void;
 };
 export {};

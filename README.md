@@ -1,9 +1,9 @@
-# Cog - Reactive Expressions
+# ⚙️Cog - Reactive Expressions
 
 ![](https://img.shields.io/badge/dependencies-0-blue)
 ![](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=5000&softmax=3000)
 ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat&logo=jest)
-![](https://img.shields.io/badge/version-0.0.4-red)
+![](https://img.shields.io/badge/version-0.0.5-red)
 
 Cog is a simple, beginner-friendly reactive expression library for building web applications, designed to provide a reactive programming experience using plain HTML and vanilla JavaScript with zero dependencies.
 
@@ -35,41 +35,35 @@ Just HTML, but with the added power of reactive expressions. This makes it easy 
 
 ## Installation
 
-You can install Cog via npm:
+Just add `<script>` tag to your `index.html`
+
+```html
+<script src="https://unpkg.com/@mzrk/cog@latest/lib/cog.js"></script>
+```
+
+Or you can install it via `npm` package manager:
 
 ```bash
 npm install @mzrk/cog
 ```
 
-Or with `<script>` tag in your index.html
+## Usage
+
+We'll build a simple counter. In this example, `countVariable` is a reactive variable and `count` is the name of the state variable used in the HTML template.
+
+We'll add a new `<script>` tag to our `index.html`. We can then get the `variable` factory method from the global Cog object.
 
 ```html
-<script src="https://unpkg.com/@mzrk/cog@0.0.4/lib/cog.js"></script>
+<!-- index.html -->
+
+<div id="app">...</div>
 <script>
-    // Use Cog global in your code
     const { variable } = Cog;
+    // ...
 </script>
 ```
 
-## Usage
-
-In this example, `countVariable` is a reactive variable. `count` is the name of the state variable used in the HTML template.
-
-```js
-// index.js
-
-import { variable } from "@mzrk/cog";
-```
-
-Or if you used `<script>` tag you can get `variable` from global Cog object.
-
-```js
-// index.js or <script> tag after cog.js library
-
-const { variable } = Cog;
-```
-
-Then you can write your counter logic.
+Then we can write our counter logic:
 
 ```js
 // Initialize reactive variable 'count'
@@ -82,9 +76,7 @@ function incrementCount(e) {
 }
 ```
 
-In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
-
-_It's important to wrap your application inside a `<div>` with an `id` of "app". This is because Cog uses this div as the root element for your application._
+In the HTML, you can use `{{ count }}` construct to bind a variable to the text content of an element.
 
 ```html
 <!-- index.html -->
@@ -93,32 +85,71 @@ _It's important to wrap your application inside a `<div>` with an `id` of "app".
     <div>{{ count }}</div>
     <button onclick="incrementCount()">Increment</button>
 </div>
-<script src="index.js"></script>
+<script>
+    ...
+</script>
 ```
 
 When the button is clicked, the `incrementCount` function is called, which updates the `count` variable and triggers a re-render of the UI.
 
 ## Basic concepts
 
-### `variable`
+### `{{...}}`
 
-`variable` is a function that creates a new reactive variable. It is used to create a state variable within the `state` object of the **Cog** library. It takes a name and an initial value as arguments, and adds an entry to the `state` object with the given name and value.
+The `{{...}}` construct in HTML templates is used for expression evaluation in Cog. It's a way to display the result of an expression, which can include variables from the state, directly in the HTML.
 
-The function returns an object with a `set` method and a `value` getter. The `set` method allows you to update the value of the state variable from your JavaScript code. It takes a new value as an argument, and updates the state variable with this new value. The `value` getter allows you to retrieve the current value of the state variable from your JavaScript code.
+When you put an expression inside `{{}}` in your HTML, Cog will automatically evaluate it and replace the `{{}}` with the result. This is done every time the state changes, ensuring that the displayed result is always up-to-date.
+
+```html
+<div>{{ count * 2 }}</div>
+```
+
+In this example, `{{ count * 2 }}` will be replaced with the result of multiplying the current value of the `count` variable from the state by 2. If `count` changes, the content of the `<div>` will automatically update to show the new result.
+
+### `variable()`
+
+The Cog library is designed with simplicity in mind and thus provides a single API, the **variable** method.
+
+`variable` is a function that creates a new reactive variable. It is used to create a state variable within the `state` object of the Cog library. It takes a name and an initial value as arguments, and adds an entry to the `state` object with the given name and value.
 
 ```js
-// index.js
+const foo = variable("foo", "bar"); // state = { foo: "bar" }
+```
 
-import { variable } from "@mzrk/cog";
+The function returns an object with a `set()` method and a `value` getter, but also a setter in case you prefer to use it that way.
 
-const { set, value } = variable("meaningOfLife", 41);
+#### `set()`
+
+The `set` method allows you to update the value of the state variable from your JavaScript code. It takes a new value as an argument, and updates the state variable with this new value.
+
+```js
+const foo = variable("foo", "bar");
+foo.set("baz"); // state = { foo: "baz" }
 ```
 
 When a state variable's value is updated using the `set` method, the UI is re-rendered, and any expressions referencing that variable are re-evaluated with the new value. This design allows the expressions in your HTML to automatically update whenever the state changes.
 
-### `state`
+#### `value` (getter/setter)
 
-The `state` object is a key-value store that holds the current state of all reactive variables in the application. Each key in the `state` object corresponds to the name of a reactive variable, and the associated value is the current value of that variable.
+The `value` getter allows you to retrieve the current value of the state variable from your JavaScript code.
+
+```js
+const foo = variable("foo", "bar");
+console.log(foo.value); // "bar"
+```
+
+The `value` setter allows you to update the value of the state variable directly. It's an alternative to the `set()` method.
+
+```js
+const foo = variable("foo", "bar");
+foo.value = "baz"; // state = { foo: "baz" }
+```
+
+Just like the `set()` method, when you change a state variable's value using the value setter, the UI is automatically re-rendered
+
+### State
+
+The `state` object is a key-value store that holds the current state of all reactive variables in the application. Each key in the `state` object corresponds to the name of a reactive variable used in HTML, and the associated value is the current value of that variable.
 
 ```html
 <!-- index.html -->

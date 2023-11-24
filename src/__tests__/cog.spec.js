@@ -201,7 +201,24 @@ describe("api", () => {
         });
     });
 
-    test("update variable", async () => {
+    test("update variable, direct assignment", async () => {
+        const element = document.createElement("div");
+        element.innerHTML = "<div id='app'><div>Hello {{ name }}!</div></div>";
+        document.body.appendChild(element);
+
+        const variable = init(document).variable;
+        const name = variable("name", "John");
+
+        dispatchDOMContentLoaded();
+
+        name.value = "Jane";
+
+        await waitFor(() => {
+            expect(getByText(element, "Hello Jane!")).toBeInTheDocument();
+        });
+    });
+
+    test("update variable, method invocation", async () => {
         const element = document.createElement("div");
         element.innerHTML = "<div id='app'><div>Hello {{ name }}!</div></div>";
         document.body.appendChild(element);
