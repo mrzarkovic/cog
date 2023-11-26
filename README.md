@@ -1,11 +1,11 @@
-# ⚙️Cog - Reactive Expressions
+# ⚙️Cog - Reactive UI Library for HTML
 
 ![](https://img.shields.io/badge/dependencies-0-blue)
 ![](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=5000&softmax=3000)
 ![Lines](https://img.shields.io/badge/lines-100%25-brightgreen.svg?style=flat&logo=jest)
-![](https://img.shields.io/badge/version-0.0.5-red)
+![](https://img.shields.io/badge/version-0.0.6-red)
 
-Cog is a simple, beginner-friendly reactive expression library for building web applications, designed to provide a reactive programming experience using plain HTML and vanilla JavaScript with zero dependencies.
+Cog is a simple, beginner-friendly reactive UI library for building web applications, designed to provide a reactive programming experience using plain HTML and vanilla JavaScript with zero dependencies.
 
 ```html
 <!-- index.html -->
@@ -142,6 +142,47 @@ In this example, we're using `document.querySelector` to get the button element 
 
 This way, you can use your functions as event handlers without adding them to the global scope.
 
+### Cog Templates
+
+In Cog, templates are a powerful feature that allows you to define reusable and dynamic HTML structures. They are defined using the `<template>` HTML element and can contain any HTML markup, including placeholders for dynamic content.
+
+#### How Templates Work
+
+In the next example, there are two templates defined: `my-element` and `my-checkbox`.
+
+```html
+<template id="my-text">
+    <div class="bold">{{ children }}</div>
+</template>
+<template id="my-checkbox">
+    <label><input type="checkbox" /> {{ label }}</label>
+</template>
+```
+
+Each template has an `id` which is used to reference it in the rest of the HTML. Inside the templates, you can see `{{ children }}` and `{{ label }}`. These are placeholders for dynamic content.
+
+When a custom element like `<my-text>` or `<my-checkbox>` is used in the HTML, Cog replaces the custom element with the corresponding template's content. Any placeholders in the template are replaced with the corresponding data from the custom element.
+
+```html
+<!-- This -->
+
+<my-text>I'm the child</my-text>
+<my-checkbox data-label="Check it"></my-checkbox>
+```
+
+For example, in the line `<my-text>I'm the child</my-text>`, `I'm the child` replaces `{{ children }}` in the `my-text` template.
+
+In the case of `<my-checkbox data-label="Check it"></my-checkbox>`, the `data-label` attribute provides the data for the `{{ label }}` placeholder in the `my-checkbox` template.
+
+```html
+<!-- Becomes this -->
+
+<div class="bold">I'm the child</div>
+<label><input type="checkbox" /> Check it</label>
+```
+
+This way, you can define a template once and then use it multiple times with different data, reducing repetition and making your HTML more maintainable.
+
 ## Basic concepts
 
 ### `{{...}}`
@@ -210,7 +251,7 @@ The `state` object is a key-value store that holds the current state of all re
 When an expression is evaluated, it's done so in the context of the `state` object. This means that any variables referenced in the expression are looked up in the `state` object.
 
 ```js
-// Cog.js under the hood
+// Cog under the hood
 
 const state = {
     meaningOfLife: 41,
