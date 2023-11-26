@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/username/repository/main/logo.png" alt="Cog Logo"/>
+  <img src="https://raw.githubusercontent.com/mrzarkovic/cog/main/logo.png" alt="Cog Logo"/>
 </p>
 
 # ⚙️Cog - Reactive UI Library for HTML
