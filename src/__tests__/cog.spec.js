@@ -7,6 +7,7 @@ import {
     loadTree,
     addEventListeners,
     removeEventListeners,
+    loadTemplates,
 } from "../cog";
 import { getByText, waitFor } from "@testing-library/dom";
 
@@ -153,6 +154,20 @@ describe("eventListeners", () => {
     });
 });
 
+describe("templates", () => {
+    test("load templates", () => {
+        const element = document.createElement("div");
+        element.innerHTML =
+            "<template id='my-template'>Hello {{ name }}!</template><template id='my-other-template'>Hello!</template>";
+        const templates = loadTemplates(element);
+        console.log(templates);
+        expect(templates).toEqual([
+            element.querySelector("#my-template"),
+            element.querySelector("#my-other-template"),
+        ]);
+    });
+});
+
 describe("api", () => {
     function dispatchDOMContentLoaded() {
         const event = new Event("DOMContentLoaded", {
@@ -164,6 +179,31 @@ describe("api", () => {
 
     afterEach(() => {
         document.body.innerHTML = "";
+    });
+
+    test("template with no id to throw", () => {
+        const element = document.createElement("div");
+        element.innerHTML =
+            "<div id='app'><template>Hello {{ name }}!</template></div>";
+        document.body.appendChild(element);
+        init(document);
+        dispatchDOMContentLoaded();
+        const errorPromise = getWindowErrorPromise();
+
+        expect(errorPromise).rejects.toThrow();
+    });
+
+    test("template props", () => {
+        const element = document.createElement("div");
+        const template =
+            "<template id='my-template'>Hello {{ name }}!</template>";
+        const html = "<div><my-template data-name='World'></my-template></div>";
+        element.innerHTML = "<div id='app'>" + template + html + "</div>";
+        document.body.appendChild(element);
+        init(document);
+        dispatchDOMContentLoaded();
+
+        expect(getByText(element, "Hello World!")).toBeInTheDocument();
     });
 
     test("fail if no #app element", () => {

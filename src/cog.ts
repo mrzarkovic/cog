@@ -226,7 +226,7 @@ export const loadTree = (rootElement: Node): DOMTree => {
     return tree;
 };
 
-const loadTemplates = (rootElement: Node): HTMLElement[] => {
+export const loadTemplates = (rootElement: Node): HTMLElement[] => {
     const templates: HTMLElement[] = [];
     const xpath = "template";
 
@@ -313,6 +313,13 @@ export const init = (document: Document): Cog => {
     function defineElement(name: string, innerHTML: string) {
         class CustomElement extends HTMLElement {
             connectedCallback() {
+                const keys = Object.keys(this.dataset);
+                for (let i = 0; i < keys.length; i++) {
+                    const key = keys[i];
+                    const value = this.dataset[key];
+                    state[key] = value;
+                }
+
                 this.outerHTML = innerHTML.replace(
                     /\{\{\s*children\s*\}\}/g,
                     this.innerHTML
