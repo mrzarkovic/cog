@@ -311,22 +311,28 @@ export const init = (document: Document): Cog => {
     let templates: HTMLElement[] = [];
 
     function defineElement(name: string, innerHTML: string) {
-        class CustomElement extends HTMLElement {
-            connectedCallback() {
-                const keys = Object.keys(this.dataset);
-                for (let i = 0; i < keys.length; i++) {
-                    const key = keys[i];
-                    const value = this.dataset[key];
-                    state[key] = value;
-                }
-
-                this.outerHTML = innerHTML.replace(
-                    /\{\{\s*children\s*\}\}/g,
-                    this.innerHTML
-                );
-            }
+        function CustomElement() {
+            return Reflect.construct(HTMLElement, [], CustomElement);
         }
-        customElements.define(name, CustomElement);
+
+        CustomElement.prototype = Object.create(HTMLElement.prototype);
+        CustomElement.prototype.constructor = CustomElement;
+
+        CustomElement.prototype.connectedCallback = function () {
+            const keys = Object.keys(this.dataset);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                const value = this.dataset[key];
+                state[key] = value;
+            }
+
+            this.outerHTML = innerHTML.replace(
+                /\{\{\s*children\s*\}\}/g,
+                this.innerHTML
+            );
+        };
+
+        customElements.define(name, CustomElement as never);
     }
 
     const AppElement = {

@@ -9,12 +9,6 @@ const common = {
                 test: /\.ts$/, // Use ts-loader for .ts files
                 use: {
                     loader: "babel-loader",
-                    options: {
-                        presets: [
-                            "@babel/preset-env",
-                            "@babel/preset-typescript",
-                        ],
-                    },
                 },
                 exclude: /node_modules/,
             },
@@ -35,10 +29,14 @@ const common = {
                         toplevel: true,
                         eval: true,
                         keep_fnames: false,
+                        properties: {
+                            reserved: ["connectedCallback"],
+                        },
                     },
                     keep_fnames: false,
                     compress: {
                         drop_console: false,
+                        passes: 2,
                     },
                     output: {
                         comments: false,

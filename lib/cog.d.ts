@@ -19,6 +19,7 @@ export declare function findNextTemplateExpression(htmlText: string): {
 };
 export declare const render: (tree: DOMTree, state: State) => void;
 export declare const loadTree: (rootElement: Node) => DOMTree;
+export declare const loadTemplates: (rootElement: Node) => HTMLElement[];
 export declare function addEventListeners(parent: HTMLElement, eventName: string | undefined, state: State): void;
 export declare function removeEventListeners(parent?: HTMLElement, eventName?: string): void;
 export declare const init: (document: Document) => Cog;
