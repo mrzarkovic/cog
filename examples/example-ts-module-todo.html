@@ -13,23 +13,29 @@
     <body>
         <div id="app" class="flex justify-center h-full w-full">
             <div class="max-w-xl grow pt-40 px-10">
-                <div>Counter: {{ counter }}</div>
-                <button class="btn" data-on="click" data-handler="increment()">
-                    Increment
-                </button>
-                <input type="text" id="input" data-input="todo" />
-                <button data-on="click" data-handler="save()">Save</button>
-                <div class="p-4">
-                    {{ todos.map((todo, i) => `
-                    <div class="p-2">
-                        <label for="todo${i}" class="flex items-center">
-                            ${Checkbox({ index: i, checked: todo.done })}
-                            <span class="pl-2"
-                                >${todo.text} <span>${todo.done}</span></span
-                            >
-                        </label>
+                <div class="pb-10">
+                    <span>Counter: {{ counter }}</span>
+                    <button class="btn" data-on-click="increment()">
+                        Increment
+                    </button>
+                </div>
+                <div>
+                    <h2 class="pb-2">Todo List</h2>
+                    <input type="text" id="input" data-input="todo" />
+                    <button class="btn" data-on-click="save()">Save</button>
+                    <div class="p-4">
+                        {{ todos.map((todo, i) => `
+                        <div class="p-2">
+                            <label for="todo${i}" class="flex items-center">
+                                ${Checkbox({ index: i, checked: todo.done })}
+                                <span class="pl-2"
+                                    >${todo.text}
+                                    <span>${todo.done}</span></span
+                                >
+                            </label>
+                        </div>
+                        `) }}
                     </div>
-                    `) }}
                 </div>
             </div>
         </div>

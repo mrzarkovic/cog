@@ -226,6 +226,27 @@ export const loadTree = (rootElement: Node): DOMTree => {
     return tree;
 };
 
+const loadTemplates = (rootElement: Node): HTMLElement[] => {
+    const templates: HTMLElement[] = [];
+    const xpath = "template";
+
+    const result = document.evaluate(
+        xpath,
+        rootElement,
+        null,
+        XPathResult.ORDERED_NODE_ITERATOR_TYPE,
+        null
+    );
+    let element = <HTMLElement>result.iterateNext();
+
+    while (element) {
+        templates.push(element);
+        element = <HTMLElement>result.iterateNext();
+    }
+
+    return templates;
+};
+
 function addAllEventListeners(parent: HTMLElement, state: State) {
     addEventListeners(parent, "click", state);
     addEventListeners(parent, "change", state);
@@ -287,6 +308,19 @@ const makeEventHandler = (
 export const init = (document: Document): Cog => {
     const state: State = {};
     let tree: DOMTree = [];
+    let templates: HTMLElement[] = [];
+
+    function defineElement(name: string, innerHTML: string) {
+        class CustomElement extends HTMLElement {
+            connectedCallback() {
+                this.outerHTML = innerHTML.replace(
+                    /\{\{\s*children\s*\}\}/g,
+                    this.innerHTML
+                );
+            }
+        }
+        customElements.define(name, CustomElement);
+    }
 
     const AppElement = {
         element: null as HTMLElement | null,
@@ -308,7 +342,19 @@ export const init = (document: Document): Cog => {
         }, 0);
     }
 
+    function defineElements(templates: HTMLElement[]) {
+        templates.forEach((template) => {
+            const name = template.getAttribute("id");
+            if (!name) {
+                throw new Error("Missing id attribute");
+            }
+            defineElement(name, template.innerHTML);
+        });
+    }
+
     const onLoad = () => {
+        templates = loadTemplates(AppElement.value);
+        defineElements(templates);
         tree = loadTree(AppElement.value);
         addAllEventListeners(AppElement.value, state);
         render(tree, state);

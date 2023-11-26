@@ -1,0 +1,31 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog.js</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="flex justify-center h-full w-full">
+            <template id="my-element">
+                <div class="grow">{{ children }}</div>
+            </template>
+            <template id="my-checkbox">
+                <label><input type="checkbox" /> {{ 'label text' }}</label>
+            </template>
+            <div class="max-w-xl grow pt-40 px-10">
+                <div class="flex">
+                    <my-element> I'm the child </my-element>
+                    <my-element> I'm the other child </my-element>
+                </div>
+                <my-checkbox></my-checkbox>
+            </div>
+        </div>
+        <script src="/examples/dist/ts-module-todo.js"></script>
+    </body>
+</html>

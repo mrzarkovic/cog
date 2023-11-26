@@ -1,4 +1,4 @@
-import { variable } from "../../lib/cog";
+import { variable } from "../../src/cog";
 
 const todos = variable("todos", [{ text: "hello", done: false }]);
 
