@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/username/repository/main/logo.png" alt="Cog Logo"/>
+</p>
+
 # ⚙️Cog - Reactive UI Library for HTML
 
 ![](https://img.shields.io/badge/dependencies-0-blue)
