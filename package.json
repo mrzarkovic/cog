@@ -8,7 +8,7 @@
         "dev": "webpack --watch",
         "build": "webpack && tsc --emitDeclarationOnly",
         "test": "jest",
-        "make-badges": "istanbul-badges-readme --logo='jest'"
+        "make-badges": "istanbul-badges-readme --linesLabel='coverage'"
     },
     "keywords": [
         "reactive",
