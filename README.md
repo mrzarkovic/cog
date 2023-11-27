@@ -4,10 +4,12 @@
 
 # ⚙️Cog - Reactive UI Library for HTML
 
-[![](https://img.shields.io/badge/dependencies-0-blue)](https://www.npmjs.com/package/@mzrk/cog?activeTab=dependencies)
-[![](https://img.shields.io/npm/v/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog)
-![](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=5000&softmax=3000)
+[![dependencies](https://img.shields.io/badge/dependencies-0-blue)](https://www.npmjs.com/package/@mzrk/cog?activeTab=dependencies)
+[![npm](https://img.shields.io/npm/v/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog)
+![gzip](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=5000&softmax=3000)
 ![Lines](https://img.shields.io/badge/coverage-100%25-brightgreen.svg?style=flat)
+![license](https://img.shields.io/npm/l/@mzrk/cog)
+[![downloads](https://img.shields.io/npm/dt/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog?activeTab=versions)
 
 Cog is a simple, beginner-friendly reactive UI library for building web applications, designed to provide a reactive programming experience using plain HTML and vanilla JavaScript with zero dependencies.
 
@@ -29,10 +31,9 @@ function increment() {
 }
 ```
 
-[![Edit on CodePen][codepen-badge]][codepen-link]
-
-[codepen-badge]: https://img.shields.io/badge/Try%20Cog%20-Edit%20on%20CodePen-blue?logo=codepen
-[codepen-link]: https://codepen.io/pen?template=rNPrarQ
+<a href="https://codepen.io/pen?template=rNPrarQ" target="_blank">
+    <img src="https://img.shields.io/badge/Try%20Cog%20-Edit%20on%20CodePen-blue?logo=codepen" alt="Edit on CodePen">
+</a>
 
 ### Beginner-friendly
 
@@ -310,4 +311,4 @@ Thanks for considering contributing to Cog!
 
 [MIT](https://opensource.org/licenses/MIT)
 
-Copyright (c) 2023-present, Milos Zarkovic
+Copyright © 2023
