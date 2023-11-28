@@ -100,14 +100,38 @@ describe("loadTree", () => {
             {
                 element: element.querySelector("#first"),
                 template: "first {{ expression }}",
+                attributes: [
+                    {
+                        name: "id",
+                        value: "first",
+                        reactive: false,
+                    },
+                ],
+                parentAttribute: undefined,
             },
             {
                 element: element.querySelector("#second"),
                 template: "second {{ expression }}",
+                attributes: [
+                    {
+                        name: "id",
+                        value: "second",
+                        reactive: false,
+                    },
+                ],
+                parentAttribute: undefined,
             },
             {
                 element: element.querySelector("#third"),
                 template: "third {{ expression }}",
+                attributes: [
+                    {
+                        name: "id",
+                        value: "third",
+                        reactive: false,
+                    },
+                ],
+                parentAttribute: undefined,
             },
         ]);
     });
@@ -196,7 +220,7 @@ describe("api", () => {
     test("template props", () => {
         const element = document.createElement("div");
         const template =
-            "<template id='my-template'>Hello {{ name }}!</template>";
+            "<template id='my-template'>Hello {{ dataName }}!</template>";
         const html = "<div><my-template data-name='World'></my-template></div>";
         element.innerHTML = "<div id='app'>" + template + html + "</div>";
         document.body.appendChild(element);
