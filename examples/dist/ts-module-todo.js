@@ -1,1 +1,477 @@
-!function(t,n){"object"==typeof exports&&"object"==typeof module?module.exports=n():"function"==typeof define&&define.amd?define([],n):"object"==typeof exports?exports["t"]=n():t["t"]=n()}(self,(()=>(()=>{"use strict";var t={};(t=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"o",{value:!0})})(t);var n=function(t,n){var e="return (state) => {".concat(Object.keys(n).map((function(t){return"const ".concat(t,' = state["').concat(t,'"];')})).join("\n"),"; return ").concat(t,"}");return Function(e)()};function e(t,e){try{var r=n(t,e)(e);return Array.isArray(r)&&(r=r.join("")),r}catch(n){throw new Error("Failed to create function from expression {{".concat(t,"}}: ").concat(n.message))}}function r(t){for(var n=t.indexOf("{{"),e=0,r=n;r<t.length;r++)if("{{"===t.slice(r,r+2)?(e++,r++):"}}"===t.slice(r,r+2)&&(e--,r++),0===e)return{start:n,end:r};return{start:n,end:-1}}var o=function(t,n){for(var o=0;o<t.length;o++){for(var a=t[o],i=a.element,c="",l=a.i,d=!0;d;){var v=r(l),s=v.start,m=v.end;if(-1===m){d=!1;break}var h=l.slice(s+2,m-1),b=l.slice(0,s),p=l.slice(m+1),y=e((x=h,E=void 0,(E=document.createElement("div")).innerHTML=function(t){return t.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(x),E.textContent||E.innerText||""),n);c+="".concat(b).concat(y),l=p}var g=(j=c+=l,k=void 0,(k=(w=i).cloneNode()).innerHTML=j,function t(n,e){for(var r=!1,o=0;o<n.childNodes.length;o++){var a=n.childNodes[o],i=e.childNodes[o];if(a.nodeType===Node.TEXT_NODE&&i&&i.nodeType===Node.TEXT_NODE&&a.textContent!==i.textContent){r=!0;break}}if(r)return[{element:n,content:e.innerHTML}];for(var u=[],c=0;c<n.childNodes.length;c++){var f=t(n.childNodes[c],e.childNodes[c]);u=u.concat(f)}return u}(w,k));g.length>0&&g.map((function(t){var e,r=t.element,o=t.content;f(e=r,"click"),f(e,"change"),r.innerHTML=o,u(r,n)}))}var w,j,k,x,E};var a=function(t){for(var n=[],e=document.evaluate(".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]",t,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),r=e.iterateNext();r;)n.push({element:r,i:r.innerHTML}),r=e.iterateNext();return n},i=function(t){for(var n=[],e=document.evaluate("template",t,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),r=e.iterateNext();r;)n.push(r),r=e.iterateNext();return n};function u(t,n){c(t,"click",n),c(t,"change",n)}function c(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"click",e=arguments.length>2?arguments[2]:void 0;t.querySelectorAll("[data-on-".concat(n,"]")).forEach((function(t){var r=l(n,t,e);t.addEventListener(n,r),t["".concat(n,"Handler")]=r}))}function f(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"click";null==t||t.querySelectorAll("[data-on-".concat(n,"]")).forEach((function(t){var e=t["".concat(n,"Handler")];e&&t.removeEventListener(n,e)}))}var l=function(){var t=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"click",e=arguments.length>2?arguments[2]:void 0,r=(arguments.length>1?arguments[1]:void 0).getAttribute("data-on-".concat(t));if(!r)throw new Error("Missing data-handler attribute");var o=n(r,e);return function(n){try{o(e),n.preventDefault()}catch(n){throw new Error("".concat(n.message,": data-on-").concat(t,"=").concat(r))}}},d=function(t){var n={},e=[],r={element:null,get value(){if(this.element||(this.element=t.querySelector("#app")),!this.element)throw new Error("No app element found!");return this.element}};function c(t,r){setTimeout((function(){n[t]=r,o(e,n)}),0)}var f=function(){i(r.value).forEach((function(t){var e=t.getAttribute("id");if(!e)throw new Error("Missing id attribute");!function(t,e){function r(){return Reflect.construct(HTMLElement,[],r)}r.prototype=Object.create(HTMLElement.prototype),r.prototype.constructor=r,r.prototype.connectedCallback=function(){for(var t=Object.keys(this.dataset),r=0;r<t.length;r++){var o=t[r],a=this.dataset[o];n[o]=a}this.outerHTML=e.replace(/\{\{\s*children\s*\}\}/g,this.innerHTML)},customElements.define(t,r)}(e,t.innerHTML)})),e=a(r.value),u(r.value,n),o(e,n)},l=t.u;return l&&t.removeEventListener("DOMContentLoaded",l),t.addEventListener("DOMContentLoaded",f),t.u=f,{variable:function(t,e){return n[t]=e,{set value(n){c(t,n)},get value(){return n[t]},set:function(n){c(t,n)}}}}}(document).variable;function v(t){return function(t){if(Array.isArray(t))return s(t)}(t)||function(t){if("undefined"!=typeof Symbol&&null!=t[Symbol.iterator]||null!=t["@@iterator"])return Array.from(t)}(t)||function(t,n){if(t){if("string"==typeof t)return s(t,n);var e=Object.prototype.toString.call(t).slice(8,-1);return"Object"===e&&t.constructor&&(e=t.constructor.name),"Map"===e||"Set"===e?Array.from(t):"Arguments"===e||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(e)?s(t,n):void 0}}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function s(t,n){(null==n||n>t.length)&&(n=t.length);for(var e=0,r=new Array(n);e<n;e++)r[e]=t[e];return r}var m=d("todos",[{text:"hello",done:!1}]);d("save",(function(){var t=document.querySelector("[data-input=todo");null!=t&&t.value&&(m.set([].concat(v(m.value),[{text:t.value,done:!1}])),t.value="")})),d("toggleTodo",(function(t){var n=v(m.value);n[t].done=!n[t].done,m.set(n)})),d("Checkbox",(function(t){var n=t.index,e=void 0===n?-1:n,r=t.checked,o=void 0!==r&&r;return'<input type="checkbox" id="todo'.concat(e,'" data-on-change="toggleTodo(').concat(e,')" ').concat(o?"checked":""," />")}));var h=d("counter",0);return d("increment",(function(){h.set(h.value+1)})),t})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-module-todo"] = factory();
+	else
+		root["ts-module-todo"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/cog.ts
+var templateExpressionRegex = /\{\{(.+?)\}\}/;
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+    return "const ".concat(variable, " = state[\"").concat(variable, "\"];");
+  }).join("\n"), " return ").concat(expression, "}");
+  return Function(functionBody)();
+};
+function evaluateExpression(expression, state) {
+  try {
+    var expressionWithScope = createExpressionScope(expression, state);
+    var evaluated = expressionWithScope(state);
+    if (Array.isArray(evaluated)) {
+      evaluated = evaluated.join("");
+    }
+    return evaluated;
+  } catch (e) {
+    throw new Error("Failed to create function from expression {{".concat(expression, "}}: ").concat(e.message));
+  }
+}
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText.slice(i, i + 2) === "{{") {
+      stack++;
+      i++;
+    } else if (htmlText.slice(i, i + 2) === "}}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+var convertAttribute = function convertAttribute(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+var isCustomElement = function isCustomElement(element) {
+  return element.tagName.includes("-");
+};
+var render = function render(tree, state) {
+  var treeNodeIndex = 0;
+  for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
+    var _tree$treeNodeIndex = tree[treeNodeIndex],
+      element = _tree$treeNodeIndex.element,
+      template = _tree$treeNodeIndex.template,
+      attributes = _tree$treeNodeIndex.attributes,
+      parentAttributes = _tree$treeNodeIndex.parentAttributes;
+    var updatedContent = "";
+    var restOfContent = template;
+    var hasTemplateExpression = true;
+    if (attributes) {
+      var i = 0;
+      for (i; i < attributes.length; i++) {
+        var attribute = attributes[i];
+        var _name = attribute.name;
+        var _value = attribute.value;
+        var reactive = attribute.reactive;
+        var evaluated = reactive ? evaluateExpression(_value, state) : _value;
+        if (evaluated !== element.getAttribute(_name)) {
+          element.setAttribute(_name, evaluated);
+        }
+      }
+    }
+    if (parentAttributes) {
+      var _i = 0;
+      for (_i; _i < parentAttributes.length; _i++) {
+        var _attribute = parentAttributes[_i];
+        var _name2 = _attribute.name;
+        var _value2 = _attribute.value;
+        var _reactive = _attribute.reactive;
+        var _evaluated = _reactive ? evaluateExpression(_value2, state) : _value2;
+        state[convertAttribute(_name2)] = _evaluated;
+      }
+    }
+    while (hasTemplateExpression) {
+      var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+        start = _findNextTemplateExpr.start,
+        end = _findNextTemplateExpr.end;
+      if (end === -1) {
+        hasTemplateExpression = false;
+        break;
+      }
+      var htmlValue = restOfContent.slice(start + 2, end - 1);
+      var before = restOfContent.slice(0, start);
+      var after = restOfContent.slice(end + 1);
+      var _value3 = htmlToText(htmlValue);
+      var _evaluated2 = evaluateExpression(_value3, state);
+      updatedContent += "".concat(before).concat(_evaluated2);
+      restOfContent = after;
+    }
+    updatedContent += restOfContent;
+    if (element.nodeType === Node.TEXT_NODE) {
+      if (element.textContent !== updatedContent) {
+        element.textContent = updatedContent;
+      }
+    } else {
+      var changedElements = findChangedElements(element, updatedContent);
+      if (changedElements.length > 0) {
+        changedElements.map(function (_ref) {
+          var element = _ref.element,
+            content = _ref.content,
+            attributes = _ref.attributes;
+          if (content !== undefined) {
+            removeAllEventListeners(element);
+            element.innerHTML = content;
+            addAllEventListeners(element, state);
+          } else if (attributes !== undefined) {
+            attributes.map(function (_ref2) {
+              var name = _ref2.name,
+                newValue = _ref2.newValue;
+              element.setAttribute(name, newValue);
+            });
+          }
+        });
+      }
+    }
+  }
+};
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+
+// function attributesChanged(
+//     oldElement: HTMLElement,
+//     newElement: HTMLElement
+// ): boolean {
+//     for (let i = 0; i < oldElement.attributes.length; i++) {
+//         const oldAttr = oldElement.attributes[i];
+//         const newAttr = newElement.getAttribute(oldAttr.name);
+//         if (newAttr !== oldAttr.value) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: newAttrValue || ""
+      });
+    }
+  }
+  return changedAttributes;
+}
+function findChangedElements(oldElement, newHtml) {
+  var newElement = oldElement.cloneNode();
+  newElement.innerHTML = newHtml;
+  function compareNodes(oldNode, newNode) {
+    var textContentChanged = false;
+    var changedChildren = [];
+    for (var i = 0; i < oldNode.childNodes.length; i++) {
+      var oldChild = oldNode.childNodes[i];
+      var newChild = newNode.childNodes[i];
+      if (oldChild.nodeType === Node.TEXT_NODE && newChild && newChild.nodeType === Node.TEXT_NODE) {
+        if (oldChild.textContent !== newChild.textContent) {
+          textContentChanged = true;
+          break;
+        }
+      } else {
+        var changedAttributes = getChangedAttributes(oldChild, newChild);
+        if (changedAttributes.length > 0) {
+          changedChildren.push({
+            element: oldChild,
+            attributes: changedAttributes
+          });
+        }
+      }
+    }
+    if (textContentChanged) {
+      return [{
+        element: oldNode,
+        content: newNode.innerHTML
+      }];
+    } else {
+      for (var _i2 = 0; _i2 < oldNode.childNodes.length; _i2++) {
+        var changes = compareNodes(oldNode.childNodes[_i2], newNode.childNodes[_i2]);
+        changedChildren = changedChildren.concat(changes);
+      }
+      return changedChildren;
+    }
+  }
+  return compareNodes(oldElement, newElement);
+}
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var reactiveMatch = templateExpressionRegex.exec(attribute.value);
+    return {
+      name: attribute.name,
+      value: reactiveMatch ? reactiveMatch[1] : attribute.value,
+      reactive: !!reactiveMatch
+    };
+  });
+  return attributes;
+};
+var loadTree = function loadTree(rootElement, parentAttributes) {
+  var tree = [];
+  var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (!isCustomElement(element)) {
+      // template =
+      //     templates.find(
+      //         (template) =>
+      //             template.getAttribute("id") ===
+      //             element.tagName.toLowerCase()
+      //     )?.innerHTML || "";
+      var attributes = getAttributes(element);
+      tree.push({
+        element: element,
+        template: element.innerHTML,
+        attributes: attributes,
+        parentAttributes: parentAttributes
+      });
+    }
+    element = result.iterateNext();
+  }
+  return tree;
+};
+var loadTemplates = function loadTemplates(rootElement) {
+  var templates = [];
+  var xpath = "template";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    templates.push(element);
+    element = result.iterateNext();
+  }
+  return templates;
+};
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+function addEventListeners(parent) {
+  var eventName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "click";
+  var state = arguments.length > 2 ? arguments[2] : undefined;
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+function removeEventListeners(parent) {
+  var eventName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "click";
+  parent === null || parent === void 0 || parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+var makeEventHandler = function makeEventHandler() {
+  var eventName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "click";
+  var element = arguments.length > 1 ? arguments[1] : undefined;
+  var state = arguments.length > 2 ? arguments[2] : undefined;
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+var init = function init(document) {
+  var state = {};
+  var tree = [];
+  var templates = [];
+  function defineCustomElement(name, innerHTML) {
+    function CustomElement() {
+      return Reflect.construct(HTMLElement, [], CustomElement);
+    }
+    CustomElement.prototype = Object.create(HTMLElement.prototype);
+    CustomElement.prototype.constructor = CustomElement;
+    CustomElement.prototype.connectedCallback = function () {
+      var attributes = getAttributes(this);
+
+      // Create a temporary div element
+      var tempDiv = document.createElement("div");
+      // Set its innerHTML to the HTML string
+      tempDiv.innerHTML = innerHTML.replace(/\{\{\s*children\s*\}\}/g, this.innerHTML);
+
+      // Replace the current element with each of the new elements
+      while (tempDiv.firstChild) {
+        var newElement = tempDiv.firstChild;
+        this.parentNode.insertBefore(newElement, this);
+        if (newElement.nodeType === Node.TEXT_NODE) {
+          var _textContent;
+          var textContent = (_textContent = newElement.textContent) !== null && _textContent !== void 0 ? _textContent : "";
+          var hasTemplateExpression = templateExpressionRegex.test(textContent);
+          if (hasTemplateExpression) {
+            var _textContent2;
+            tree.push({
+              element: newElement,
+              template: (_textContent2 = newElement.textContent) !== null && _textContent2 !== void 0 ? _textContent2 : "",
+              attributes: [],
+              parentAttributes: attributes
+            });
+          }
+        } else {
+          if (!isCustomElement(newElement)) {
+            tree = tree.concat(loadTree(newElement, attributes));
+          }
+        }
+      }
+      this.parentNode.removeChild(this);
+    };
+    customElements.define(name, CustomElement);
+  }
+  var AppElement = {
+    element: null,
+    get value() {
+      if (!this.element) {
+        this.element = document.querySelector("#app");
+      }
+      if (!this.element) {
+        throw new Error("No app element found!");
+      }
+      return this.element;
+    }
+  };
+  function updateState(name, value) {
+    setTimeout(function () {
+      state[name] = value;
+      render(tree, state);
+    }, 0);
+  }
+  function defineCustomElements(templates) {
+    templates.forEach(function (template) {
+      var name = template.getAttribute("id");
+      if (!name) {
+        throw new Error("Missing id attribute");
+      }
+      defineCustomElement(name, template.innerHTML);
+    });
+  }
+  var onLoad = function onLoad() {
+    tree = loadTree(AppElement.value, []);
+    templates = loadTemplates(AppElement.value);
+    defineCustomElements(templates);
+    console.log(tree);
+    addAllEventListeners(AppElement.value, state);
+    render(tree, state);
+  };
+  var onLoadHandler = document["onLoadHandler"];
+  if (onLoadHandler) {
+    document.removeEventListener("DOMContentLoaded", onLoadHandler);
+  }
+  document.addEventListener("DOMContentLoaded", onLoad);
+  document["onLoadHandler"] = onLoad;
+  return {
+    variable: function variable(name, value) {
+      state[name] = value;
+      return {
+        set value(newVal) {
+          updateState(name, newVal);
+        },
+        get value() {
+          return state[name];
+        },
+        set: function set(newVal) {
+          updateState(name, newVal);
+        }
+      };
+    }
+  };
+};
+var _init = init(document),
+  variable = _init.variable;
+
+;// CONCATENATED MODULE: ./examples/src/ts-module-todo.ts
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+var todos = variable("todos", [{
+  text: "hello",
+  done: false
+}]);
+variable("save", function () {
+  var todo = document.querySelector("[data-input=todo");
+  if (todo !== null && todo !== void 0 && todo.value) {
+    todos.set([].concat(_toConsumableArray(todos.value), [{
+      text: todo.value,
+      done: false
+    }]));
+    todo.value = "";
+  }
+});
+variable("toggleTodo", function (index) {
+  var newTodos = _toConsumableArray(todos.value);
+  newTodos[index].done = !newTodos[index].done;
+  todos.set(newTodos);
+});
+variable("Checkbox", function (_ref) {
+  var _ref$index = _ref.index,
+    index = _ref$index === void 0 ? -1 : _ref$index,
+    _ref$checked = _ref.checked,
+    checked = _ref$checked === void 0 ? false : _ref$checked;
+  return "<input type=\"checkbox\" id=\"todo".concat(index, "\" data-on-change=\"toggleTodo(").concat(index, ")\" ").concat(checked ? "checked" : "", " />");
+});
+var counter = variable("counter", 0);
+variable("increment", function () {
+  counter.set(counter.value + 1);
+});
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});

@@ -1,0 +1,41 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog Templates</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="pt-40 max-w-sm mx-auto">
+            <template id="x-name">
+                <div>{{ dataId }} {{ children }}</div>
+            </template>
+            <template id="x-child">
+                <div>
+                    <div>{{ dataId }}</div>
+                    <div>
+                        {{ names.map( (n, i) => `
+                        <x-name data-id="1">
+                            ${n + (dataId == i ? count : '')}
+                        </x-name>
+                        ` ) }}
+                    </div>
+                </div>
+            </template>
+            <template id="x-parent">
+                <div>Parent</div>
+                <x-child data-id="{{ count }}"></x-child>
+            </template>
+            <button class="btn btn-primary" onclick="increment()">
+                Increment
+            </button>
+            <x-parent></x-parent>
+        </div>
+        <script src="/examples/dist/ts-templates.js"></script>
+    </body>
+</html>
