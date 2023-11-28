@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["Cog"] = factory();
+		exports["ts-templates"] = factory();
 	else
-		root["Cog"] = factory();
+		root["ts-templates"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -14,23 +14,6 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_require__ = {};
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -44,18 +27,10 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   addEventListeners: () => (/* binding */ addEventListeners),
-/* harmony export */   evaluateExpression: () => (/* binding */ evaluateExpression),
-/* harmony export */   findNextTemplateExpression: () => (/* binding */ findNextTemplateExpression),
-/* harmony export */   init: () => (/* binding */ init),
-/* harmony export */   loadTemplates: () => (/* binding */ loadTemplates),
-/* harmony export */   loadTree: () => (/* binding */ loadTree),
-/* harmony export */   removeEventListeners: () => (/* binding */ removeEventListeners),
-/* harmony export */   render: () => (/* binding */ render),
-/* harmony export */   variable: () => (/* binding */ variable)
-/* harmony export */ });
+
+;// CONCATENATED MODULE: ./src/cog.ts
 var templateExpressionRegex = /\{\{(.+?)\}\}/;
 var createExpressionScope = function createExpressionScope(expression, state) {
   var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
@@ -458,6 +433,15 @@ var init = function init(document) {
 var _init = init(document),
   variable = _init.variable;
 
+;// CONCATENATED MODULE: ./examples/src/ts-templates.ts
+
+variable("foo", "bar");
+variable("myValue", "My Attribute");
+var count = variable("count", 0);
+window.increment = function () {
+  count.value++;
+};
+variable("names", ["Alice", "Bob", "Carol"]);
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

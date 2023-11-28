@@ -11,17 +11,25 @@ interface Cog {
 
 type HTMLString = string;
 
+type Attribute = {
+    name: string;
+    value: string;
+    reactive: boolean;
+};
+
 type ReactiveNode = {
     element: HTMLElement;
     template: HTMLString;
+    attributes: Attribute[];
+    parentAttributes: Attribute[];
 };
 
 type DOMTree = ReactiveNode[];
 
 type ChangedElement = {
     element: HTMLElement;
-    content: HTMLString;
-    attributes?: Record<string, string>[];
+    content?: HTMLString;
+    attributes?: { name: string; newValue: string }[];
 };
 
 type State = Record<string, unknown>;
@@ -29,10 +37,12 @@ type State = Record<string, unknown>;
 type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
 type DocumentWithHandler = Document & { onLoadHandler: () => void };
 
+const templateExpressionRegex = /\{\{(.+?)\}\}/;
+
 const createExpressionScope = (expression: string, state: State) => {
     const functionBody = `return (state) => {${Object.keys(state)
         .map((variable) => `const ${variable} = state["${variable}"];`)
-        .join("\n")}; return ${expression}}`;
+        .join("\n")} return ${expression}}`;
 
     return Function(functionBody)();
 };
@@ -80,15 +90,62 @@ export function findNextTemplateExpression(htmlText: string): {
     return { start, end: -1 };
 }
 
+const convertAttribute = (attribute: string): string => {
+    return attribute
+        .split("-")
+        .reduce(
+            (result, part, index) =>
+                result + (index ? part[0].toUpperCase() + part.slice(1) : part),
+            ""
+        );
+};
+
+const isCustomElement = (element: HTMLElement): boolean => {
+    return element.tagName.includes("-");
+};
+
 export const render = (tree: DOMTree, state: State) => {
     let treeNodeIndex = 0;
 
     for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
-        const { element, template } = tree[treeNodeIndex];
+        const { element, template, attributes, parentAttributes } =
+            tree[treeNodeIndex];
 
         let updatedContent = "";
         let restOfContent = template;
         let hasTemplateExpression = true;
+
+        if (attributes) {
+            let i = 0;
+            for (i; i < attributes.length; i++) {
+                const attribute = attributes[i];
+                const name = attribute.name;
+                const value = attribute.value;
+                const reactive = attribute.reactive;
+                const evaluated = reactive
+                    ? evaluateExpression(value, state)
+                    : value;
+
+                if (evaluated !== element.getAttribute(name)) {
+                    element.setAttribute(name, evaluated);
+                }
+            }
+        }
+
+        if (parentAttributes) {
+            let i = 0;
+            for (i; i < parentAttributes.length; i++) {
+                const attribute = parentAttributes[i];
+                const name = attribute.name;
+                const value = attribute.value;
+                const reactive = attribute.reactive;
+                const evaluated = reactive
+                    ? evaluateExpression(value, state)
+                    : value;
+
+                state[convertAttribute(name)] = evaluated;
+            }
+        }
 
         while (hasTemplateExpression) {
             const { start, end } = findNextTemplateExpression(restOfContent);
@@ -108,27 +165,32 @@ export const render = (tree: DOMTree, state: State) => {
 
             restOfContent = after;
         }
+
         updatedContent += restOfContent;
 
-        const changedElements = findChangedElements(element, updatedContent);
+        if (element.nodeType === Node.TEXT_NODE) {
+            if (element.textContent !== updatedContent) {
+                element.textContent = updatedContent;
+            }
+        } else {
+            const changedElements = findChangedElements(
+                element,
+                updatedContent
+            );
 
-        if (changedElements.length > 0) {
-            changedElements.map(({ element, content }) => {
-                removeAllEventListeners(element);
-                // if (attributes) {
-                //     let i = 0;
-                //     for (i; i < attributes.length; i++) {
-                //         const attribute = attributes[i];
-                //         const name = Object.keys(attribute)[0];
-                //         const value = attribute[name];
-                //         element.setAttribute(name, value);
-                //     }
-                // } else
-                // if (content) {
-                element.innerHTML = content;
-                // }
-                addAllEventListeners(element, state);
-            });
+            if (changedElements.length > 0) {
+                changedElements.map(({ element, content, attributes }) => {
+                    if (content !== undefined) {
+                        removeAllEventListeners(element);
+                        element.innerHTML = content;
+                        addAllEventListeners(element, state);
+                    } else if (attributes !== undefined) {
+                        attributes.map(({ name, newValue }) => {
+                            element.setAttribute(name, newValue);
+                        });
+                    }
+                });
+            }
         }
     }
 };
@@ -146,19 +208,39 @@ function htmlToText(html: string) {
     return tmp.textContent || tmp.innerText || "";
 }
 
-// const getDifferentAttributes = (oldNode: Element, newNode: Element) => {
-//     const differentAttributes: Record<string, string>[] = [];
-//     for (let i = 0; i < oldNode.attributes.length; i++) {
-//         const oldAttribute = oldNode.attributes[i];
-//         const newAttribute = newNode.attributes[i];
-//         if (oldAttribute.value !== newAttribute.value) {
-//             differentAttributes.push({
-//                 [oldAttribute.name]: newAttribute.value,
-//             });
+// function attributesChanged(
+//     oldElement: HTMLElement,
+//     newElement: HTMLElement
+// ): boolean {
+//     for (let i = 0; i < oldElement.attributes.length; i++) {
+//         const oldAttr = oldElement.attributes[i];
+//         const newAttr = newElement.getAttribute(oldAttr.name);
+//         if (newAttr !== oldAttr.value) {
+//             return true;
 //         }
 //     }
-//     return differentAttributes;
-// };
+//     return false;
+// }
+
+function getChangedAttributes(
+    oldElement: HTMLElement,
+    newElement: HTMLElement
+): Array<{ name: string; newValue: string }> {
+    const changedAttributes: Array<{ name: string; newValue: string }> = [];
+
+    for (let i = 0; i < oldElement.attributes.length; i++) {
+        const oldAttr = oldElement.attributes[i];
+        const newAttrValue = newElement.getAttribute(oldAttr.name);
+        if (newAttrValue !== oldAttr.value) {
+            changedAttributes.push({
+                name: oldAttr.name,
+                newValue: newAttrValue || "",
+            });
+        }
+    }
+
+    return changedAttributes;
+}
 
 function findChangedElements(oldElement: HTMLElement, newHtml: string) {
     const newElement = oldElement.cloneNode() as HTMLElement;
@@ -169,6 +251,7 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
         newNode: HTMLElement
     ): ChangedElement[] {
         let textContentChanged = false;
+        let changedChildren: ChangedElement[] = [];
 
         for (let i = 0; i < oldNode.childNodes.length; i++) {
             const oldChild = oldNode.childNodes[i];
@@ -182,13 +265,23 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
                     textContentChanged = true;
                     break;
                 }
+            } else {
+                const changedAttributes = getChangedAttributes(
+                    oldChild as HTMLElement,
+                    newChild as HTMLElement
+                );
+                if (changedAttributes.length > 0) {
+                    changedChildren.push({
+                        element: oldChild as HTMLElement,
+                        attributes: changedAttributes,
+                    });
+                }
             }
         }
 
         if (textContentChanged) {
             return [{ element: oldNode, content: newNode.innerHTML }];
         } else {
-            let changedChildren: ChangedElement[] = [];
             for (let i = 0; i < oldNode.childNodes.length; i++) {
                 const changes = compareNodes(
                     oldNode.childNodes[i] as HTMLElement,
@@ -204,10 +297,26 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
     return compareNodes(oldElement, newElement);
 }
 
-export const loadTree = (rootElement: Node): DOMTree => {
+const getAttributes = (element: HTMLElement): Attribute[] => {
+    const attributes = Array.from(element.attributes).map((attribute) => {
+        const reactiveMatch = templateExpressionRegex.exec(attribute.value);
+        return {
+            name: attribute.name,
+            value: reactiveMatch ? reactiveMatch[1] : attribute.value,
+            reactive: !!reactiveMatch,
+        };
+    });
+
+    return attributes;
+};
+
+export const loadTree = (
+    rootElement: Node,
+    parentAttributes: Attribute[]
+): DOMTree => {
     const tree: DOMTree = [];
     const xpath =
-        ".//*[text()[contains(., '{{')] and text()[contains(., '}}')]]";
+        "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
 
     const result = document.evaluate(
         xpath,
@@ -219,7 +328,22 @@ export const loadTree = (rootElement: Node): DOMTree => {
     let element = <HTMLElement>result.iterateNext();
 
     while (element) {
-        tree.push({ element, template: element.innerHTML });
+        if (!isCustomElement(element)) {
+            // template =
+            //     templates.find(
+            //         (template) =>
+            //             template.getAttribute("id") ===
+            //             element.tagName.toLowerCase()
+            //     )?.innerHTML || "";
+            const attributes = getAttributes(element);
+            tree.push({
+                element,
+                template: element.innerHTML,
+                attributes,
+                parentAttributes,
+            });
+        }
+
         element = <HTMLElement>result.iterateNext();
     }
 
@@ -310,7 +434,7 @@ export const init = (document: Document): Cog => {
     let tree: DOMTree = [];
     let templates: HTMLElement[] = [];
 
-    function defineElement(name: string, innerHTML: string) {
+    function defineCustomElement(name: string, innerHTML: string) {
         function CustomElement() {
             return Reflect.construct(HTMLElement, [], CustomElement);
         }
@@ -319,17 +443,43 @@ export const init = (document: Document): Cog => {
         CustomElement.prototype.constructor = CustomElement;
 
         CustomElement.prototype.connectedCallback = function () {
-            const keys = Object.keys(this.dataset);
-            for (let i = 0; i < keys.length; i++) {
-                const key = keys[i];
-                const value = this.dataset[key];
-                state[key] = value;
-            }
+            const attributes = getAttributes(this);
 
-            this.outerHTML = innerHTML.replace(
+            // Create a temporary div element
+            const tempDiv = document.createElement("div");
+            // Set its innerHTML to the HTML string
+            tempDiv.innerHTML = innerHTML.replace(
                 /\{\{\s*children\s*\}\}/g,
                 this.innerHTML
             );
+
+            // Replace the current element with each of the new elements
+            while (tempDiv.firstChild) {
+                const newElement = tempDiv.firstChild;
+                this.parentNode.insertBefore(newElement, this);
+                if (newElement.nodeType === Node.TEXT_NODE) {
+                    const textContent =
+                        (newElement as HTMLElement).textContent ?? "";
+                    const hasTemplateExpression =
+                        templateExpressionRegex.test(textContent);
+
+                    if (hasTemplateExpression) {
+                        tree.push({
+                            element: newElement as HTMLElement,
+                            template:
+                                (newElement as HTMLElement).textContent ?? "",
+                            attributes: [],
+                            parentAttributes: attributes,
+                        });
+                    }
+                } else {
+                    if (!isCustomElement(newElement as HTMLElement)) {
+                        tree = tree.concat(loadTree(newElement, attributes));
+                    }
+                }
+            }
+
+            this.parentNode.removeChild(this);
         };
 
         customElements.define(name, CustomElement as never);
@@ -355,20 +505,21 @@ export const init = (document: Document): Cog => {
         }, 0);
     }
 
-    function defineElements(templates: HTMLElement[]) {
+    function defineCustomElements(templates: HTMLElement[]) {
         templates.forEach((template) => {
             const name = template.getAttribute("id");
             if (!name) {
                 throw new Error("Missing id attribute");
             }
-            defineElement(name, template.innerHTML);
+            defineCustomElement(name, template.innerHTML);
         });
     }
 
     const onLoad = () => {
+        tree = loadTree(AppElement.value, []);
         templates = loadTemplates(AppElement.value);
-        defineElements(templates);
-        tree = loadTree(AppElement.value);
+        defineCustomElements(templates);
+        console.log(tree);
         addAllEventListeners(AppElement.value, state);
         render(tree, state);
     };
