@@ -274,14 +274,13 @@ export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
             lastEvaluation,
             updatedContent
         );
-        console.log(changedElements);
+
         if (changedElements.length > 0) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(updatedContent, "text/html");
             const newElement = doc.body.firstChild as HTMLElementFromTemplate;
             newElement.lastTemplateEvaluation = updatedContent;
             newElement.originalTemplateInvocation = template;
-            console.log(newElement, element);
 
             // Version with replacing the whole template invocation
             // And triggering callback for custom templates
@@ -656,6 +655,7 @@ export const init = (document: Document): Cog => {
         CustomElement.prototype.constructor = CustomElement;
 
         CustomElement.prototype.connectedCallback = function () {
+            console.log("new custom element added to DOM", name);
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const customElement: HTMLElementFromTemplate = this;
             const template = templates.find(
@@ -686,16 +686,6 @@ export const init = (document: Document): Cog => {
                 localState[convertAttribute(attribute.name)] = attributeValue;
             }
 
-            const evaluatedTemplate = evaluateTemplate(
-                tempDiv.innerHTML,
-                localState
-            );
-            const originalInvocation =
-                customElement.originalTemplateInvocation || tempDiv.innerHTML;
-            const lastTemplateEvaluation = evaluatedTemplate;
-            // console.log(evaluatedTemplate);
-            tempDiv.innerHTML = evaluatedTemplate;
-
             const xpathResult = document.evaluate(
                 "//*[contains(name(), '-')]",
                 tempDiv,
@@ -712,12 +702,25 @@ export const init = (document: Document): Cog => {
                 customChildElement = xpathResult.iterateNext();
             }
 
-            for (const customChildElement of customChildElements) {
-                (customChildElement as HTMLElement).setAttribute(
-                    "data-child-of",
-                    name
-                );
-            }
+            // for (const customChildElement of customChildElements) {
+            //     (customChildElement as HTMLElement).setAttribute(
+            //         "data-child-of",
+            //         name
+            //     );
+            // }
+
+            const originalInvocation =
+                customElement.originalTemplateInvocation || tempDiv.innerHTML;
+
+            const evaluatedTemplate = evaluateTemplate(
+                tempDiv.innerHTML,
+                localState
+            );
+
+            // console.log(evaluatedTemplate);
+            tempDiv.innerHTML = evaluatedTemplate;
+
+            const lastTemplateEvaluation = evaluatedTemplate;
             //     const customElementAttributes = getAttributes(
             //         customChildElement as HTMLElement
             //     );
@@ -771,7 +774,7 @@ export const init = (document: Document): Cog => {
 
                 // const newTree = loadTree(AppElement.value, []);
                 templatesTree = cleanTemplatesTree(templatesTree);
-                console.log(templatesTree);
+                console.log("tree", templatesTree);
                 // render(newTree, state);
             }
             // }

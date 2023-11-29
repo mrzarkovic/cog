@@ -225,14 +225,12 @@ var renderTemplates = function renderTemplates(tree, state) {
     }
     var updatedContent = evaluateTemplate(template, localState);
     var changedElements = findChangedTemplateElements(lastEvaluation, updatedContent);
-    console.log(changedElements);
     if (changedElements.length > 0) {
       var parser = new DOMParser();
       var doc = parser.parseFromString(updatedContent, "text/html");
       var newElement = doc.body.firstChild;
       newElement.lastTemplateEvaluation = updatedContent;
       newElement.originalTemplateInvocation = template;
-      console.log(newElement, element);
 
       // Version with replacing the whole template invocation
       // And triggering callback for custom templates
@@ -521,6 +519,7 @@ var init = function init(document) {
     CustomElement.prototype.constructor = CustomElement;
     CustomElement.prototype.connectedCallback = function () {
       var _customElement$parent, _customElement$parent2;
+      console.log("new custom element added to DOM", name);
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       var customElement = this;
       var template = templates.find(function (template) {
@@ -552,11 +551,6 @@ var init = function init(document) {
       } finally {
         _iterator.f();
       }
-      var evaluatedTemplate = evaluateTemplate(tempDiv.innerHTML, localState);
-      var originalInvocation = customElement.originalTemplateInvocation || tempDiv.innerHTML;
-      var lastTemplateEvaluation = evaluatedTemplate;
-      // console.log(evaluatedTemplate);
-      tempDiv.innerHTML = evaluatedTemplate;
       var xpathResult = document.evaluate("//*[contains(name(), '-')]", tempDiv, null, XPathResult.ANY_TYPE, null);
       var customChildElement = xpathResult.iterateNext();
       var customChildElements = [];
@@ -564,10 +558,20 @@ var init = function init(document) {
         customChildElements.push(customChildElement);
         customChildElement = xpathResult.iterateNext();
       }
-      for (var _i5 = 0, _customChildElements = customChildElements; _i5 < _customChildElements.length; _i5++) {
-        var _customChildElement = _customChildElements[_i5];
-        _customChildElement.setAttribute("data-child-of", name);
-      }
+
+      // for (const customChildElement of customChildElements) {
+      //     (customChildElement as HTMLElement).setAttribute(
+      //         "data-child-of",
+      //         name
+      //     );
+      // }
+
+      var originalInvocation = customElement.originalTemplateInvocation || tempDiv.innerHTML;
+      var evaluatedTemplate = evaluateTemplate(tempDiv.innerHTML, localState);
+
+      // console.log(evaluatedTemplate);
+      tempDiv.innerHTML = evaluatedTemplate;
+      var lastTemplateEvaluation = evaluatedTemplate;
       //     const customElementAttributes = getAttributes(
       //         customChildElement as HTMLElement
       //     );
@@ -619,7 +623,7 @@ var init = function init(document) {
 
         // const newTree = loadTree(AppElement.value, []);
         templatesTree = cleanTemplatesTree(templatesTree);
-        console.log(templatesTree);
+        console.log("tree", templatesTree);
         // render(newTree, state);
       }
       // }

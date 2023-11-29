@@ -13,12 +13,11 @@
     <body>
         <div id="app" class="pt-40 max-w-sm mx-auto">
             <template id="x-child">
-                <div>{{ dataChild }}</div>
+                <div>{{ dataChild }} {{ count }}</div>
             </template>
             <template id="x-parent">
                 <div>
-                    <div>{{ dataParent }}</div>
-                    <div>{{ names.map(n => n) }}</div>
+                    <x-child data-child="dataChild"></x-child>
                 </div>
             </template>
             <x-parent data-parent="{{ count }}"></x-parent>
