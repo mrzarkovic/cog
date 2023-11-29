@@ -13,28 +13,27 @@
     <body>
         <div id="app" class="pt-40 max-w-sm mx-auto">
             <template id="x-name">
-                <div>{{ dataId }} {{ children }}</div>
+                <div>{{ dataX }} {{ children }}</div>
             </template>
             <template id="x-child">
                 <div>
-                    <div>{{ dataId }}</div>
+                    <div>{{ dataChild }}</div>
                     <div>
                         {{ names.map( (n, i) => `
-                        <x-name data-id="1">
-                            ${n + (dataId == i ? count : '')}
-                        </x-name>
+                        <x-name data-x="0"> ${n} </x-name>
                         ` ) }}
                     </div>
                 </div>
             </template>
             <template id="x-parent">
-                <div>Parent</div>
-                <x-child data-id="{{ count }}"></x-child>
+                <div>
+                    <x-name data-x="{{ dataCount }}">{{ dataCount }}</x-name>
+                </div>
             </template>
             <button class="btn btn-primary" onclick="increment()">
                 Increment
             </button>
-            <x-parent></x-parent>
+            <x-parent data-count="{{ count }}"></x-parent>
         </div>
         <script src="/examples/dist/ts-templates.js"></script>
     </body>

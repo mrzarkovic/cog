@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["ts-templates"] = factory();
+		exports["ts-html-in-expression"] = factory();
 	else
-		root["ts-templates"] = factory();
+		root["ts-html-in-expression"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -697,15 +697,13 @@ var init = function init(document) {
 var _init = init(document),
   variable = _init.variable;
 
-;// CONCATENATED MODULE: ./examples/src/ts-templates.ts
+;// CONCATENATED MODULE: ./examples/src/ts-html-in-expression.ts
 
-variable("foo", "bar");
-variable("myValue", "My Attribute");
+variable("names", ["Alice", "Bob", "Carol"]);
 var count = variable("count", 0);
 window.increment = function () {
   count.value++;
 };
-variable("names", ["Alice", "Bob", "Carol"]);
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;
