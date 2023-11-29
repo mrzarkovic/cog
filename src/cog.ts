@@ -35,6 +35,7 @@ type DOMTree = ReactiveNode[];
 
 type ChangedElement = {
     element: HTMLElement;
+    newElement: HTMLElement;
     content?: HTMLString;
     attributes?: { name: string; newValue: string }[];
 };
@@ -200,7 +201,8 @@ export const render = (tree: DOMTree, state: State) => {
                         removeAllEventListeners(element);
                         element.innerHTML = content;
                         addAllEventListeners(element, localState);
-                    } else if (attributes !== undefined) {
+                    }
+                    if (attributes !== undefined) {
                         attributes.map(({ name, newValue }) => {
                             element.setAttribute(name, newValue);
                         });
@@ -251,32 +253,97 @@ export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
         }
 
         const updatedContent = evaluateTemplate(template, localState);
-        const changedElements = findChangedTemplateElements(
-            element.lastTemplateEvaluation,
-            updatedContent
+        const parser = new DOMParser();
+        const newElementDoc = parser.parseFromString(
+            updatedContent,
+            "text/html"
         );
+        const newElement = newElementDoc.body.firstChild as HTMLElement;
+        const oldElementDoc = parser.parseFromString(
+            element.lastTemplateEvaluation,
+            "text/html"
+        );
+        const oldElement = oldElementDoc.body.firstChild as HTMLElement;
 
-        // TODO: Changed elements for TEXT_NODE
+        const changedElements = compareNodes(oldElement, newElement);
 
         if (changedElements.length > 0) {
             element.lastTemplateEvaluation = updatedContent;
-            if (element.nodeType === Node.TEXT_NODE) {
-                element.textContent = updatedContent;
-            } else {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(updatedContent, "text/html");
-                const newElement = doc.body
-                    .firstChild as HTMLElementFromTemplate;
-                element.innerHTML = newElement.innerHTML;
-            }
 
-            // TODO: find exact changed element in template and replace
-            // only that element with original part of the template
-            // For example, findCahngedTemplateElements can return index
-            // of changed child node
+            changedElements.map(
+                ({
+                    element: changedTarget,
+                    newElement,
+                    content,
+                    attributes,
+                }) => {
+                    const changedElement = findCorrespondingNode(
+                        changedTarget,
+                        oldElement,
+                        element
+                    ) as HTMLElement;
+
+                    if (changedElement) {
+                        if (
+                            changedTarget.nodeType !== Node.TEXT_NODE &&
+                            isCustomElement(changedTarget)
+                        ) {
+                            changedElement.parentElement?.replaceChild(
+                                newElement,
+                                changedElement
+                            );
+                        } else {
+                            if (content !== undefined) {
+                                if (
+                                    changedElement.nodeType === Node.TEXT_NODE
+                                ) {
+                                    changedElement.textContent = content;
+                                } else {
+                                    removeAllEventListeners(changedElement);
+                                    changedElement.innerHTML = content;
+                                    addAllEventListeners(
+                                        changedElement,
+                                        localState
+                                    );
+                                }
+                            } else if (attributes !== undefined) {
+                                attributes.map(({ name, newValue }) => {
+                                    changedElement.setAttribute(name, newValue);
+                                });
+                            }
+                        }
+                    }
+                }
+            );
         }
     }
 };
+
+function findCorrespondingNode(
+    nodeInA: Node,
+    rootA: Node,
+    rootB: Node
+): Node | null {
+    const pathInA = [];
+    let temp = nodeInA;
+    while (temp !== rootA) {
+        pathInA.unshift(
+            Array.prototype.indexOf.call(temp.parentNode!.childNodes, temp)
+        );
+        temp = temp.parentNode!;
+    }
+
+    let correspondingNodeInB = rootB;
+    for (const index of pathInA) {
+        if (correspondingNodeInB.childNodes[index]) {
+            correspondingNodeInB = correspondingNodeInB.childNodes[index];
+        } else {
+            return null;
+        }
+    }
+
+    return correspondingNodeInB;
+}
 
 function escapeHtml(html: string) {
     return html
@@ -315,72 +382,81 @@ const sanitizeHtml = (html: string) => {
     return html.replace(/[\r\n]+\s*/g, "");
 };
 
-function findChangedTemplateElements(oldHtml: string, newHtml: string) {
-    const oldElement = document.createElement("div");
-    oldElement.innerHTML = oldHtml;
-    const newElement = document.createElement("div");
-    newElement.innerHTML = newHtml;
+function compareNodes(
+    oldNode: HTMLElement,
+    newNode: HTMLElement
+): ChangedElement[] {
+    // TODO: changed custom element like <my-element></my-element> will
+    // be returned twice if both attributes and content changed.
+    // But either way the entire element will be updated, so it's suboptimal
+    // because the loop with changed elements will be longer for no reason.
 
-    function compareNodes(
-        oldNode: HTMLElement,
-        newNode: HTMLElement
-    ): ChangedElement[] {
-        if (oldNode.nodeType === Node.TEXT_NODE) {
-            if (oldNode.textContent !== newNode.textContent) {
-                return [{ element: oldNode, content: newNode.innerHTML }];
-            }
+    if (oldNode.nodeType === Node.TEXT_NODE) {
+        if (oldNode.textContent !== newNode.textContent) {
+            return [
+                {
+                    element: oldNode,
+                    newElement: newNode,
+                    content: newNode.textContent ?? "",
+                },
+            ];
+        }
 
-            return [];
-        } else {
-            oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
-            newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
+        return [];
+    } else {
+        oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
+        newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
 
-            let textContentChanged = false;
-            let changedChildren: ChangedElement[] = [];
+        let textContentChanged = false;
+        let changedChildren: ChangedElement[] = [];
 
-            for (let i = 0; i < oldNode.childNodes.length; i++) {
-                const oldChild = oldNode.childNodes[i];
-                const newChild = newNode.childNodes[i];
-                if (
-                    oldChild.nodeType === Node.TEXT_NODE &&
-                    newChild &&
-                    newChild.nodeType === Node.TEXT_NODE
-                ) {
-                    if (oldChild.textContent !== newChild.textContent) {
-                        textContentChanged = true;
-                        break;
-                    }
-                } else if (oldChild.nodeType === Node.ELEMENT_NODE) {
-                    const changedAttributes = getChangedAttributes(
-                        oldChild as HTMLElement,
-                        newChild as HTMLElement
-                    );
-                    if (changedAttributes.length > 0) {
-                        changedChildren.push({
-                            element: oldChild as HTMLElement,
-                            attributes: changedAttributes,
-                        });
-                    }
+        for (let i = 0; i < oldNode.childNodes.length; i++) {
+            const oldChild = oldNode.childNodes[i];
+            const newChild = newNode.childNodes[i];
+            if (
+                oldChild.nodeType === Node.TEXT_NODE &&
+                newChild &&
+                newChild.nodeType === Node.TEXT_NODE
+            ) {
+                if (oldChild.textContent !== newChild.textContent) {
+                    textContentChanged = true;
+                    break;
                 }
-            }
-
-            if (textContentChanged) {
-                return [{ element: oldNode, content: newNode.innerHTML }];
-            } else {
-                for (let i = 0; i < oldNode.childNodes.length; i++) {
-                    const changes = compareNodes(
-                        oldNode.childNodes[i] as HTMLElement,
-                        newNode.childNodes[i] as HTMLElement
-                    );
-                    changedChildren = changedChildren.concat(changes);
+            } else if (oldChild.nodeType === Node.ELEMENT_NODE) {
+                const changedAttributes = getChangedAttributes(
+                    oldChild as HTMLElement,
+                    newChild as HTMLElement
+                );
+                if (changedAttributes.length > 0) {
+                    changedChildren.push({
+                        element: oldChild as HTMLElement,
+                        newElement: newChild as HTMLElement,
+                        attributes: changedAttributes,
+                    });
                 }
-
-                return changedChildren;
             }
         }
-    }
 
-    return compareNodes(oldElement, newElement);
+        if (textContentChanged) {
+            return [
+                {
+                    element: oldNode,
+                    newElement: newNode,
+                    content: newNode.innerHTML,
+                },
+            ];
+        } else {
+            for (let i = 0; i < oldNode.childNodes.length; i++) {
+                const changes = compareNodes(
+                    oldNode.childNodes[i] as HTMLElement,
+                    newNode.childNodes[i] as HTMLElement
+                );
+                changedChildren = changedChildren.concat(changes);
+            }
+
+            return changedChildren;
+        }
+    }
 }
 
 function findChangedElements(oldElement: HTMLElement, newHtml: string) {
@@ -393,7 +469,13 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
     ): ChangedElement[] {
         if (oldNode.nodeType === Node.TEXT_NODE) {
             if (oldNode.textContent !== newNode.textContent) {
-                return [{ element: oldNode, content: newNode.innerHTML }];
+                return [
+                    {
+                        element: oldNode,
+                        newElement: newNode,
+                        content: newNode.innerHTML,
+                    },
+                ];
             }
 
             return [];
@@ -427,6 +509,7 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
                     if (changedAttributes.length > 0) {
                         changedChildren.push({
                             element: oldChild as HTMLElement,
+                            newElement: newChild as HTMLElement,
                             attributes: changedAttributes,
                         });
                     }
@@ -434,7 +517,13 @@ function findChangedElements(oldElement: HTMLElement, newHtml: string) {
             }
 
             if (textContentChanged) {
-                return [{ element: oldNode, content: newNode.innerHTML }];
+                return [
+                    {
+                        element: oldNode,
+                        newElement: newNode,
+                        content: newNode.innerHTML,
+                    },
+                ];
             } else {
                 for (let i = 0; i < oldNode.childNodes.length; i++) {
                     const changes = compareNodes(
@@ -603,7 +692,7 @@ export const init = (document: Document): Cog => {
 
         CustomElement.prototype.connectedCallback = function () {
             // eslint-disable-next-line @typescript-eslint/no-this-alias
-            const customElement: HTMLElementFromTemplate = this;
+            const customElement: HTMLElement = this;
             const template = templates.find(
                 (template) =>
                     template.getAttribute("id") ===
@@ -633,7 +722,7 @@ export const init = (document: Document): Cog => {
             let newElementAttributes: Attribute[] = [];
             if (tempDiv.firstChild?.nodeType !== Node.TEXT_NODE) {
                 newElementAttributes = getAttributes(
-                    tempDiv.firstChild! as HTMLElementFromTemplate
+                    tempDiv.firstChild! as HTMLElement
                 );
             }
 
@@ -656,24 +745,6 @@ export const init = (document: Document): Cog => {
                     attributes: newElementAttributes,
                     parentAttributes: attributes,
                 });
-                // if (newElement.nodeType === Node.TEXT_NODE) {
-                //     const textContent = newElement.textContent ?? "";
-                //     const hasTemplateExpression =
-                //         templateExpressionRegex.test(textContent);
-                //     newElement.lastTemplateEvaluation = evaluatedTemplate;
-
-                //     if (hasTemplateExpression) {
-                //     }
-                // } else {
-                //     if (!isCustomElement(newElement as HTMLElement)) {
-                //         templatesTree.push({
-                //             element: newElement,
-                //             template: originalInvocation,
-                //             attributes: newElementAttributes,
-                //             parentAttributes: attributes,
-                //         });
-                //     }
-                // }
 
                 templatesTree = cleanTemplatesTree(templatesTree);
             }
