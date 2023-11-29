@@ -1,1 +1,643 @@
-!function(n,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports["t"]=t():n["t"]=t()}(self,(()=>(()=>{"use strict";var n={};function t(n){return t="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(n){return typeof n}:function(n){return n&&"function"==typeof Symbol&&n.constructor===Symbol&&n!==Symbol.prototype?"symbol":typeof n},t(n)}function r(n,t){(null==t||t>n.length)&&(t=n.length);for(var r=0,e=new Array(t);r<t;r++)e[r]=n[r];return e}function e(n,t){var r=Object.keys(n);if(Object.getOwnPropertySymbols){var e=Object.getOwnPropertySymbols(n);t&&(e=e.filter((function(t){return Object.getOwnPropertyDescriptor(n,t).enumerable}))),r.push.apply(r,e)}return r}function o(n){for(var r=1;r<arguments.length;r++){var o=null!=arguments[r]?arguments[r]:{};r%2?e(Object(o),!0).forEach((function(r){var e,i,a;e=n,i=r,a=o[r],(i=function(n){var r=function(n,r){if("object"!==t(n)||null===n)return n;var e=n[Symbol.toPrimitive];if(void 0!==e){var o=e.call(n,"string");if("object"!==t(o))return o;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(n)}(n);return"symbol"===t(r)?r:String(r)}(i))in e?Object.defineProperty(e,i,{value:a,enumerable:!0,configurable:!0,writable:!0}):e[i]=a})):Object.getOwnPropertyDescriptors?Object.defineProperties(n,Object.getOwnPropertyDescriptors(o)):e(Object(o)).forEach((function(t){Object.defineProperty(n,t,Object.getOwnPropertyDescriptor(o,t))}))}return n}(n=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(n,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(n,"o",{value:!0})})(n);var i=/\{\{(.+?)\}\}/,a=function(n,t){var r="return (state) => {".concat(Object.keys(t).map((function(n){return"const ".concat(n,' = state["').concat(n,'"];')})).join("\n")," return ").concat(n,"}");return Function(r)()};function u(n,t){try{var r=a(n,t)(t);return Array.isArray(r)&&(r=r.join("")),r}catch(t){throw new Error("Failed to create function from expression {{".concat(n,"}}: ").concat(t.message))}}function f(n){for(var t=n.indexOf("{{"),r=0,e=t;e<n.length;e++)if("{{"===n.slice(e,e+2)?(r++,e++):"}}"===n.slice(e,e+2)&&(r--,e++),0===r)return{start:t,end:e};return{start:t,end:-1}}var c=function(n){return n.split("-").reduce((function(n,t,r){return n+(r?t[0].toUpperCase()+t.slice(1):t)}),"")},v=function(n){return n.tagName.includes("-")},l=function(n,t){for(var r=n,e=!0,o="";e;){var i=f(r),a=i.start,c=i.end;if(-1===c){e=!1;break}var v=r.slice(a+2,c-1),l=r.slice(0,a),d=r.slice(c+1),s=u((b=v,m=void 0,(m=document.createElement("div")).innerHTML=function(n){return n.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(b),m.textContent||m.innerText||""),t);o+="".concat(l).concat(s),r=d}var b,m;return o+r};function d(n,t){for(var r=[],e=0;e<n.attributes.length;e++){var o=n.attributes[e],i=t.getAttribute(o.name);i!==o.value&&r.push({name:o.name,newValue:i||""})}return r}var s=function(n){return n.replace(/[\r\n]+\s*/g,"")};function b(n,t){var r=document.createElement("div");r.innerHTML=n;var e=document.createElement("div");return e.innerHTML=t,function n(t,r){if(t.nodeType===Node.TEXT_NODE)return t.textContent!==r.textContent?[{element:t,content:r.innerHTML}]:[];t.innerHTML=s(t.innerHTML),r.innerHTML=s(r.innerHTML);for(var e=!1,o=[],i=0;i<t.childNodes.length;i++){var a=t.childNodes[i],u=r.childNodes[i];if(a.nodeType===Node.TEXT_NODE&&u&&u.nodeType===Node.TEXT_NODE){if(a.textContent!==u.textContent){e=!0;break}}else if(a.nodeType===Node.ELEMENT_NODE){var f=d(a,u);f.length>0&&o.push({element:a,attributes:f})}}if(e)return[{element:t,content:r.innerHTML}];for(var c=0;c<t.childNodes.length;c++){var v=n(t.childNodes[c],r.childNodes[c]);o=o.concat(v)}return o}(r,e)}var m=function(n){return Array.from(n.attributes).map((function(n){var t=i.exec(n.value);return{name:n.name,value:t?t[1]:n.value,i:!!t}}))},y=function(n,t){for(var r=[],e=document.evaluate("self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",n,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),o=e.iterateNext();o;){if(!v(o)){var i=m(o);r.push({element:o,u:o.innerHTML,attributes:i,v:t})}o=e.iterateNext()}return r},p=function(n){for(var t=[],r=document.evaluate("template",n,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),e=r.iterateNext();e;)e.innerHTML=s(e.innerHTML),t.push(e),e=r.iterateNext();return t};function h(n,t){j(n,"click",t),j(n,"change",t)}function j(n){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"click",r=arguments.length>2?arguments[2]:void 0;n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var e=O(t,n,r);n.addEventListener(t,e),n["".concat(t,"Handler")]=e}))}function w(n){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"click";null==n||n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var r=n["".concat(t,"Handler")];r&&n.removeEventListener(t,r)}))}var O=function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"click",t=arguments.length>2?arguments[2]:void 0,r=(arguments.length>1?arguments[1]:void 0).getAttribute("data-on-".concat(n));if(!r)throw new Error("Missing data-handler attribute");var e=a(r,t);return function(o){try{e(t),o.preventDefault()}catch(o){throw new Error("".concat(o.message,": data-on-").concat(n,"=").concat(r))}}},g=function(n){return n.filter((function(n){var t=n.element;return document.body.contains(t)}))},S=function(n){var t={},e=[],i=[],a=[];function f(e){function f(){return Reflect.construct(HTMLElement,[],f)}f.prototype=Object.create(HTMLElement.prototype),f.prototype.constructor=f,f.prototype.connectedCallback=function(){var e,f,v,d=this,s=i.find((function(n){return n.getAttribute("id")===d.tagName.toLowerCase()})),b=m(d),y=n.createElement("div");y.innerHTML=s.innerHTML.replace(/\{\{\s*children\s*\}\}/g,d.innerHTML);var p,h=o({},t),j=function(n,t){var e="undefined"!=typeof Symbol&&n[Symbol.iterator]||n["@@iterator"];if(!e){if(Array.isArray(n)||(e=function(n,t){if(n){if("string"==typeof n)return r(n,t);var e=Object.prototype.toString.call(n).slice(8,-1);return"Object"===e&&n.constructor&&(e=n.constructor.name),"Map"===e||"Set"===e?Array.from(n):"Arguments"===e||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(e)?r(n,t):void 0}}(n))||t&&n&&"number"==typeof n.length){e&&(n=e);var o=0,i=function(){};return{s:i,n:function(){return o>=n.length?{done:!0}:{done:!1,value:n[o++]}},e:function(n){throw n},f:i}}throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}var a,u=!0,f=!1;return{s:function(){e=e.call(n)},n:function(){var n=e.next();return u=n.done,n},e:function(n){f=!0,a=n},f:function(){try{u||null==e.l||e.l()}finally{if(f)throw a}}}}(b);try{for(j.s();!(p=j.n()).done;){var w=p.value,O=w.value;w.i&&(O=u(O,t)),h[c(w.name)]=O}}catch(n){j.e(n)}finally{j.f()}var S=y.innerHTML,N=[];(null===(e=y.firstChild)||void 0===e?void 0:e.nodeType)!==Node.TEXT_NODE&&(N=m(y.firstChild));var E=l(y.innerHTML,h);y.innerHTML=E;var A=y.firstChild;null===(f=d.parentNode)||void 0===f||f.insertBefore(A,d),!d.dataset.m&&A&&(A.p=E,a.push({element:A,u:S,attributes:N,v:b}),a=g(a)),null===(v=d.parentNode)||void 0===v||v.removeChild(d)},customElements.define(e,f)}var v={element:null,get value(){if(this.element||(this.element=n.querySelector("#app")),!this.element)throw new Error("No app element found!");return this.element}};function j(){(function(n,t){for(var r=0,e=function(){var e=o({},t),i=n[r],a=i.element,f=i.u,v=i.attributes,b=i.v;if(b)for(var m=0;m<b.length;m++){var y=b[m],p=y.name,j=y.value,O=y.i?u(j,e):j;e[c(p)]=O}if(v)for(var g=0;g<v.length;g++){var S=v[g],N=S.name,E=S.value,A=S.i?u(E,e):E;A!==a.getAttribute(N)&&a.setAttribute(N,A)}var M,x,k,T=l(f,e);if(a.nodeType===Node.TEXT_NODE)a.textContent!==T&&(a.textContent=T);else{var C=(x=T,(k=(M=a).cloneNode()).innerHTML=x,function n(t,r){if(t.nodeType===Node.TEXT_NODE)return t.textContent!==r.textContent?[{element:t,content:r.innerHTML}]:[];t.innerHTML=s(t.innerHTML),r.innerHTML=s(r.innerHTML);for(var e=!1,o=[],i=0;i<t.childNodes.length;i++){var a=t.childNodes[i],u=r.childNodes[i];if(a.nodeType===Node.TEXT_NODE&&u&&u.nodeType===Node.TEXT_NODE){if(a.textContent!==u.textContent){e=!0;break}}else if(a.nodeType===Node.ELEMENT_NODE){var f=d(a,u);f.length>0&&o.push({element:a,attributes:f})}}if(e)return[{element:t,content:r.innerHTML}];for(var c=0;c<t.childNodes.length;c++){var v=n(t.childNodes[c],r.childNodes[c]);o=o.concat(v)}return o}(M,k));C.length>0&&C.map((function(n){var t,r=n.element,o=n.content,i=n.attributes;void 0!==o?(w(t=r,"click"),w(t,"change"),r.innerHTML=o,h(r,e)):void 0!==i&&i.map((function(n){var t=n.name,e=n.newValue;r.setAttribute(t,e)}))}))}};r<n.length;r++)e()})(e,t),function(n,t){for(var r=0;r<n.length;r++){var e=o({},t),i=n[r],a=i.element,f=i.u,v=i.attributes,d=i.v;if(d)for(var s=0;s<d.length;s++){var m=d[s],y=m.name,p=m.value,h=m.i?u(p,e):p;e[c(y)]=h}if(v)for(var j=0;j<v.length;j++){var w=v[j],O=w.name,g=w.value,S=w.i?u(g,e):g;S!==a.getAttribute(O)&&a.setAttribute(O,S)}var N=l(f,e);if(b(a.p,N).length>0)if(a.p=N,a.nodeType===Node.TEXT_NODE)a.textContent=N;else{var E=(new DOMParser).parseFromString(N,"text/html").body.firstChild;a.innerHTML=E.innerHTML}}}(a,t)}function O(n,r){setTimeout((function(){t[n]=r,j()}),0)}var S=function(){e=y(v.value,[]),function(n){n.forEach((function(n){var t=n.getAttribute("id");if(!t)throw new Error("Missing id attribute");if(1!==n.content.childNodes.length)throw new Error("Template ".concat(t," should have a single child"));f(t)}))}(i=p(v.value)),h(v.value,t),j()},N=n.h;return N&&n.removeEventListener("DOMContentLoaded",N),n.addEventListener("DOMContentLoaded",S),n.h=S,{variable:function(n,r){return t[n]=r,{set value(t){O(n,t)},get value(){return t[n]},set:function(t){O(n,t)}}}}}(document).variable;S("names",["Alice","Bob","Carol"]);var N=S("count",0);return window.increment=function(){N.value++},n})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-html-in-expression"] = factory();
+	else
+		root["ts-html-in-expression"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/cog.ts
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+var templateExpressionRegex = /\{\{(.+?)\}\}/;
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+    return "const ".concat(variable, " = state[\"").concat(variable, "\"];");
+  }).join("\n"), " return ").concat(expression, "}");
+  return Function(functionBody)();
+};
+function evaluateExpression(expression, state) {
+  try {
+    var expressionWithScope = createExpressionScope(expression, state);
+    var evaluated = expressionWithScope(state);
+    if (Array.isArray(evaluated)) {
+      evaluated = evaluated.join("");
+    }
+    return evaluated;
+  } catch (e) {
+    throw new Error("Failed to create function from expression {{".concat(expression, "}}: ").concat(e.message));
+  }
+}
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText.slice(i, i + 2) === "{{") {
+      stack++;
+      i++;
+    } else if (htmlText.slice(i, i + 2) === "}}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+var convertAttribute = function convertAttribute(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+var isCustomElement = function isCustomElement(element) {
+  return element.tagName.includes("-");
+};
+var evaluateTemplate = function evaluateTemplate(template, state) {
+  var restOfContent = template;
+  var hasTemplateExpression = true;
+  var updatedContent = "";
+  while (hasTemplateExpression) {
+    var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+      start = _findNextTemplateExpr.start,
+      end = _findNextTemplateExpr.end;
+    if (end === -1) {
+      hasTemplateExpression = false;
+      break;
+    }
+    var htmlValue = restOfContent.slice(start + 2, end - 1);
+    var before = restOfContent.slice(0, start);
+    var after = restOfContent.slice(end + 1);
+    var _value = htmlToText(htmlValue);
+    var evaluated = evaluateExpression(_value, state);
+    updatedContent += "".concat(before).concat(evaluated);
+    restOfContent = after;
+  }
+  updatedContent += restOfContent;
+  return updatedContent;
+};
+var render = function render(tree, state) {
+  var treeNodeIndex = 0;
+  var _loop = function _loop() {
+    var localState = _objectSpread({}, state);
+    var _tree$treeNodeIndex = tree[treeNodeIndex],
+      element = _tree$treeNodeIndex.element,
+      template = _tree$treeNodeIndex.template,
+      attributes = _tree$treeNodeIndex.attributes,
+      parentAttributes = _tree$treeNodeIndex.parentAttributes;
+    if (parentAttributes) {
+      var i = 0;
+      for (i; i < parentAttributes.length; i++) {
+        var attribute = parentAttributes[i];
+        var _name = attribute.name;
+        var _value2 = attribute.value;
+        var reactive = attribute.reactive;
+        var evaluated = reactive ? evaluateExpression(_value2, localState) : _value2;
+        localState[convertAttribute(_name)] = evaluated;
+      }
+    }
+    if (attributes) {
+      var _i = 0;
+      for (_i; _i < attributes.length; _i++) {
+        var _attribute = attributes[_i];
+        var _name2 = _attribute.name;
+        var _value3 = _attribute.value;
+        var _reactive = _attribute.reactive;
+        var _evaluated = _reactive ? evaluateExpression(_value3, localState) : _value3;
+        if (_evaluated !== element.getAttribute(_name2)) {
+          element.setAttribute(_name2, _evaluated);
+        }
+      }
+    }
+    var updatedContent = evaluateTemplate(template, localState);
+    if (element.nodeType === Node.TEXT_NODE) {
+      if (element.textContent !== updatedContent) {
+        element.textContent = updatedContent;
+      }
+    } else {
+      var changedElements = findChangedElements(element, updatedContent);
+      if (changedElements.length > 0) {
+        changedElements.map(function (_ref) {
+          var element = _ref.element,
+            content = _ref.content,
+            attributes = _ref.attributes;
+          if (content !== undefined) {
+            removeAllEventListeners(element);
+            element.innerHTML = content;
+            addAllEventListeners(element, localState);
+          }
+          if (attributes !== undefined) {
+            attributes.map(function (_ref2) {
+              var name = _ref2.name,
+                newValue = _ref2.newValue;
+              element.setAttribute(name, newValue);
+            });
+          }
+        });
+      }
+    }
+  };
+  for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
+    _loop();
+  }
+};
+var renderTemplates = function renderTemplates(tree, state) {
+  var treeNodeIndex = 0;
+  var _loop2 = function _loop2() {
+    var localState = _objectSpread({}, state);
+    var _tree$treeNodeIndex2 = tree[treeNodeIndex],
+      element = _tree$treeNodeIndex2.element,
+      template = _tree$treeNodeIndex2.template,
+      attributes = _tree$treeNodeIndex2.attributes,
+      parentAttributes = _tree$treeNodeIndex2.parentAttributes;
+    if (parentAttributes) {
+      var i = 0;
+      for (i; i < parentAttributes.length; i++) {
+        var attribute = parentAttributes[i];
+        var _name3 = attribute.name;
+        var _value4 = attribute.value;
+        var reactive = attribute.reactive;
+        var evaluated = reactive ? evaluateExpression(_value4, localState) : _value4;
+        localState[convertAttribute(_name3)] = evaluated;
+      }
+    }
+    if (attributes) {
+      var _i2 = 0;
+      for (_i2; _i2 < attributes.length; _i2++) {
+        var _attribute2 = attributes[_i2];
+        var _name4 = _attribute2.name;
+        var _value5 = _attribute2.value;
+        var _reactive2 = _attribute2.reactive;
+        var _evaluated2 = _reactive2 ? evaluateExpression(_value5, localState) : _value5;
+        if (_evaluated2 !== element.getAttribute(_name4)) {
+          element.setAttribute(_name4, _evaluated2);
+        }
+      }
+    }
+    var updatedContent = evaluateTemplate(template, localState);
+    var parser = new DOMParser();
+    var newElementDoc = parser.parseFromString(updatedContent, "text/html");
+    var newElement = newElementDoc.body.firstChild;
+    var oldElementDoc = parser.parseFromString(element.lastTemplateEvaluation, "text/html");
+    var oldElement = oldElementDoc.body.firstChild;
+    var changedElements = compareNodes(oldElement, newElement);
+    if (changedElements.length > 0) {
+      element.lastTemplateEvaluation = updatedContent;
+      changedElements.map(function (_ref3) {
+        var changedTarget = _ref3.element,
+          newElement = _ref3.newElement,
+          content = _ref3.content,
+          attributes = _ref3.attributes;
+        var changedElement = findCorrespondingNode(changedTarget, oldElement, element);
+        if (changedElement) {
+          if (changedTarget.nodeType !== Node.TEXT_NODE && isCustomElement(changedTarget)) {
+            var _changedElement$paren;
+            (_changedElement$paren = changedElement.parentElement) === null || _changedElement$paren === void 0 || _changedElement$paren.replaceChild(newElement, changedElement);
+          } else {
+            if (content !== undefined) {
+              if (changedElement.nodeType === Node.TEXT_NODE) {
+                changedElement.textContent = content;
+              } else {
+                removeAllEventListeners(changedElement);
+                changedElement.innerHTML = content;
+                addAllEventListeners(changedElement, localState);
+              }
+            } else if (attributes !== undefined) {
+              attributes.map(function (_ref4) {
+                var name = _ref4.name,
+                  newValue = _ref4.newValue;
+                changedElement.setAttribute(name, newValue);
+              });
+            }
+          }
+        }
+      });
+    }
+  };
+  for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
+    _loop2();
+  }
+};
+function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var pathInA = [];
+  var temp = nodeInA;
+  while (temp !== rootA) {
+    pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
+    temp = temp.parentNode;
+  }
+  var correspondingNodeInB = rootB;
+  for (var _i3 = 0, _pathInA = pathInA; _i3 < _pathInA.length; _i3++) {
+    var index = _pathInA[_i3];
+    if (correspondingNodeInB.childNodes[index]) {
+      correspondingNodeInB = correspondingNodeInB.childNodes[index];
+    } else {
+      return null;
+    }
+  }
+  return correspondingNodeInB;
+}
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: newAttrValue || ""
+      });
+    }
+  }
+  return changedAttributes;
+}
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+function compareNodes(oldNode, newNode) {
+  // TODO: changed custom element like <my-element></my-element> will
+  // be returned twice if both attributes and content changed.
+  // But either way the entire element will be updated, so it's suboptimal
+  // because the loop with changed elements will be longer for no reason.
+
+  if (oldNode.nodeType === Node.TEXT_NODE) {
+    if (oldNode.textContent !== newNode.textContent) {
+      var _newNode$textContent;
+      return [{
+        element: oldNode,
+        newElement: newNode,
+        content: (_newNode$textContent = newNode.textContent) !== null && _newNode$textContent !== void 0 ? _newNode$textContent : ""
+      }];
+    }
+    return [];
+  } else {
+    oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
+    newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
+    var textContentChanged = false;
+    var changedChildren = [];
+    for (var i = 0; i < oldNode.childNodes.length; i++) {
+      var oldChild = oldNode.childNodes[i];
+      var newChild = newNode.childNodes[i];
+      if (oldChild.nodeType === Node.TEXT_NODE && newChild && newChild.nodeType === Node.TEXT_NODE) {
+        if (oldChild.textContent !== newChild.textContent) {
+          textContentChanged = true;
+          break;
+        }
+      } else if (oldChild.nodeType === Node.ELEMENT_NODE) {
+        var changedAttributes = getChangedAttributes(oldChild, newChild);
+        if (changedAttributes.length > 0) {
+          changedChildren.push({
+            element: oldChild,
+            newElement: newChild,
+            attributes: changedAttributes
+          });
+        }
+      }
+    }
+    if (textContentChanged) {
+      return [{
+        element: oldNode,
+        newElement: newNode,
+        content: newNode.innerHTML
+      }];
+    } else {
+      for (var _i4 = 0; _i4 < oldNode.childNodes.length; _i4++) {
+        var changes = compareNodes(oldNode.childNodes[_i4], newNode.childNodes[_i4]);
+        changedChildren = changedChildren.concat(changes);
+      }
+      return changedChildren;
+    }
+  }
+}
+function findChangedElements(oldElement, newHtml) {
+  var newElement = oldElement.cloneNode();
+  newElement.innerHTML = newHtml;
+  function compareNodes(oldNode, newNode) {
+    if (oldNode.nodeType === Node.TEXT_NODE) {
+      if (oldNode.textContent !== newNode.textContent) {
+        return [{
+          element: oldNode,
+          newElement: newNode,
+          content: newNode.innerHTML
+        }];
+      }
+      return [];
+    } else {
+      // const oldNodeSanitized = oldNode.innerHTML.replace(/\r?\n|\r/g, "");
+      // const newNodeSanitized = newNode.innerHTML.replace(/\r?\n|\r/g, "");
+
+      oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
+      newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
+      var textContentChanged = false;
+      var changedChildren = [];
+      for (var i = 0; i < oldNode.childNodes.length; i++) {
+        var oldChild = oldNode.childNodes[i];
+        var newChild = newNode.childNodes[i];
+        if (oldChild.nodeType === Node.TEXT_NODE && newChild && newChild.nodeType === Node.TEXT_NODE) {
+          if (oldChild.textContent !== newChild.textContent) {
+            textContentChanged = true;
+            break;
+          }
+        } else if (oldChild.nodeType === Node.ELEMENT_NODE) {
+          var changedAttributes = getChangedAttributes(oldChild, newChild);
+          if (changedAttributes.length > 0) {
+            changedChildren.push({
+              element: oldChild,
+              newElement: newChild,
+              attributes: changedAttributes
+            });
+          }
+        }
+      }
+      if (textContentChanged) {
+        return [{
+          element: oldNode,
+          newElement: newNode,
+          content: newNode.innerHTML
+        }];
+      } else {
+        for (var _i5 = 0; _i5 < oldNode.childNodes.length; _i5++) {
+          var changes = compareNodes(oldNode.childNodes[_i5], newNode.childNodes[_i5]);
+          changedChildren = changedChildren.concat(changes);
+        }
+        return changedChildren;
+      }
+    }
+  }
+  return compareNodes(oldElement, newElement);
+}
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var reactiveMatch = templateExpressionRegex.exec(attribute.value);
+    return {
+      name: attribute.name,
+      value: reactiveMatch ? reactiveMatch[1] : attribute.value,
+      reactive: !!reactiveMatch
+    };
+  });
+  return attributes;
+};
+var loadTree = function loadTree(rootElement, parentAttributes) {
+  var tree = [];
+  var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (!isCustomElement(element)) {
+      var attributes = getAttributes(element);
+      tree.push({
+        element: element,
+        template: element.innerHTML,
+        attributes: attributes,
+        parentAttributes: parentAttributes
+      });
+    }
+    element = result.iterateNext();
+  }
+  return tree;
+};
+var loadTemplates = function loadTemplates(rootElement) {
+  var templates = [];
+  var xpath = "template";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    element.innerHTML = sanitizeHtml(element.innerHTML);
+    templates.push(element);
+    element = result.iterateNext();
+  }
+  return templates;
+};
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+function addEventListeners(parent) {
+  var eventName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "click";
+  var state = arguments.length > 2 ? arguments[2] : undefined;
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+function removeEventListeners(parent) {
+  var eventName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "click";
+  parent === null || parent === void 0 || parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+var makeEventHandler = function makeEventHandler() {
+  var eventName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "click";
+  var element = arguments.length > 1 ? arguments[1] : undefined;
+  var state = arguments.length > 2 ? arguments[2] : undefined;
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+var cleanTemplatesTree = function cleanTemplatesTree(templatesTree) {
+  return templatesTree.filter(function (_ref5) {
+    var element = _ref5.element;
+    return document.body.contains(element);
+  });
+};
+var init = function init(document) {
+  var state = {};
+  var tree = [];
+  var templates = [];
+  var templatesTree = [];
+  function defineCustomElement(name) {
+    function CustomElement() {
+      return Reflect.construct(HTMLElement, [], CustomElement);
+    }
+    CustomElement.prototype = Object.create(HTMLElement.prototype);
+    CustomElement.prototype.constructor = CustomElement;
+    CustomElement.prototype.connectedCallback = function () {
+      var _tempDiv$firstChild, _customElement$parent, _customElement$parent2;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      var customElement = this;
+      var template = templates.find(function (template) {
+        return template.getAttribute("id") === customElement.tagName.toLowerCase();
+      });
+      var attributes = getAttributes(customElement);
+      var tempDiv = document.createElement("div");
+      tempDiv.innerHTML = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, customElement.innerHTML);
+      var localState = _objectSpread({}, state);
+      var _iterator = _createForOfIteratorHelper(attributes),
+        _step;
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var attribute = _step.value;
+          var attributeValue = attribute.value;
+          if (attribute.reactive) {
+            attributeValue = evaluateExpression(attributeValue, state);
+          }
+          localState[convertAttribute(attribute.name)] = attributeValue;
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+      var originalInvocation = tempDiv.innerHTML;
+      var newElementAttributes = [];
+      if (((_tempDiv$firstChild = tempDiv.firstChild) === null || _tempDiv$firstChild === void 0 ? void 0 : _tempDiv$firstChild.nodeType) !== Node.TEXT_NODE) {
+        newElementAttributes = getAttributes(tempDiv.firstChild);
+      }
+      var evaluatedTemplate = evaluateTemplate(tempDiv.innerHTML, localState);
+      tempDiv.innerHTML = evaluatedTemplate;
+      var newElement = tempDiv.firstChild;
+      (_customElement$parent = customElement.parentNode) === null || _customElement$parent === void 0 || _customElement$parent.insertBefore(newElement, customElement);
+      if (!customElement.dataset.childOf && newElement) {
+        newElement.lastTemplateEvaluation = evaluatedTemplate;
+        templatesTree.push({
+          element: newElement,
+          template: originalInvocation,
+          attributes: newElementAttributes,
+          parentAttributes: attributes
+        });
+        templatesTree = cleanTemplatesTree(templatesTree);
+      }
+      (_customElement$parent2 = customElement.parentNode) === null || _customElement$parent2 === void 0 || _customElement$parent2.removeChild(customElement);
+    };
+    customElements.define(name, CustomElement);
+  }
+  var AppElement = {
+    element: null,
+    get value() {
+      if (!this.element) {
+        this.element = document.querySelector("#app");
+      }
+      if (!this.element) {
+        throw new Error("No app element found!");
+      }
+      return this.element;
+    }
+  };
+  function reRender() {
+    render(tree, state);
+    renderTemplates(templatesTree, state);
+  }
+  function updateState(name, value) {
+    setTimeout(function () {
+      state[name] = value;
+      reRender();
+    }, 0);
+  }
+  function defineCustomElements(templates) {
+    templates.forEach(function (template) {
+      var name = template.getAttribute("id");
+      if (!name) {
+        throw new Error("Missing id attribute");
+      }
+      if (template.content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name);
+    });
+  }
+  var onLoad = function onLoad() {
+    tree = loadTree(AppElement.value, []);
+    templates = loadTemplates(AppElement.value);
+    defineCustomElements(templates);
+    addAllEventListeners(AppElement.value, state);
+    reRender();
+  };
+  var onLoadHandler = document["onLoadHandler"];
+  if (onLoadHandler) {
+    document.removeEventListener("DOMContentLoaded", onLoadHandler);
+  }
+  document.addEventListener("DOMContentLoaded", onLoad);
+  document["onLoadHandler"] = onLoad;
+  return {
+    variable: function variable(name, value) {
+      state[name] = value;
+      return {
+        set value(newVal) {
+          updateState(name, newVal);
+        },
+        get value() {
+          return state[name];
+        },
+        set: function set(newVal) {
+          updateState(name, newVal);
+        }
+      };
+    }
+  };
+};
+var _init = init(document),
+  variable = _init.variable;
+
+;// CONCATENATED MODULE: ./examples/src/ts-html-in-expression.ts
+
+variable("names", ["Alice", "Bob", "Carol"]);
+var count = variable("count", 0);
+window.increment = function () {
+  count.value++;
+};
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});
