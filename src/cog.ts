@@ -27,7 +27,6 @@ type ReactiveNode = {
 type ReactiveTemplateNode = {
     element: HTMLElementFromTemplate;
     template: HTMLString;
-    // lastEvaluation: string;
     attributes: Attribute[];
     parentAttributes: Attribute[];
 };
@@ -46,7 +45,6 @@ type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
 type DocumentWithHandler = Document & { onLoadHandler: () => void };
 type HTMLElementFromTemplate = HTMLElement & {
     lastTemplateEvaluation: string;
-    // originalTemplateInvocation: string;
 };
 
 const templateExpressionRegex = /\{\{(.+?)\}\}/;
@@ -146,12 +144,6 @@ const evaluateTemplate = (template: string, state: State): string => {
 };
 
 export const render = (tree: DOMTree, state: State) => {
-    // TODO: special render for templates tree
-    // to compare last template evaluation with current one
-    // Example:
-    // "<div><x-child data-child="{{ dataParent }}"></x-child></div>"
-    // "<div><x-child data-child="0"></x-child></div>"
-
     let treeNodeIndex = 0;
     for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
         const localState: State = { ...state };
@@ -220,12 +212,6 @@ export const render = (tree: DOMTree, state: State) => {
 };
 
 export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
-    // TODO: special render for templates tree
-    // to compare last template evaluation with current one
-    // Example:
-    // "<div><x-child data-child="{{ dataParent }}"></x-child></div>"
-    // "<div><x-child data-child="0"></x-child></div>"
-
     let treeNodeIndex = 0;
     for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
         const localState: State = { ...state };
@@ -265,41 +251,29 @@ export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
         }
 
         const updatedContent = evaluateTemplate(template, localState);
-
         const changedElements = findChangedTemplateElements(
             element.lastTemplateEvaluation,
             updatedContent
         );
 
+        // TODO: Changed elements for TEXT_NODE
+
         if (changedElements.length > 0) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(updatedContent, "text/html");
-            const newElement = doc.body.firstChild as HTMLElementFromTemplate;
             element.lastTemplateEvaluation = updatedContent;
-            // newElement.originalTemplateInvocation = template;
+            if (element.nodeType === Node.TEXT_NODE) {
+                element.textContent = updatedContent;
+            } else {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(updatedContent, "text/html");
+                const newElement = doc.body
+                    .firstChild as HTMLElementFromTemplate;
+                element.innerHTML = newElement.innerHTML;
+            }
 
-            // Version with replacing the whole template invocation
-            // And triggering callback for custom templates
-            // element.parentNode?.replaceChild(newElement, element);
-
-            element.innerHTML = newElement.innerHTML;
-
-            // changedElements.map(({ element, content, attributes }) => {
             // TODO: find exact changed element in template and replace
             // only that element with original part of the template
             // For example, findCahngedTemplateElements can return index
             // of changed child node
-            // removeAllEventListeners(element);
-
-            // if (content !== undefined) {
-            //     element.innerHTML = content;
-            // } else if (attributes !== undefined) {
-            //     attributes.map(({ name, newValue }) => {
-            //         element.setAttribute(name, newValue);
-            //     });
-            // }
-            // addAllEventListeners(element, localState);
-            // });
         }
     }
 };
@@ -316,20 +290,6 @@ function htmlToText(html: string) {
 
     return tmp.textContent || tmp.innerText || "";
 }
-
-// function attributesChanged(
-//     oldElement: HTMLElement,
-//     newElement: HTMLElement
-// ): boolean {
-//     for (let i = 0; i < oldElement.attributes.length; i++) {
-//         const oldAttr = oldElement.attributes[i];
-//         const newAttr = newElement.getAttribute(oldAttr.name);
-//         if (newAttr !== oldAttr.value) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
 
 function getChangedAttributes(
     oldElement: HTMLElement,
@@ -372,9 +332,6 @@ function findChangedTemplateElements(oldHtml: string, newHtml: string) {
 
             return [];
         } else {
-            // const oldNodeSanitized = oldNode.innerHTML.replace(/\r?\n|\r/g, "");
-            // const newNodeSanitized = newNode.innerHTML.replace(/\r?\n|\r/g, "");
-
             oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
             newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
 
@@ -527,12 +484,6 @@ export const loadTree = (
 
     while (element) {
         if (!isCustomElement(element)) {
-            // template =
-            //     templates.find(
-            //         (template) =>
-            //             template.getAttribute("id") ===
-            //             element.tagName.toLowerCase()
-            //     )?.innerHTML || "";
             const attributes = getAttributes(element);
             tree.push({
                 element,
@@ -651,7 +602,6 @@ export const init = (document: Document): Cog => {
         CustomElement.prototype.constructor = CustomElement;
 
         CustomElement.prototype.connectedCallback = function () {
-            console.log("new custom element added to DOM", name);
             // eslint-disable-next-line @typescript-eslint/no-this-alias
             const customElement: HTMLElementFromTemplate = this;
             const template = templates.find(
@@ -661,16 +611,13 @@ export const init = (document: Document): Cog => {
             )!;
 
             const attributes = getAttributes(customElement);
-            // Create a temporary div element
+
             const tempDiv = document.createElement("div");
-            // Set its innerHTML to the HTML string
+
             tempDiv.innerHTML = template.innerHTML.replace(
                 /\{\{\s*children\s*\}\}/g,
                 customElement.innerHTML
             );
-
-            // Parse all the expressions in template
-            // and replace them with their evaluated value
 
             const localState: State = { ...state };
 
@@ -682,98 +629,54 @@ export const init = (document: Document): Cog => {
                 localState[convertAttribute(attribute.name)] = attributeValue;
             }
 
-            // const xpathResult = document.evaluate(
-            //     "//*[contains(name(), '-')]",
-            //     tempDiv,
-            //     null,
-            //     XPathResult.ANY_TYPE,
-            //     null
-            // );
-
-            // let customChildElement = xpathResult.iterateNext();
-            // const customChildElements = [];
-
-            // while (customChildElement) {
-            //     customChildElements.push(customChildElement);
-            //     customChildElement = xpathResult.iterateNext();
-            // }
-
-            // for (const customChildElement of customChildElements) {
-            //     (customChildElement as HTMLElement).setAttribute(
-            //         "data-child-of",
-            //         name
-            //     );
-            // }
-
             const originalInvocation = tempDiv.innerHTML;
+            let newElementAttributes: Attribute[] = [];
+            if (tempDiv.firstChild?.nodeType !== Node.TEXT_NODE) {
+                newElementAttributes = getAttributes(
+                    tempDiv.firstChild! as HTMLElementFromTemplate
+                );
+            }
 
             const evaluatedTemplate = evaluateTemplate(
                 tempDiv.innerHTML,
                 localState
             );
 
-            // console.log(evaluatedTemplate);
             tempDiv.innerHTML = evaluatedTemplate;
 
-            // const lastTemplateEvaluation = evaluatedTemplate;
-            //     const customElementAttributes = getAttributes(
-            //         customChildElement as HTMLElement
-            //     );
-            //     for (const attribute of customElementAttributes) {
-            //         if (attribute.reactive) {
-            //             const attributeValue = evaluateExpression(
-            //                 attribute.value,
-            //                 localState
-            //             );
-            //             (customChildElement as HTMLElement).setAttribute(
-            //                 attribute.name,
-            //                 attributeValue
-            //             );
-            //         }
-            //     }
-            // }
-
-            // Replace the current element with each of the new elements
-            // while (tempDiv.firstChild) {
             const newElement = tempDiv.firstChild as HTMLElementFromTemplate;
-            // console.log(newElement);
 
             customElement.parentNode?.insertBefore(newElement, customElement);
 
             if (!customElement.dataset.childOf && newElement) {
-                if (newElement.nodeType === Node.TEXT_NODE) {
-                    const textContent = newElement.textContent ?? "";
-                    const hasTemplateExpression =
-                        templateExpressionRegex.test(textContent);
+                newElement.lastTemplateEvaluation = evaluatedTemplate;
+                templatesTree.push({
+                    element: newElement,
+                    template: originalInvocation,
+                    attributes: newElementAttributes,
+                    parentAttributes: attributes,
+                });
+                // if (newElement.nodeType === Node.TEXT_NODE) {
+                //     const textContent = newElement.textContent ?? "";
+                //     const hasTemplateExpression =
+                //         templateExpressionRegex.test(textContent);
+                //     newElement.lastTemplateEvaluation = evaluatedTemplate;
 
-                    if (hasTemplateExpression) {
-                        templatesTree.push({
-                            element: newElement,
-                            template: textContent,
-                            attributes: [],
-                            parentAttributes: attributes,
-                            // lastEvaluation: textContent,
-                        });
-                    }
-                } else {
-                    newElement.lastTemplateEvaluation = evaluatedTemplate;
-                    if (!isCustomElement(newElement as HTMLElement)) {
-                        templatesTree.push({
-                            element: newElement,
-                            template: originalInvocation,
-                            // lastEvaluation: lastTemplateEvaluation,
-                            attributes: getAttributes(newElement),
-                            parentAttributes: attributes,
-                        });
-                    }
-                }
+                //     if (hasTemplateExpression) {
+                //     }
+                // } else {
+                //     if (!isCustomElement(newElement as HTMLElement)) {
+                //         templatesTree.push({
+                //             element: newElement,
+                //             template: originalInvocation,
+                //             attributes: newElementAttributes,
+                //             parentAttributes: attributes,
+                //         });
+                //     }
+                // }
 
-                // const newTree = loadTree(AppElement.value, []);
                 templatesTree = cleanTemplatesTree(templatesTree);
-                console.log("tree", templatesTree);
-                // render(newTree, state);
             }
-            // }
 
             customElement.parentNode?.removeChild(customElement);
         };
@@ -796,8 +699,6 @@ export const init = (document: Document): Cog => {
 
     function reRender() {
         render(tree, state);
-        // templatesTree = cleanTemplatesTree(templatesTree);
-        // console.log(templatesTree);
         renderTemplates(templatesTree, state);
     }
 

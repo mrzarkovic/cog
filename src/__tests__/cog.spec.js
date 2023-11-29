@@ -184,7 +184,7 @@ describe("templates", () => {
         element.innerHTML =
             "<template id='my-template'>Hello {{ name }}!</template><template id='my-other-template'>Hello!</template>";
         const templates = loadTemplates(element);
-        console.log(templates);
+
         expect(templates).toEqual([
             element.querySelector("#my-template"),
             element.querySelector("#my-other-template"),

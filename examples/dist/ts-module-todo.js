@@ -114,12 +114,6 @@ var evaluateTemplate = function evaluateTemplate(template, state) {
   return updatedContent;
 };
 var render = function render(tree, state) {
-  // TODO: special render for templates tree
-  // to compare last template evaluation with current one
-  // Example:
-  // "<div><x-child data-child="{{ dataParent }}"></x-child></div>"
-  // "<div><x-child data-child="0"></x-child></div>"
-
   var treeNodeIndex = 0;
   var _loop = function _loop() {
     var localState = _objectSpread({}, state);
@@ -184,12 +178,6 @@ var render = function render(tree, state) {
   }
 };
 var renderTemplates = function renderTemplates(tree, state) {
-  // TODO: special render for templates tree
-  // to compare last template evaluation with current one
-  // Example:
-  // "<div><x-child data-child="{{ dataParent }}"></x-child></div>"
-  // "<div><x-child data-child="0"></x-child></div>"
-
   var treeNodeIndex = 0;
   for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
     var localState = _objectSpread({}, state);
@@ -224,35 +212,24 @@ var renderTemplates = function renderTemplates(tree, state) {
     }
     var updatedContent = evaluateTemplate(template, localState);
     var changedElements = findChangedTemplateElements(element.lastTemplateEvaluation, updatedContent);
+
+    // TODO: Changed elements for TEXT_NODE
+
     if (changedElements.length > 0) {
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(updatedContent, "text/html");
-      var newElement = doc.body.firstChild;
       element.lastTemplateEvaluation = updatedContent;
-      // newElement.originalTemplateInvocation = template;
+      if (element.nodeType === Node.TEXT_NODE) {
+        element.textContent = updatedContent;
+      } else {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(updatedContent, "text/html");
+        var newElement = doc.body.firstChild;
+        element.innerHTML = newElement.innerHTML;
+      }
 
-      // Version with replacing the whole template invocation
-      // And triggering callback for custom templates
-      // element.parentNode?.replaceChild(newElement, element);
-
-      element.innerHTML = newElement.innerHTML;
-
-      // changedElements.map(({ element, content, attributes }) => {
       // TODO: find exact changed element in template and replace
       // only that element with original part of the template
       // For example, findCahngedTemplateElements can return index
       // of changed child node
-      // removeAllEventListeners(element);
-
-      // if (content !== undefined) {
-      //     element.innerHTML = content;
-      // } else if (attributes !== undefined) {
-      //     attributes.map(({ name, newValue }) => {
-      //         element.setAttribute(name, newValue);
-      //     });
-      // }
-      // addAllEventListeners(element, localState);
-      // });
     }
   }
 };
@@ -265,21 +242,6 @@ function htmlToText(html) {
   tmp.innerHTML = escapeHtml(html);
   return tmp.textContent || tmp.innerText || "";
 }
-
-// function attributesChanged(
-//     oldElement: HTMLElement,
-//     newElement: HTMLElement
-// ): boolean {
-//     for (let i = 0; i < oldElement.attributes.length; i++) {
-//         const oldAttr = oldElement.attributes[i];
-//         const newAttr = newElement.getAttribute(oldAttr.name);
-//         if (newAttr !== oldAttr.value) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
 function getChangedAttributes(oldElement, newElement) {
   var changedAttributes = [];
   for (var i = 0; i < oldElement.attributes.length; i++) {
@@ -312,9 +274,6 @@ function findChangedTemplateElements(oldHtml, newHtml) {
       }
       return [];
     } else {
-      // const oldNodeSanitized = oldNode.innerHTML.replace(/\r?\n|\r/g, "");
-      // const newNodeSanitized = newNode.innerHTML.replace(/\r?\n|\r/g, "");
-
       oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
       newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
       var textContentChanged = false;
@@ -425,12 +384,6 @@ var loadTree = function loadTree(rootElement, parentAttributes) {
   var element = result.iterateNext();
   while (element) {
     if (!isCustomElement(element)) {
-      // template =
-      //     templates.find(
-      //         (template) =>
-      //             template.getAttribute("id") ===
-      //             element.tagName.toLowerCase()
-      //     )?.innerHTML || "";
       var attributes = getAttributes(element);
       tree.push({
         element: element,
@@ -517,22 +470,15 @@ var init = function init(document) {
     CustomElement.prototype = Object.create(HTMLElement.prototype);
     CustomElement.prototype.constructor = CustomElement;
     CustomElement.prototype.connectedCallback = function () {
-      var _customElement$parent, _customElement$parent2;
-      console.log("new custom element added to DOM", name);
+      var _tempDiv$firstChild, _customElement$parent, _customElement$parent2;
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       var customElement = this;
       var template = templates.find(function (template) {
         return template.getAttribute("id") === customElement.tagName.toLowerCase();
       });
       var attributes = getAttributes(customElement);
-      // Create a temporary div element
       var tempDiv = document.createElement("div");
-      // Set its innerHTML to the HTML string
       tempDiv.innerHTML = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, customElement.innerHTML);
-
-      // Parse all the expressions in template
-      // and replace them with their evaluated value
-
       var localState = _objectSpread({}, state);
       var _iterator = _createForOfIteratorHelper(attributes),
         _step;
@@ -545,98 +491,49 @@ var init = function init(document) {
           }
           localState[convertAttribute(attribute.name)] = attributeValue;
         }
-
-        // const xpathResult = document.evaluate(
-        //     "//*[contains(name(), '-')]",
-        //     tempDiv,
-        //     null,
-        //     XPathResult.ANY_TYPE,
-        //     null
-        // );
-
-        // let customChildElement = xpathResult.iterateNext();
-        // const customChildElements = [];
-
-        // while (customChildElement) {
-        //     customChildElements.push(customChildElement);
-        //     customChildElement = xpathResult.iterateNext();
-        // }
-
-        // for (const customChildElement of customChildElements) {
-        //     (customChildElement as HTMLElement).setAttribute(
-        //         "data-child-of",
-        //         name
-        //     );
-        // }
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
       }
       var originalInvocation = tempDiv.innerHTML;
+      var newElementAttributes = [];
+      if (((_tempDiv$firstChild = tempDiv.firstChild) === null || _tempDiv$firstChild === void 0 ? void 0 : _tempDiv$firstChild.nodeType) !== Node.TEXT_NODE) {
+        newElementAttributes = getAttributes(tempDiv.firstChild);
+      }
       var evaluatedTemplate = evaluateTemplate(tempDiv.innerHTML, localState);
-
-      // console.log(evaluatedTemplate);
       tempDiv.innerHTML = evaluatedTemplate;
-
-      // const lastTemplateEvaluation = evaluatedTemplate;
-      //     const customElementAttributes = getAttributes(
-      //         customChildElement as HTMLElement
-      //     );
-      //     for (const attribute of customElementAttributes) {
-      //         if (attribute.reactive) {
-      //             const attributeValue = evaluateExpression(
-      //                 attribute.value,
-      //                 localState
-      //             );
-      //             (customChildElement as HTMLElement).setAttribute(
-      //                 attribute.name,
-      //                 attributeValue
-      //             );
-      //         }
-      //     }
-      // }
-
-      // Replace the current element with each of the new elements
-      // while (tempDiv.firstChild) {
       var newElement = tempDiv.firstChild;
-      // console.log(newElement);
-
       (_customElement$parent = customElement.parentNode) === null || _customElement$parent === void 0 || _customElement$parent.insertBefore(newElement, customElement);
       if (!customElement.dataset.childOf && newElement) {
-        if (newElement.nodeType === Node.TEXT_NODE) {
-          var _newElement$textConte;
-          var textContent = (_newElement$textConte = newElement.textContent) !== null && _newElement$textConte !== void 0 ? _newElement$textConte : "";
-          var hasTemplateExpression = templateExpressionRegex.test(textContent);
-          if (hasTemplateExpression) {
-            templatesTree.push({
-              element: newElement,
-              template: textContent,
-              attributes: [],
-              parentAttributes: attributes
-              // lastEvaluation: textContent,
-            });
-          }
-        } else {
-          newElement.lastTemplateEvaluation = evaluatedTemplate;
-          if (!isCustomElement(newElement)) {
-            templatesTree.push({
-              element: newElement,
-              template: originalInvocation,
-              // lastEvaluation: lastTemplateEvaluation,
-              attributes: getAttributes(newElement),
-              parentAttributes: attributes
-            });
-          }
-        }
+        newElement.lastTemplateEvaluation = evaluatedTemplate;
+        templatesTree.push({
+          element: newElement,
+          template: originalInvocation,
+          attributes: newElementAttributes,
+          parentAttributes: attributes
+        });
+        // if (newElement.nodeType === Node.TEXT_NODE) {
+        //     const textContent = newElement.textContent ?? "";
+        //     const hasTemplateExpression =
+        //         templateExpressionRegex.test(textContent);
+        //     newElement.lastTemplateEvaluation = evaluatedTemplate;
 
-        // const newTree = loadTree(AppElement.value, []);
+        //     if (hasTemplateExpression) {
+        //     }
+        // } else {
+        //     if (!isCustomElement(newElement as HTMLElement)) {
+        //         templatesTree.push({
+        //             element: newElement,
+        //             template: originalInvocation,
+        //             attributes: newElementAttributes,
+        //             parentAttributes: attributes,
+        //         });
+        //     }
+        // }
+
         templatesTree = cleanTemplatesTree(templatesTree);
-        console.log("tree", templatesTree);
-        // render(newTree, state);
       }
-      // }
-
       (_customElement$parent2 = customElement.parentNode) === null || _customElement$parent2 === void 0 || _customElement$parent2.removeChild(customElement);
     };
     customElements.define(name, CustomElement);
@@ -655,8 +552,6 @@ var init = function init(document) {
   };
   function reRender() {
     render(tree, state);
-    // templatesTree = cleanTemplatesTree(templatesTree);
-    // console.log(templatesTree);
     renderTemplates(templatesTree, state);
   }
   function updateState(name, value) {
