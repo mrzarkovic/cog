@@ -27,7 +27,7 @@ type ReactiveNode = {
 type ReactiveTemplateNode = {
     element: HTMLElementFromTemplate;
     template: HTMLString;
-    lastEvaluation: string;
+    // lastEvaluation: string;
     attributes: Attribute[];
     parentAttributes: Attribute[];
 };
@@ -46,7 +46,7 @@ type ElementWithHandler = Element & { [key: string]: (e: Event) => void };
 type DocumentWithHandler = Document & { onLoadHandler: () => void };
 type HTMLElementFromTemplate = HTMLElement & {
     lastTemplateEvaluation: string;
-    originalTemplateInvocation: string;
+    // originalTemplateInvocation: string;
 };
 
 const templateExpressionRegex = /\{\{(.+?)\}\}/;
@@ -229,13 +229,8 @@ export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
     let treeNodeIndex = 0;
     for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
         const localState: State = { ...state };
-        const {
-            element,
-            template,
-            attributes,
-            parentAttributes,
-            lastEvaluation,
-        } = tree[treeNodeIndex];
+        const { element, template, attributes, parentAttributes } =
+            tree[treeNodeIndex];
 
         if (parentAttributes) {
             let i = 0;
@@ -270,8 +265,9 @@ export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
         }
 
         const updatedContent = evaluateTemplate(template, localState);
+
         const changedElements = findChangedTemplateElements(
-            lastEvaluation,
+            element.lastTemplateEvaluation,
             updatedContent
         );
 
@@ -279,8 +275,8 @@ export const renderTemplates = (tree: ReactiveTemplateNode[], state: State) => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(updatedContent, "text/html");
             const newElement = doc.body.firstChild as HTMLElementFromTemplate;
-            newElement.lastTemplateEvaluation = updatedContent;
-            newElement.originalTemplateInvocation = template;
+            element.lastTemplateEvaluation = updatedContent;
+            // newElement.originalTemplateInvocation = template;
 
             // Version with replacing the whole template invocation
             // And triggering callback for custom templates
@@ -686,21 +682,21 @@ export const init = (document: Document): Cog => {
                 localState[convertAttribute(attribute.name)] = attributeValue;
             }
 
-            const xpathResult = document.evaluate(
-                "//*[contains(name(), '-')]",
-                tempDiv,
-                null,
-                XPathResult.ANY_TYPE,
-                null
-            );
+            // const xpathResult = document.evaluate(
+            //     "//*[contains(name(), '-')]",
+            //     tempDiv,
+            //     null,
+            //     XPathResult.ANY_TYPE,
+            //     null
+            // );
 
-            let customChildElement = xpathResult.iterateNext();
-            const customChildElements = [];
+            // let customChildElement = xpathResult.iterateNext();
+            // const customChildElements = [];
 
-            while (customChildElement) {
-                customChildElements.push(customChildElement);
-                customChildElement = xpathResult.iterateNext();
-            }
+            // while (customChildElement) {
+            //     customChildElements.push(customChildElement);
+            //     customChildElement = xpathResult.iterateNext();
+            // }
 
             // for (const customChildElement of customChildElements) {
             //     (customChildElement as HTMLElement).setAttribute(
@@ -709,8 +705,7 @@ export const init = (document: Document): Cog => {
             //     );
             // }
 
-            const originalInvocation =
-                customElement.originalTemplateInvocation || tempDiv.innerHTML;
+            const originalInvocation = tempDiv.innerHTML;
 
             const evaluatedTemplate = evaluateTemplate(
                 tempDiv.innerHTML,
@@ -720,7 +715,7 @@ export const init = (document: Document): Cog => {
             // console.log(evaluatedTemplate);
             tempDiv.innerHTML = evaluatedTemplate;
 
-            const lastTemplateEvaluation = evaluatedTemplate;
+            // const lastTemplateEvaluation = evaluatedTemplate;
             //     const customElementAttributes = getAttributes(
             //         customChildElement as HTMLElement
             //     );
@@ -757,15 +752,16 @@ export const init = (document: Document): Cog => {
                             template: textContent,
                             attributes: [],
                             parentAttributes: attributes,
-                            lastEvaluation: textContent,
+                            // lastEvaluation: textContent,
                         });
                     }
                 } else {
+                    newElement.lastTemplateEvaluation = evaluatedTemplate;
                     if (!isCustomElement(newElement as HTMLElement)) {
                         templatesTree.push({
                             element: newElement,
                             template: originalInvocation,
-                            lastEvaluation: lastTemplateEvaluation,
+                            // lastEvaluation: lastTemplateEvaluation,
                             attributes: getAttributes(newElement),
                             parentAttributes: attributes,
                         });

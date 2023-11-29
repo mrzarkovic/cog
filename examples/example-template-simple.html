@@ -13,14 +13,22 @@
     <body>
         <div id="app" class="pt-40 max-w-sm mx-auto">
             <template id="x-child">
-                <div>{{ dataChild }} {{ count }}</div>
+                <div>{{ dataChild == count ? count : "" }} {{ children }}</div>
             </template>
             <template id="x-parent">
                 <div>
-                    <x-child data-child="dataChild"></x-child>
+                    <div checked="{{ dataChecked }}">{{ dataParent }}</div>
+                    <div>
+                        {{ names.map( (n, i) => `
+                        <x-child data-child="${i}">${n}</x-child>
+                        `)}}
+                    </div>
                 </div>
             </template>
-            <x-parent data-parent="{{ count }}"></x-parent>
+            <x-parent
+                data-parent="{{ count }}"
+                data-checked="checked"
+            ></x-parent>
             <button onclick="increment()">Increment</button>
         </div>
         <script src="/examples/dist/ts-html-in-expression.js"></script>

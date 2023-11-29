@@ -197,8 +197,7 @@ var renderTemplates = function renderTemplates(tree, state) {
       element = _tree$treeNodeIndex2.element,
       template = _tree$treeNodeIndex2.template,
       attributes = _tree$treeNodeIndex2.attributes,
-      parentAttributes = _tree$treeNodeIndex2.parentAttributes,
-      lastEvaluation = _tree$treeNodeIndex2.lastEvaluation;
+      parentAttributes = _tree$treeNodeIndex2.parentAttributes;
     if (parentAttributes) {
       var i = 0;
       for (i; i < parentAttributes.length; i++) {
@@ -224,13 +223,13 @@ var renderTemplates = function renderTemplates(tree, state) {
       }
     }
     var updatedContent = evaluateTemplate(template, localState);
-    var changedElements = findChangedTemplateElements(lastEvaluation, updatedContent);
+    var changedElements = findChangedTemplateElements(element.lastTemplateEvaluation, updatedContent);
     if (changedElements.length > 0) {
       var parser = new DOMParser();
       var doc = parser.parseFromString(updatedContent, "text/html");
       var newElement = doc.body.firstChild;
-      newElement.lastTemplateEvaluation = updatedContent;
-      newElement.originalTemplateInvocation = template;
+      element.lastTemplateEvaluation = updatedContent;
+      // newElement.originalTemplateInvocation = template;
 
       // Version with replacing the whole template invocation
       // And triggering callback for custom templates
@@ -546,32 +545,41 @@ var init = function init(document) {
           }
           localState[convertAttribute(attribute.name)] = attributeValue;
         }
+
+        // const xpathResult = document.evaluate(
+        //     "//*[contains(name(), '-')]",
+        //     tempDiv,
+        //     null,
+        //     XPathResult.ANY_TYPE,
+        //     null
+        // );
+
+        // let customChildElement = xpathResult.iterateNext();
+        // const customChildElements = [];
+
+        // while (customChildElement) {
+        //     customChildElements.push(customChildElement);
+        //     customChildElement = xpathResult.iterateNext();
+        // }
+
+        // for (const customChildElement of customChildElements) {
+        //     (customChildElement as HTMLElement).setAttribute(
+        //         "data-child-of",
+        //         name
+        //     );
+        // }
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
       }
-      var xpathResult = document.evaluate("//*[contains(name(), '-')]", tempDiv, null, XPathResult.ANY_TYPE, null);
-      var customChildElement = xpathResult.iterateNext();
-      var customChildElements = [];
-      while (customChildElement) {
-        customChildElements.push(customChildElement);
-        customChildElement = xpathResult.iterateNext();
-      }
-
-      // for (const customChildElement of customChildElements) {
-      //     (customChildElement as HTMLElement).setAttribute(
-      //         "data-child-of",
-      //         name
-      //     );
-      // }
-
-      var originalInvocation = customElement.originalTemplateInvocation || tempDiv.innerHTML;
+      var originalInvocation = tempDiv.innerHTML;
       var evaluatedTemplate = evaluateTemplate(tempDiv.innerHTML, localState);
 
       // console.log(evaluatedTemplate);
       tempDiv.innerHTML = evaluatedTemplate;
-      var lastTemplateEvaluation = evaluatedTemplate;
+
+      // const lastTemplateEvaluation = evaluatedTemplate;
       //     const customElementAttributes = getAttributes(
       //         customChildElement as HTMLElement
       //     );
@@ -605,16 +613,17 @@ var init = function init(document) {
               element: newElement,
               template: textContent,
               attributes: [],
-              parentAttributes: attributes,
-              lastEvaluation: textContent
+              parentAttributes: attributes
+              // lastEvaluation: textContent,
             });
           }
         } else {
+          newElement.lastTemplateEvaluation = evaluatedTemplate;
           if (!isCustomElement(newElement)) {
             templatesTree.push({
               element: newElement,
               template: originalInvocation,
-              lastEvaluation: lastTemplateEvaluation,
+              // lastEvaluation: lastTemplateEvaluation,
               attributes: getAttributes(newElement),
               parentAttributes: attributes
             });
