@@ -1,0 +1,48 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog Templates</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="pt-40 max-w-sm mx-auto">
+            <template id="my-template">
+                Hello {{ dataName }}! {{ dataCount }}
+            </template>
+            <template id="x-child">
+                <div>
+                    {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
+                    Number(dataCount) % (Number(dataChild) + 2) }} {{ children
+                    }}
+                </div>
+            </template>
+            <template id="x-parent">
+                <div>
+                    {{ names.map( (n, i) => `
+                    <x-child data-count="${ dataParent + 1 }" data-child="${i}"
+                        >${n}</x-child
+                    >
+                    `)}}
+                </div>
+            </template>
+            <div>
+                <my-template
+                    data-name="World"
+                    data-count="{{ count }}"
+                ></my-template>
+            </div>
+            <x-parent data-parent="{{ count }}"></x-parent>
+            <div class="flex items-center">
+                <button onclick="increment()">Increment</button>
+                <div class="pl-3">{{ count }}</div>
+            </div>
+        </div>
+        <script src="/examples/dist/ts-html-in-expression.js"></script>
+    </body>
+</html>
