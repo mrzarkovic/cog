@@ -1,2 +1,2 @@
 import { StateObject } from "../types";
-export declare const state: StateObject;
+export declare function createState(): StateObject;

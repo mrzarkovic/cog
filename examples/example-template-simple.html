@@ -40,12 +40,12 @@
                     </div>
                 </div>
             </template>
-            <div>
-                <my-template
-                    data-name="World"
-                    data-count="{{ count }}"
-                ></my-template>
-            </div>
+
+            <my-template
+                data-name="World"
+                data-count="{{ count }}"
+            ></my-template>
+
             <x-parent data-parent="{{ count }}"></x-parent>
             <div class="flex items-center">
                 <button onclick="increment()" class="btn">Increment</button>

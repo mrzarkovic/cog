@@ -1,16 +1,18 @@
 import { type Cog, type DOMTree, type DocumentWithHandler } from "./types";
-import { appElement } from "./util/appElement";
+import { createAppElement } from "./util/appElement";
 import { defineCustomElement } from "./util/defineCustomElement";
 import { addAllEventListeners } from "./util/eventListeners/addAllEventListeners";
-import { loadTemplates } from "./util/loadTemplate";
+import { loadTemplates } from "./util/loadTemplates";
 import { loadTree } from "./util/loadTree";
 import { renderTemplates } from "./util/renderTemplates";
-import { state } from "./util/state";
+import { createState } from "./util/state";
 import { templatesStack } from "./util/templatesStack";
 
 export const init = (document: Document): Cog => {
     let tree: DOMTree = [];
     let templates: HTMLTemplateElement[] = [];
+    const appElement = createAppElement(document);
+    const state = createState();
 
     function reRender() {
         renderTemplates(tree, state.value);
@@ -27,6 +29,7 @@ export const init = (document: Document): Cog => {
     function defineCustomElements(templates: HTMLTemplateElement[]) {
         templates.forEach((template) => {
             const name = template.getAttribute("id");
+
             if (!name) {
                 throw new Error("Missing id attribute");
             }
@@ -34,7 +37,7 @@ export const init = (document: Document): Cog => {
             if (template.content.childNodes.length !== 1) {
                 throw new Error(`Template ${name} should have a single child`);
             }
-            defineCustomElement(name, template);
+            defineCustomElement(name, template, state);
         });
     }
 

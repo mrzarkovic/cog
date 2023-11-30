@@ -1,13 +1,13 @@
-import { Attribute, HTMLElementFromTemplate } from "../types";
+import { Attribute, HTMLElementFromTemplate, StateObject } from "../types";
 import { attributesToState } from "./helpers/attributesToState";
 import { evaluateTemplate } from "./helpers/evaluateTemplate";
 import { getAttributes } from "./helpers/getAttributes";
-import { state } from "./state";
 import { templatesStack } from "./templatesStack";
 
 export function defineCustomElement(
     name: string,
-    template: HTMLTemplateElement
+    template: HTMLTemplateElement,
+    state: StateObject
 ) {
     function CustomElement() {
         return Reflect.construct(HTMLElement, [], CustomElement);
