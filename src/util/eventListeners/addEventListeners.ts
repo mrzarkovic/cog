@@ -3,7 +3,7 @@ import { makeEventHandler } from "./makeEventHandler";
 
 export function addEventListeners(
     parent: HTMLElement,
-    eventName = "click",
+    eventName: string,
     state: State
 ) {
     parent.querySelectorAll(`[data-on-${eventName}]`).forEach((element) => {

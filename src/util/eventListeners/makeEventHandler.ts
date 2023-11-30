@@ -2,7 +2,7 @@ import { State } from "../../types";
 import { createExpressionScope } from "../helpers/createExpressionScope";
 
 export const makeEventHandler = (
-    eventName = "click",
+    eventName: string,
     element: Element,
     state: State
 ) => {

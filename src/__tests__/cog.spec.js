@@ -19,7 +19,7 @@ describe("cog", () => {
         document.dispatchEvent(event);
     }
 
-    afterEach(() => {
+    beforeEach(() => {
         document.body.innerHTML = "";
     });
 
@@ -39,8 +39,9 @@ describe("cog", () => {
     test("template props", async () => {
         const element = document.createElement("div");
         const template =
-            "<template id='my-template'>Hello {{ dataName }}!</template>";
-        const html = "<div><my-template data-name='World'></my-template></div>";
+            "<template id='my-template1'>Hello {{ dataName }}!</template>";
+        const html =
+            "<div><my-template1 data-name='World'></my-template1></div>";
         element.innerHTML = "<div id='app'>" + template + html + "</div>";
         document.body.appendChild(element);
         init(document);
@@ -48,6 +49,144 @@ describe("cog", () => {
 
         await waitFor(() => {
             expect(getByText(element, "Hello World!")).toBeInTheDocument();
+        });
+    });
+
+    test("template root attributes", async () => {
+        const element = document.createElement("div");
+        const template =
+            "<template id='my-template2'><span id='{{ dataName }}'>Hello Span!</span></template>";
+        const html =
+            "<div><my-template2 data-name='World'></my-template2></div>";
+        element.innerHTML = "<div id='app'>" + template + html + "</div>";
+        document.body.appendChild(element);
+        init(document);
+        dispatchDOMContentLoaded();
+
+        await waitFor(() => {
+            expect(element.querySelector("#World")).toBeInTheDocument();
+        });
+    });
+
+    test("template should have a single child", () => {
+        const element = document.createElement("div");
+        element.innerHTML =
+            "<div id='app'><template id='my-template3'><div></div><div></div></template></div>";
+        document.body.appendChild(element);
+        init(document);
+        dispatchDOMContentLoaded();
+
+        const errorPromise = getWindowErrorPromise();
+
+        dispatchDOMContentLoaded();
+
+        expect(errorPromise).rejects.toThrow(
+            "Template my-template3 should have a single child"
+        );
+    });
+
+    test("update template root attributes", async () => {
+        const element = document.createElement("div");
+        const template =
+            "<template id='my-template4'><span id='{{ dataName }}'>Hello Span!</span></template>";
+        const html =
+            "<div><my-template4 data-name='{{ name }}'></my-template4></div>";
+        element.innerHTML = "<div id='app'>" + template + html + "</div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+
+        const name = variable("name", "first");
+
+        dispatchDOMContentLoaded();
+
+        name.value = "second";
+
+        await waitFor(() => {
+            expect(element.querySelector("#second")).toBeInTheDocument();
+        });
+    });
+
+    test("custom child element changed", async () => {
+        const element = document.createElement("div");
+        const childTemplate =
+            "<template id='my-child1'><div>{{ dataChild }}</div></template>";
+        const parentTemplate =
+            "<template id='my-template5'><div><my-child1 data-child='{{ dataName }}'></my-child1></div></template>";
+        const html =
+            "<div><my-template5 data-name='{{ name }}'></my-template5></div>";
+        element.innerHTML =
+            "<div id='app'>" + childTemplate + parentTemplate + html + "</div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+
+        const name = variable("name", "first");
+
+        dispatchDOMContentLoaded();
+
+        name.value = "second";
+
+        await waitFor(() => {
+            expect(getByText(element, "second")).toBeInTheDocument();
+        });
+    });
+
+    test("text node changed", async () => {
+        const element = document.createElement("div");
+        const template =
+            "<template id='my-template6'>{{ dataName }}</template>";
+        const html = "<my-template6 data-name='{{ name }}'></my-template6>";
+        element.innerHTML = "<div id='app'>" + template + html + "</div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+
+        const name = variable("name", "first");
+
+        dispatchDOMContentLoaded();
+
+        name.value = "second";
+
+        await waitFor(() => {
+            expect(getByText(element, "second")).toBeInTheDocument();
+        });
+    });
+
+    test("child attributes changed", async () => {
+        const element = document.createElement("div");
+        const template =
+            "<template id='my-template7'><div><span id='{{ dataName }}'>Name</span></div></template>";
+        const html = "<my-template7 data-name='{{ name }}'></my-template7>";
+        element.innerHTML = "<div id='app'>" + template + html + "</div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+
+        const name = variable("name", "first");
+
+        dispatchDOMContentLoaded();
+
+        name.value = "second";
+
+        await waitFor(() => {
+            expect(element.querySelector("#second")).toBeInTheDocument();
+        });
+    });
+
+    test("child text changed", async () => {
+        const element = document.createElement("div");
+        const template =
+            "<template id='my-template8'><div><span>{{ dataName }}</span></div></template>";
+        const html = "<my-template8 data-name='{{ name }}'></my-template8>";
+        element.innerHTML = "<div id='app'>" + template + html + "</div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+
+        const name = variable("name", "first");
+
+        dispatchDOMContentLoaded();
+
+        name.value = "second";
+
+        await waitFor(() => {
+            expect(getByText(element, "second")).toBeInTheDocument();
         });
     });
 
