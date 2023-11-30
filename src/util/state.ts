@@ -1,7 +1,7 @@
-import { State } from "../types";
+import { StateObject } from "../types";
 
-export const state = {
-    state: null as State | null,
+export const state: StateObject = {
+    state: null,
     get value() {
         if (!this.state) {
             this.state = {};

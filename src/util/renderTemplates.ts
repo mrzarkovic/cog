@@ -1,8 +1,9 @@
 import { ReactiveNode, State } from "../types";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "./eventListeners/removeAllEventListeners";
+import { attributesToState } from "./helpers/attributesToState";
 import { compareNodes } from "./helpers/compareNodes";
-import { convertAttribute } from "./helpers/convertAttribute";
+import { elementFromString } from "./helpers/elementFromString";
 import { evaluateExpression } from "./helpers/evaluateExpression";
 import { evaluateTemplate } from "./helpers/evaluateTemplate";
 import { findCorrespondingNode } from "./helpers/findCorrespondingNode";
@@ -11,55 +12,26 @@ import { isCustomElement } from "./helpers/isCustomElement";
 export const renderTemplates = (tree: ReactiveNode[], state: State) => {
     let treeNodeIndex = 0;
     for (treeNodeIndex; treeNodeIndex < tree.length; treeNodeIndex++) {
-        const localState: State = { ...state };
         const { element, template, attributes, parentAttributes } =
             tree[treeNodeIndex];
-
-        if (parentAttributes) {
-            let i = 0;
-            for (i; i < parentAttributes.length; i++) {
-                const attribute = parentAttributes[i];
-                const name = attribute.name;
-                const value = attribute.value;
-                const reactive = attribute.reactive;
-                const evaluated = reactive
-                    ? evaluateExpression(value, localState)
-                    : value;
-
-                localState[convertAttribute(name)] = evaluated;
-            }
-        }
+        const localState = attributesToState(parentAttributes, state);
 
         if (attributes) {
             let i = 0;
             for (i; i < attributes.length; i++) {
-                const attribute = attributes[i];
-                const name = attribute.name;
-                const value = attribute.value;
-                const reactive = attribute.reactive;
-                const evaluated = reactive
-                    ? evaluateExpression(value, localState)
-                    : value;
+                const evaluated = attributes[i].reactive
+                    ? evaluateExpression(attributes[i].value, localState)
+                    : attributes[i].value;
 
-                if (evaluated !== element.getAttribute(name)) {
-                    element.setAttribute(name, evaluated);
+                if (evaluated !== element.getAttribute(attributes[i].name)) {
+                    element.setAttribute(attributes[i].name, evaluated);
                 }
             }
         }
 
         const updatedContent = evaluateTemplate(template, localState);
-        const parser = new DOMParser();
-        const newElementDoc = parser.parseFromString(
-            updatedContent,
-            "text/html"
-        );
-        const newElement = newElementDoc.body.firstChild as HTMLElement;
-        const oldElementDoc = parser.parseFromString(
-            element.lastTemplateEvaluation,
-            "text/html"
-        );
-        const oldElement = oldElementDoc.body.firstChild as HTMLElement;
-
+        const newElement = elementFromString(updatedContent);
+        const oldElement = elementFromString(element.lastTemplateEvaluation);
         const changedElements = compareNodes(oldElement, newElement);
 
         if (changedElements.length > 0) {

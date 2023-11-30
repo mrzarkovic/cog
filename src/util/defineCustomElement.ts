@@ -1,6 +1,5 @@
-import { Attribute, HTMLElementFromTemplate, State } from "../types";
-import { convertAttribute } from "./helpers/convertAttribute";
-import { evaluateExpression } from "./helpers/evaluateExpression";
+import { Attribute, HTMLElementFromTemplate } from "../types";
+import { attributesToState } from "./helpers/attributesToState";
 import { evaluateTemplate } from "./helpers/evaluateTemplate";
 import { getAttributes } from "./helpers/getAttributes";
 import { state } from "./state";
@@ -30,18 +29,7 @@ export function defineCustomElement(
             customElement.innerHTML
         );
 
-        const localState: State = { ...state.value };
-
-        for (const attribute of attributes) {
-            let attributeValue = attribute.value;
-            if (attribute.reactive) {
-                attributeValue = evaluateExpression(
-                    attributeValue,
-                    state.value
-                );
-            }
-            localState[convertAttribute(attribute.name)] = attributeValue;
-        }
+        const localState = attributesToState(attributes, state.value);
 
         const originalInvocation = tempDiv.innerHTML;
         let newElementAttributes: Attribute[] = [];

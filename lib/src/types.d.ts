@@ -27,6 +27,11 @@ export type ChangedElement = {
         newValue: string;
     }[];
 };
+export type StateObject = {
+    state: State | null;
+    get value(): State;
+    set: <T>(name: string, value: T) => void;
+};
 export type State = Record<string, unknown>;
 export type ElementWithHandler = Element & {
     [key: string]: (e: Event) => void;

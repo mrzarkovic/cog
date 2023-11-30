@@ -3,7 +3,7 @@
     "version": "0.0.7",
     "description": "A simple, reactive expression library with zero dependencies.",
     "main": "lib/cog.js",
-    "types": "lib/cog.d.ts",
+    "types": "lib/src/cog.d.ts",
     "scripts": {
         "dev": "webpack --watch",
         "build": "webpack && tsc --emitDeclarationOnly",
