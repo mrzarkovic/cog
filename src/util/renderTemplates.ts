@@ -31,8 +31,11 @@ export const renderTemplates = (tree: ReactiveNode[], state: State) => {
 
         const updatedContent = evaluateTemplate(template, localState);
         const newElement = elementFromString(updatedContent);
-        const oldElement = elementFromString(element.lastTemplateEvaluation);
+        const oldElement = elementFromString(
+            element.lastTemplateEvaluation ?? element.outerHTML
+        );
         const changedElements = compareNodes(oldElement, newElement);
+        console.log(oldElement, newElement);
 
         if (changedElements.length > 0) {
             element.lastTemplateEvaluation = updatedContent;

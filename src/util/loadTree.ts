@@ -23,7 +23,7 @@ export const loadTree = (rootElement: Node): DOMTree => {
             const attributes = getAttributes(element);
             tree.push({
                 element,
-                template: element.innerHTML,
+                template: element.outerHTML,
                 attributes,
                 parentAttributes: [],
             });
