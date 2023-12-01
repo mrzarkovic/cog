@@ -12,7 +12,7 @@ const config: Config = {
             statements: 100,
         },
     },
-    coverageReporters: ["json-summary"],
+    coverageReporters: ["json-summary", "lcov"],
 };
 
 export default config;
