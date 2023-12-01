@@ -1,2 +1,2 @@
-import { ReactiveNode, State } from "../types";
-export declare const reconcile: (tree: ReactiveNode[], state: State) => void;
+import { ReactiveNodesStack, State } from "../types";
+export declare const reconcile: (reactiveNodes: ReactiveNodesStack, state: State) => void;

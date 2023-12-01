@@ -1,22 +1,22 @@
-import { type Cog, type DOMTree, type DocumentWithHandler } from "./types";
+import { type Cog, type DocumentWithHandler } from "./types";
 import { createAppElement } from "./util/appElement";
-import { defineCustomElement } from "./util/defineCustomElement";
+import { defineCustomElements } from "./util/defineCustomElements";
 import { addAllEventListeners } from "./util/eventListeners/addAllEventListeners";
-import { loadTemplates } from "./util/loadTemplates";
-import { loadTree } from "./util/loadTree";
+import { loadNativeElements } from "./util/loadNativeElements";
 import { reconcile } from "./util/reconcile";
 import { createState } from "./util/state";
-import { templatesStack } from "./util/templatesStack";
+import { createCustomElements } from "./util/customElements";
+import { createNativeElements } from "./util/nativeElements";
 
 export const init = (document: Document): Cog => {
-    let tree: DOMTree = [];
-    let templates: HTMLTemplateElement[] = [];
+    const nativeElements = createNativeElements();
+    const customElements = createCustomElements();
     const appElement = createAppElement(document);
     const state = createState();
 
     function reRender() {
-        reconcile(tree, state.value);
-        reconcile(templatesStack.value, state.value);
+        reconcile(nativeElements, state.value);
+        reconcile(customElements, state.value);
     }
 
     function updateState<T>(name: string, value: T) {
@@ -26,25 +26,9 @@ export const init = (document: Document): Cog => {
         }, 0);
     }
 
-    function defineCustomElements(templates: HTMLTemplateElement[]) {
-        templates.forEach((template) => {
-            const name = template.getAttribute("id");
-
-            if (!name) {
-                throw new Error("Missing id attribute");
-            }
-
-            if (template.content.childNodes.length !== 1) {
-                throw new Error(`Template ${name} should have a single child`);
-            }
-            defineCustomElement(name, template, state);
-        });
-    }
-
     const onLoad = () => {
-        templates = loadTemplates(appElement.value);
-        tree = loadTree(appElement.value);
-        defineCustomElements(templates);
+        defineCustomElements(appElement.value, state.value, customElements);
+        loadNativeElements(appElement.value, nativeElements);
         addAllEventListeners(appElement.value, state.value);
         reRender();
     };

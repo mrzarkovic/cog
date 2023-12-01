@@ -12,9 +12,6 @@
     </head>
     <body>
         <div id="app" class="py-40 px-8 max-w-sm mx-auto">
-            <template id="my-template">
-                Hello {{ dataName }}! {{ dataCount }}
-            </template>
             <template id="x-child">
                 <div>
                     {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
@@ -25,37 +22,22 @@
             <template id="x-parent">
                 <div>
                     <div class="p-4">
-                        <div>1 {{ count % 3 == 0 ? count : '' }}</div>
-                        <div>2 {{ count % 3 == 1 ? count : '' }}</div>
-                        <div>3 {{ count % 3 == 2 ? count : '' }}</div>
-                    </div>
-                    <div class="p-4">
-                        {{ names.map( (n, i) => `
-                        <x-child
-                            data-count="${ dataParent + 1 }"
-                            data-child="${i}"
-                            >${n} ${dataParent}</x-child
-                        >
-                        `)}}
+                        <div>
+                            {{ names.map( (n, i) => `
+                            <x-child
+                                data-count="${ dataParent % (i + 1) }"
+                                data-child="${i}"
+                                >${n}</x-child
+                            >
+                            `)}}
+                        </div>
                     </div>
                 </div>
             </template>
 
-            <my-template
-                data-name="World"
-                data-count="{{ count }}"
-            ></my-template>
-
             <x-parent data-parent="{{ count }}"></x-parent>
             <div class="flex items-center">
                 <button onclick="increment()" class="btn">Increment</button>
-                <div class="p-4">{{ count }}</div>
-            </div>
-            <div>{{ count }}</div>
-            <div data-id="{{ count }}">
-                &lt;<span class="text-info-content">div</span>&gt;Counter: {{
-                "{{ counter }}" }}&lt;/<span class="text-info-content">div</span
-                >&gt;
             </div>
         </div>
         <script src="/examples/dist/ts-html-in-expression.js"></script>

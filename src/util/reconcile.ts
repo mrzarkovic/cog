@@ -1,4 +1,4 @@
-import { ChangedAttribute, ReactiveNode, State } from "../types";
+import { ChangedAttribute, ReactiveNodesStack, State } from "../types";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "./eventListeners/removeAllEventListeners";
 import { attributesToState } from "./helpers/attributesToState";
@@ -15,7 +15,7 @@ const updateElement = (
     attributes: ChangedAttribute[] | undefined,
     localState: State
 ) => {
-    if (newNode.nodeType !== Node.TEXT_NODE && isCustomElement(newNode)) {
+    if (isCustomElement(newNode)) {
         changedNode.parentElement?.replaceChild(newNode, changedNode);
     } else {
         if (content !== undefined) {
@@ -37,33 +37,40 @@ const updateElement = (
     }
 };
 
-export const reconcile = (tree: ReactiveNode[], state: State) => {
-    for (let treeNodeIndex = 0; treeNodeIndex < tree.length; treeNodeIndex++) {
-        const { element, template, parentAttributes } = tree[treeNodeIndex];
+export const reconcile = (reactiveNodes: ReactiveNodesStack, state: State) => {
+    for (
+        let treeNodeIndex = 0;
+        treeNodeIndex < reactiveNodes.value.length;
+        treeNodeIndex++
+    ) {
+        const { element, template, parentAttributes, lastTemplateEvaluation } =
+            reactiveNodes.value[treeNodeIndex];
         const localState = attributesToState(parentAttributes, state);
         const updatedContent = evaluateTemplate(template, localState);
         const newElement = elementFromString(updatedContent);
-        const oldElement = elementFromString(element.lastTemplateEvaluation);
+        const oldElement = elementFromString(lastTemplateEvaluation);
         const changedNodes = compareNodes(oldElement, newElement);
 
         if (changedNodes.length > 0) {
-            element.lastTemplateEvaluation = updatedContent;
+            reactiveNodes.updateLastTemplateEvaluation(
+                treeNodeIndex,
+                updatedContent
+            );
 
             for (let i = 0; i < changedNodes.length; i++) {
-                const realChangedNode = findCorrespondingNode(
+                const oldNode = findCorrespondingNode(
                     changedNodes[i].node,
                     oldElement,
                     element
                 ) as HTMLElement;
-                if (realChangedNode) {
-                    updateElement(
-                        realChangedNode,
-                        changedNodes[i].newNode,
-                        changedNodes[i].content,
-                        changedNodes[i].attributes,
-                        localState
-                    );
-                }
+
+                updateElement(
+                    oldNode,
+                    changedNodes[i].newNode,
+                    changedNodes[i].content,
+                    changedNodes[i].attributes,
+                    localState
+                );
             }
         }
     }

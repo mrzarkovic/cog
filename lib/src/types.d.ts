@@ -16,11 +16,11 @@ export type Attribute = {
     reactive: boolean;
 };
 export type ReactiveNode = {
-    element: HTMLElementFromTemplate;
+    element: HTMLElement;
     template: HTMLString;
+    lastTemplateEvaluation: HTMLString;
     parentAttributes: Attribute[];
 };
-export type DOMTree = ReactiveNode[];
 export type ChangedAttribute = {
     name: string;
     newValue: string;
@@ -43,6 +43,12 @@ export type ElementWithHandler = Element & {
 export type DocumentWithHandler = Document & {
     onLoadHandler: () => void;
 };
-export type HTMLElementFromTemplate = HTMLElement & {
-    lastTemplateEvaluation: string;
+export type ReactiveNodesStack = {
+    stack: ReactiveNode[];
+    get value(): ReactiveNode[];
+    add: (item: ReactiveNode) => void;
+    updateLastTemplateEvaluation: (index: number, value: string) => void;
+};
+export type CustomElementsStack = ReactiveNodesStack & {
+    clean: () => void;
 };

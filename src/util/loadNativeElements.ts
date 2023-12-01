@@ -1,10 +1,10 @@
-// TODO: rename, not a tree
-
-import { DOMTree, HTMLElementFromTemplate } from "../types";
+import { ReactiveNodesStack } from "../types";
 import { isCustomElement } from "./helpers/isCustomElement";
 
-export const loadTree = (rootElement: Node): DOMTree => {
-    const tree: DOMTree = [];
+export const loadNativeElements = (
+    rootElement: Node,
+    nativeElements: ReactiveNodesStack
+) => {
     const xpath =
         "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
 
@@ -15,20 +15,18 @@ export const loadTree = (rootElement: Node): DOMTree => {
         XPathResult.ORDERED_NODE_ITERATOR_TYPE,
         null
     );
-    let element = <HTMLElementFromTemplate>result.iterateNext();
+    let element = <HTMLElement>result.iterateNext();
 
     while (element) {
         if (!isCustomElement(element)) {
-            element.lastTemplateEvaluation = element.outerHTML;
-            tree.push({
+            nativeElements.add({
                 element,
                 template: element.outerHTML,
+                lastTemplateEvaluation: element.outerHTML,
                 parentAttributes: [],
             });
         }
 
-        element = <HTMLElementFromTemplate>result.iterateNext();
+        element = <HTMLElement>result.iterateNext();
     }
-
-    return tree;
 };

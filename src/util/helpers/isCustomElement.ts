@@ -1,3 +1,6 @@
 export const isCustomElement = (element: HTMLElement): boolean => {
-    return element.tagName.indexOf("-") !== -1;
+    return (
+        element.nodeType !== Node.TEXT_NODE &&
+        element.tagName.indexOf("-") !== -1
+    );
 };
