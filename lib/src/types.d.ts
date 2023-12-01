@@ -6,6 +6,10 @@ export interface Cog {
     };
 }
 export type HTMLString = string;
+export type RootElement = {
+    element: HTMLElement | null;
+    get value(): HTMLElement;
+};
 export type Attribute = {
     name: string;
     value: string;

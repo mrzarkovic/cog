@@ -1,1 +1,1 @@
-export declare function removeAllEventListeners(parent?: HTMLElement): void;
+export declare function removeAllEventListeners(parent: HTMLElement): void;

@@ -1,4 +1,2 @@
-export declare const appElement: {
-    element: HTMLElement | null;
-    readonly value: HTMLElement;
-};
+import { RootElement } from "../types";
+export declare function createAppElement(document: Document): RootElement;
