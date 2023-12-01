@@ -4,7 +4,7 @@ import { defineCustomElement } from "./util/defineCustomElement";
 import { addAllEventListeners } from "./util/eventListeners/addAllEventListeners";
 import { loadTemplates } from "./util/loadTemplates";
 import { loadTree } from "./util/loadTree";
-import { renderTemplates } from "./util/renderTemplates";
+import { reconcile } from "./util/reconcile";
 import { createState } from "./util/state";
 import { templatesStack } from "./util/templatesStack";
 
@@ -15,8 +15,8 @@ export const init = (document: Document): Cog => {
     const state = createState();
 
     function reRender() {
-        renderTemplates(tree, state.value);
-        renderTemplates(templatesStack.value, state.value);
+        reconcile(tree, state.value);
+        reconcile(templatesStack.value, state.value);
     }
 
     function updateState<T>(name: string, value: T) {

@@ -1,4 +1,4 @@
-import { ChangedElement } from "../../types";
+import { ChangedNode } from "../../types";
 import { getChangedAttributes } from "./getChangedAttributes";
 import { sanitizeHtml } from "./sanitizeHtml";
 
@@ -10,12 +10,12 @@ import { sanitizeHtml } from "./sanitizeHtml";
 function compareTextNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
-): ChangedElement[] {
+): ChangedNode[] {
     if (oldNode.textContent !== newNode.textContent) {
         return [
             {
-                element: oldNode,
-                newElement: newNode,
+                node: oldNode,
+                newNode: newNode,
                 content: newNode.textContent ?? "",
             },
         ];
@@ -26,8 +26,8 @@ function compareTextNodes(
 function compareChildNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
-): ChangedElement[] {
-    let changedChildren: ChangedElement[] = [];
+): ChangedNode[] {
+    let changedChildren: ChangedNode[] = [];
 
     for (let i = 0; i < oldNode.childNodes.length; i++) {
         const oldChild = oldNode.childNodes[i];
@@ -39,8 +39,8 @@ function compareChildNodes(
         ) {
             if (oldChild.textContent !== newChild.textContent) {
                 changedChildren.push({
-                    element: oldNode,
-                    newElement: newNode,
+                    node: oldNode,
+                    newNode: newNode,
                     content: newNode.innerHTML,
                 });
                 break;
@@ -60,7 +60,7 @@ function compareChildNodes(
 export function compareNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
-): ChangedElement[] {
+): ChangedNode[] {
     if (oldNode.nodeType === Node.TEXT_NODE) {
         return compareTextNodes(oldNode, newNode);
     }
@@ -69,12 +69,12 @@ export function compareNodes(
     newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
 
     const changedAttributes = getChangedAttributes(oldNode, newNode);
-    const changedChildren: ChangedElement[] =
+    const changedChildren: ChangedNode[] =
         changedAttributes.length > 0
             ? [
                   {
-                      element: oldNode,
-                      newElement: newNode,
+                      node: oldNode,
+                      newNode: newNode,
                       attributes: changedAttributes,
                   },
               ]

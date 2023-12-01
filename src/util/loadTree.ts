@@ -19,6 +19,7 @@ export const loadTree = (rootElement: Node): DOMTree => {
 
     while (element) {
         if (!isCustomElement(element)) {
+            element.lastTemplateEvaluation = element.outerHTML;
             tree.push({
                 element,
                 template: element.outerHTML,

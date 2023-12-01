@@ -21,14 +21,15 @@ export type ReactiveNode = {
     parentAttributes: Attribute[];
 };
 export type DOMTree = ReactiveNode[];
-export type ChangedElement = {
-    element: HTMLElement;
-    newElement: HTMLElement;
+export type ChangedAttribute = {
+    name: string;
+    newValue: string;
+};
+export type ChangedNode = {
+    node: HTMLElement;
+    newNode: HTMLElement;
     content?: HTMLString;
-    attributes?: {
-        name: string;
-        newValue: string;
-    }[];
+    attributes?: ChangedAttribute[];
 };
 export type StateObject = {
     state: State | null;
