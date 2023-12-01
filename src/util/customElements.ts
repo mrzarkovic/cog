@@ -1,20 +1,20 @@
-import { CustomElementsStack, ReactiveNode } from "../types";
-import { cleanTemplatesTree } from "./helpers/cleanTemplatesTree";
+import { CustomElementsList, ReactiveNode } from "../types";
+import { cleanReactiveNodesList } from "./helpers/cleanReactiveNodesList";
 
-export function createCustomElements(): CustomElementsStack {
+export function createCustomElements(): CustomElementsList {
     return {
-        stack: [] as ReactiveNode[],
+        list: [] as ReactiveNode[],
         get value() {
-            return this.stack;
+            return this.list;
         },
         add(item: ReactiveNode) {
-            this.stack.push(item);
+            this.list.push(item);
         },
         updateLastTemplateEvaluation(index: number, value: string) {
-            this.stack[index].lastTemplateEvaluation = value;
+            this.list[index].lastTemplateEvaluation = value;
         },
         clean() {
-            this.stack = cleanTemplatesTree(this.stack);
+            this.list = cleanReactiveNodesList(this.list);
         },
     };
 }

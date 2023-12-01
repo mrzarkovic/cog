@@ -1,16 +1,16 @@
-import { ReactiveNodesStack, ReactiveNode } from "../types";
+import { ReactiveNodesList, ReactiveNode } from "../types";
 
-export function createNativeElements(): ReactiveNodesStack {
+export function createNativeElements(): ReactiveNodesList {
     return {
-        stack: [] as ReactiveNode[],
+        list: [] as ReactiveNode[],
         get value() {
-            return this.stack;
+            return this.list;
         },
         add(item: ReactiveNode) {
-            this.stack.push(item);
+            this.list.push(item);
         },
         updateLastTemplateEvaluation(index: number, value: string) {
-            this.stack[index].lastTemplateEvaluation = value;
+            this.list[index].lastTemplateEvaluation = value;
         },
     };
 }

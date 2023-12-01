@@ -1,4 +1,4 @@
-import { ChangedAttribute, ReactiveNodesStack, State } from "../types";
+import { ChangedAttribute, ReactiveNodesList, State } from "../types";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "./eventListeners/removeAllEventListeners";
 import { attributesToState } from "./helpers/attributesToState";
@@ -37,7 +37,7 @@ const updateElement = (
     }
 };
 
-export const reconcile = (reactiveNodes: ReactiveNodesStack, state: State) => {
+export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
     for (
         let treeNodeIndex = 0;
         treeNodeIndex < reactiveNodes.value.length;

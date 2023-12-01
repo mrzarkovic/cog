@@ -1,9 +1,9 @@
-import { ReactiveNodesStack } from "../types";
+import { ReactiveNodesList } from "../types";
 import { isCustomElement } from "./helpers/isCustomElement";
 
 export const loadNativeElements = (
     rootElement: Node,
-    nativeElements: ReactiveNodesStack
+    nativeElements: ReactiveNodesList
 ) => {
     const xpath =
         "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";

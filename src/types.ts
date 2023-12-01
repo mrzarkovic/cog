@@ -53,13 +53,13 @@ export type ElementWithHandler = Element & {
 };
 export type DocumentWithHandler = Document & { onLoadHandler: () => void };
 
-export type ReactiveNodesStack = {
-    stack: ReactiveNode[];
+export type ReactiveNodesList = {
+    list: ReactiveNode[];
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
     updateLastTemplateEvaluation: (index: number, value: string) => void;
 };
 
-export type CustomElementsStack = ReactiveNodesStack & {
+export type CustomElementsList = ReactiveNodesList & {
     clean: () => void;
 };

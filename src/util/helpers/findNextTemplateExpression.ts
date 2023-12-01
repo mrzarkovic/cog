@@ -1,4 +1,6 @@
-export function findNextTemplateExpression(htmlText: string): {
+import { HTMLString } from "../../types";
+
+export function findNextTemplateExpression(htmlText: HTMLString): {
     start: number;
     end: number;
 } {

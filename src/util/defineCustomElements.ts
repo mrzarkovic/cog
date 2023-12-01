@@ -1,4 +1,4 @@
-import { CustomElementsStack, State } from "../types";
+import { CustomElementsList, State } from "../types";
 import { attributesToState } from "./helpers/attributesToState";
 import { evaluateTemplate } from "./helpers/evaluateTemplate";
 import { getAttributes } from "./helpers/getAttributes";
@@ -27,7 +27,7 @@ function loadTemplates(rootElement: Node) {
 export function defineCustomElements(
     rootElement: Node,
     state: State,
-    customElements: CustomElementsStack
+    customElements: CustomElementsList
 ) {
     const templates = loadTemplates(rootElement);
     const fragment = document.createDocumentFragment();
@@ -54,7 +54,7 @@ function defineCustomElement(
     name: string,
     template: HTMLTemplateElement,
     state: State,
-    customElementsStack: CustomElementsStack
+    customElementsList: CustomElementsList
 ) {
     function CustomElement() {
         return Reflect.construct(HTMLElement, [], CustomElement);
@@ -66,7 +66,7 @@ function defineCustomElement(
     CustomElement.prototype.connectedCallback = renderCustomElement(
         template,
         state,
-        customElementsStack
+        customElementsList
     );
 
     customElements.define(name, CustomElement as never);
@@ -75,7 +75,7 @@ function defineCustomElement(
 function renderCustomElement(
     template: HTMLTemplateElement,
     state: State,
-    customElements: CustomElementsStack
+    customElements: CustomElementsList
 ) {
     return function (this: HTMLElement) {
         const attributes = getAttributes(this);
