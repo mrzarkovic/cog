@@ -16,38 +16,17 @@ describe("loadTree", () => {
         expect(tree).toEqual([
             {
                 element: element.querySelector("#first"),
-                template: "first {{ expression }}",
-                attributes: [
-                    {
-                        name: "id",
-                        value: "first",
-                        reactive: false,
-                    },
-                ],
+                template: '<div id="first">first {{ expression }}</div>',
                 parentAttributes: [],
             },
             {
                 element: element.querySelector("#second"),
-                template: "second {{ expression }}",
-                attributes: [
-                    {
-                        name: "id",
-                        value: "second",
-                        reactive: false,
-                    },
-                ],
+                template: '<div id="second">second {{ expression }}</div>',
                 parentAttributes: [],
             },
             {
                 element: element.querySelector("#third"),
-                template: "third {{ expression }}",
-                attributes: [
-                    {
-                        name: "id",
-                        value: "third",
-                        reactive: false,
-                    },
-                ],
+                template: '<div id="third">third {{ expression }}</div>',
                 parentAttributes: [],
             },
         ]);

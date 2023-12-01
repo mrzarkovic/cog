@@ -68,21 +68,22 @@ describe("cog", () => {
         });
     });
 
-    test("template should have a single child", () => {
+    test("template should have a single child", async () => {
         const element = document.createElement("div");
         element.innerHTML =
             "<div id='app'><template id='my-template3'><div></div><div></div></template></div>";
         document.body.appendChild(element);
         init(document);
-        dispatchDOMContentLoaded();
 
         const errorPromise = getWindowErrorPromise();
 
         dispatchDOMContentLoaded();
 
-        expect(errorPromise).rejects.toThrow(
-            "Template my-template3 should have a single child"
-        );
+        await waitFor(() => {
+            expect(errorPromise).rejects.toThrow(
+                "Template my-template3 should have a single child"
+            );
+        });
     });
 
     test("update template root attributes", async () => {
@@ -190,15 +191,17 @@ describe("cog", () => {
         });
     });
 
-    test("fail if no #app element", () => {
+    test("fail if no #app element", async () => {
         init(document);
         const errorPromise = getWindowErrorPromise();
         dispatchDOMContentLoaded();
 
-        expect(errorPromise).rejects.toThrow("No app element found!");
+        await waitFor(() => {
+            expect(errorPromise).rejects.toThrow("No app element found!");
+        });
     });
 
-    test("render with #app element", () => {
+    test("render with #app element", async () => {
         const element = document.createElement("div");
         element.innerHTML = "<div id='app'></div>";
         document.body.appendChild(element);
@@ -207,7 +210,9 @@ describe("cog", () => {
 
         dispatchDOMContentLoaded();
 
-        expect(element.innerHTML).toEqual('<div id="app"></div>');
+        await waitFor(() => {
+            expect(element.innerHTML).toEqual('<div id="app"></div>');
+        });
     });
 
     test("use variable in HTML", async () => {
@@ -226,24 +231,35 @@ describe("cog", () => {
     });
 
     test("update variable, direct assignment", async () => {
+        const element = document.createElement("div");
+        element.innerHTML = "<div id='app'><div>Hello {{ name }}!</div></div>";
+        document.body.appendChild(element);
+
         const variable = init(document).variable;
         const name = variable("name", "John");
+
+        dispatchDOMContentLoaded();
 
         name.value = "Jane";
 
         await waitFor(() => {
-            expect(name.value).toEqual("Jane");
+            expect(getByText(element, "Hello Jane!")).toBeInTheDocument();
         });
     });
 
     test("update variable, method invocation", async () => {
+        const element = document.createElement("div");
+        element.innerHTML = "<div id='app'><div>Hello {{ name }}!</div></div>";
+        document.body.appendChild(element);
         const variable = init(document).variable;
         const name = variable("name", "John");
+
+        dispatchDOMContentLoaded();
 
         name.set("Jane");
 
         await waitFor(() => {
-            expect(name.value).toEqual("Jane");
+            expect(getByText(element, "Hello Jane!")).toBeInTheDocument();
         });
     });
 

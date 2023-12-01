@@ -3,15 +3,14 @@ import { renderTemplates } from "../util/renderTemplates";
 import { getByText, waitFor } from "@testing-library/dom";
 
 describe("render", () => {
-    test("renders a template with a single expression", async () => {
+    test("renders a HTML with a single expression", async () => {
         const element = document.createElement("div");
         element.innerHTML = "<div>Hello {{ name }}!</div>";
-        const template = element.innerHTML;
+        const template = element.outerHTML;
         const tree = [
             {
                 element,
                 template,
-                attributes: [],
                 parentAttributes: [],
             },
         ];

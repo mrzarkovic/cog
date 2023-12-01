@@ -18,7 +18,6 @@ export type Attribute = {
 export type ReactiveNode = {
     element: HTMLElementFromTemplate;
     template: HTMLString;
-    attributes: Attribute[];
     parentAttributes: Attribute[];
 };
 export type DOMTree = ReactiveNode[];

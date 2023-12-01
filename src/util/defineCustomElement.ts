@@ -1,4 +1,4 @@
-import { Attribute, HTMLElementFromTemplate, StateObject } from "../types";
+import { HTMLElementFromTemplate, StateObject } from "../types";
 import { attributesToState } from "./helpers/attributesToState";
 import { evaluateTemplate } from "./helpers/evaluateTemplate";
 import { getAttributes } from "./helpers/getAttributes";
@@ -32,12 +32,6 @@ export function defineCustomElement(
         const localState = attributesToState(attributes, state.value);
 
         const originalInvocation = tempDiv.innerHTML;
-        let newElementAttributes: Attribute[] = [];
-        if (tempDiv.firstChild?.nodeType !== Node.TEXT_NODE) {
-            newElementAttributes = getAttributes(
-                tempDiv.firstChild! as HTMLElement
-            );
-        }
 
         const evaluatedTemplate = evaluateTemplate(
             tempDiv.innerHTML,
@@ -55,7 +49,6 @@ export function defineCustomElement(
             templatesStack.add({
                 element: newElement,
                 template: originalInvocation,
-                attributes: newElementAttributes,
                 parentAttributes: attributes,
             });
 

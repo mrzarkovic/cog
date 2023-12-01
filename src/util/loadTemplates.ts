@@ -12,12 +12,19 @@ export const loadTemplates = (rootElement: Node): HTMLTemplateElement[] => {
         null
     );
     let element = <HTMLTemplateElement>result.iterateNext();
+    const fragment = document.createDocumentFragment();
 
     while (element) {
         element.innerHTML = sanitizeHtml(element.innerHTML);
         templates.push(element);
         element = <HTMLTemplateElement>result.iterateNext();
     }
+
+    for (let i = 0; i < templates.length; i++) {
+        fragment.appendChild(templates[i]);
+    }
+
+    fragment.textContent = "";
 
     return templates;
 };

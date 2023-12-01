@@ -42,8 +42,8 @@ export const init = (document: Document): Cog => {
     }
 
     const onLoad = () => {
-        tree = loadTree(appElement.value);
         templates = loadTemplates(appElement.value);
+        tree = loadTree(appElement.value);
         defineCustomElements(templates);
         addAllEventListeners(appElement.value, state.value);
         reRender();

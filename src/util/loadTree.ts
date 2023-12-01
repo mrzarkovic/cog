@@ -1,7 +1,6 @@
 // TODO: rename, not a tree
 
 import { DOMTree, HTMLElementFromTemplate } from "../types";
-import { getAttributes } from "./helpers/getAttributes";
 import { isCustomElement } from "./helpers/isCustomElement";
 
 export const loadTree = (rootElement: Node): DOMTree => {
@@ -20,11 +19,9 @@ export const loadTree = (rootElement: Node): DOMTree => {
 
     while (element) {
         if (!isCustomElement(element)) {
-            const attributes = getAttributes(element);
             tree.push({
                 element,
                 template: element.outerHTML,
-                attributes,
                 parentAttributes: [],
             });
         }

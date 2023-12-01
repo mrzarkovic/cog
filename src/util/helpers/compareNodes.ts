@@ -42,29 +42,24 @@ export function compareNodes(
                     textContentChanged = true;
                     break;
                 }
-            } else if (oldChild.nodeType === Node.ELEMENT_NODE) {
-                const changedAttributes = getChangedAttributes(
-                    oldChild as HTMLElement,
-                    newChild as HTMLElement
-                );
-                if (changedAttributes.length > 0) {
-                    changedChildren.push({
-                        element: oldChild as HTMLElement,
-                        newElement: newChild as HTMLElement,
-                        attributes: changedAttributes,
-                    });
-                }
             }
+        }
+        const changedAttributes = getChangedAttributes(oldNode, newNode);
+
+        if (changedAttributes.length > 0) {
+            changedChildren.push({
+                element: oldNode,
+                newElement: newNode,
+                attributes: changedAttributes,
+            });
         }
 
         if (textContentChanged) {
-            return [
-                {
-                    element: oldNode,
-                    newElement: newNode,
-                    content: newNode.innerHTML,
-                },
-            ];
+            changedChildren.push({
+                element: oldNode,
+                newElement: newNode,
+                content: newNode.innerHTML,
+            });
         } else {
             for (let i = 0; i < oldNode.childNodes.length; i++) {
                 const changes = compareNodes(
@@ -73,8 +68,7 @@ export function compareNodes(
                 );
                 changedChildren = changedChildren.concat(changes);
             }
-
-            return changedChildren;
         }
+        return changedChildren;
     }
 }
