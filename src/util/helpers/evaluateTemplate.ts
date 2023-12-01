@@ -2,6 +2,7 @@ import { State } from "../../types";
 import { evaluateExpression } from "./evaluateExpression";
 import { findNextTemplateExpression } from "./findNextTemplateExpression";
 import { htmlToText } from "./htmlToText";
+import { sanitizeHtml } from "./sanitizeHtml";
 
 export const evaluateTemplate = (template: string, state: State): string => {
     let restOfContent = template;
@@ -19,7 +20,7 @@ export const evaluateTemplate = (template: string, state: State): string => {
         const htmlValue = restOfContent.slice(start + 2, end - 1);
         const before = restOfContent.slice(0, start);
         const after = restOfContent.slice(end + 1);
-        const value = htmlToText(htmlValue);
+        const value = htmlToText(sanitizeHtml(htmlValue));
 
         const evaluated = evaluateExpression(value, state);
         updatedContent += `${before}${evaluated}`;

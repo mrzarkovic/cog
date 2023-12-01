@@ -19,7 +19,7 @@ const common = {
     },
     mode: "production", // Set mode to production for optimizations
     optimization: {
-        minimize: true,
+        minimize: false,
         minimizer: [
             new TerserPlugin({
                 // Use TerserPlugin for minification
