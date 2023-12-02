@@ -27,10 +27,10 @@ export const init = (document: Document): Cog => {
     }
 
     const onLoad = () => {
+        loadNativeElements(rootElement.value, state.value, nativeElements);
         loadCustomElements(rootElement.value, state.value, customElements);
-        loadNativeElements(rootElement.value, nativeElements);
         addAllEventListeners(rootElement.value, state.value);
-        reRender();
+        // reRender();
     };
 
     const onLoadHandler = (document as DocumentWithHandler)["onLoadHandler"];

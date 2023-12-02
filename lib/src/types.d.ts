@@ -23,7 +23,7 @@ export type ReactiveNode = {
 };
 export type ChangedAttribute = {
     name: string;
-    newValue: string | number | boolean;
+    newValue: string | number | boolean | null | undefined;
 };
 export type ChangedNode = {
     node: HTMLElement;

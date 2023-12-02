@@ -1,9 +1,13 @@
 import { State } from "../types";
 import { createExpressionScope } from "./createExpressionScope";
+import { sanitizeExpression } from "./sanitizeExpression";
 
 export function evaluateExpression(expression: string, state: State): string {
     try {
-        const expressionWithScope = createExpressionScope(expression, state);
+        const expressionWithScope = createExpressionScope(
+            sanitizeExpression(expression),
+            state
+        );
         let evaluated = expressionWithScope(state);
 
         if (Array.isArray(evaluated)) {

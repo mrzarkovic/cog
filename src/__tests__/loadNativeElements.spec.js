@@ -12,29 +12,27 @@ describe("loadNativeElements", () => {
             </div>
             <div id='third'>third {{ expression }}</div>
         </div>`;
+
         const nativeElements = createNativeElements();
-        loadNativeElements(element, nativeElements);
+        loadNativeElements(element, { expression: "hello" }, nativeElements);
 
         expect(nativeElements.value).toEqual([
             {
                 element: element.querySelector("#first"),
                 template: '<div id="first">first {{ expression }}</div>',
-                lastTemplateEvaluation:
-                    '<div id="first">first {{ expression }}</div>',
+                lastTemplateEvaluation: '<div id="first">first hello</div>',
                 parentAttributes: [],
             },
             {
                 element: element.querySelector("#second"),
                 template: '<div id="second">second {{ expression }}</div>',
-                lastTemplateEvaluation:
-                    '<div id="second">second {{ expression }}</div>',
+                lastTemplateEvaluation: '<div id="second">second hello</div>',
                 parentAttributes: [],
             },
             {
                 element: element.querySelector("#third"),
                 template: '<div id="third">third {{ expression }}</div>',
-                lastTemplateEvaluation:
-                    '<div id="third">third {{ expression }}</div>',
+                lastTemplateEvaluation: '<div id="third">third hello</div>',
                 parentAttributes: [],
             },
         ]);

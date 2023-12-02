@@ -6,3 +6,7 @@ const count = variable("count", 0);
 window.increment = () => {
     count.value++;
 };
+
+window.decrement = () => {
+    count.value--;
+};

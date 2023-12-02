@@ -1,1 +1,1 @@
-export declare function convertAttributeValue(value: string): string | number | boolean;
+export declare function convertAttributeValue(value: string): string | number | boolean | null | undefined;

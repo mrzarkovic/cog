@@ -7,7 +7,7 @@ import { sanitizeHtml } from "../html/sanitizeHtml";
 // But either way the entire element will be updated, so it's suboptimal
 // because the loop with changed elements will be longer for no reason.
 
-function compareTextNodes(
+export function compareTextNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
@@ -23,35 +23,53 @@ function compareTextNodes(
     return [];
 }
 
-function compareChildNodes(
+export function compareChildNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
     let changedChildren: ChangedNode[] = [];
+    let differentChildren = false;
 
-    for (let i = 0; i < oldNode.childNodes.length; i++) {
-        const oldChild = oldNode.childNodes[i];
-        const newChild = newNode.childNodes[i];
+    const nodesLength = Math.max(
+        oldNode.childNodes.length,
+        newNode.childNodes.length
+    );
+
+    for (let i = 0; i < nodesLength; i++) {
+        const oldChild = oldNode.childNodes[i] as HTMLElement;
+        const newChild = newNode.childNodes[i] as HTMLElement;
 
         if (
+            typeof oldChild !== "undefined" &&
             oldChild.nodeType === Node.TEXT_NODE &&
-            newChild?.nodeType === Node.TEXT_NODE
+            typeof newChild !== "undefined" &&
+            newChild.nodeType === Node.TEXT_NODE
         ) {
             if (oldChild.textContent !== newChild.textContent) {
-                changedChildren.push({
-                    node: oldNode,
-                    newNode: newNode,
-                    content: newNode.innerHTML,
-                });
+                differentChildren = true;
                 break;
             }
+        } else if (
+            typeof oldChild === "undefined" ||
+            typeof newChild === "undefined"
+        ) {
+            differentChildren = true;
+            break;
         } else {
-            const changes = compareNodes(
-                oldChild as HTMLElement,
-                newChild as HTMLElement
+            changedChildren = changedChildren.concat(
+                compareNodes(oldChild, newChild)
             );
-            changedChildren = changedChildren.concat(changes);
         }
+    }
+
+    if (differentChildren) {
+        return [
+            {
+                node: oldNode,
+                newNode: newNode,
+                content: newNode.innerHTML,
+            },
+        ];
     }
 
     return changedChildren;

@@ -1,0 +1,90 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog Templates</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="py-40 px-8 max-w-sm mx-auto">
+            <template id="move-c">
+                <li>
+                    <button onclick="{{ dataClick }}">{{ children }}</button>
+                </li>
+            </template>
+            <template id="square-c">
+                <button class="btn w-10 h-10" onclick="{{ dataSquareClick }}">
+                    {{ dataValue }}
+                </button>
+            </template>
+            <template id="board-c">
+                <div>
+                    <div class="status">{{ status }}</div>
+                    <div class="flex">
+                        <square-c
+                            data-value="{{ squares[0] }}"
+                            data-square-click="handleClick(0)"
+                        ></square-c>
+                        <square-c
+                            data-value="{{ squares[1] }}"
+                            data-square-click="handleClick(1)"
+                        ></square-c>
+                        <square-c
+                            data-value="{{ squares[2] }}"
+                            data-square-click="handleClick(2)"
+                        ></square-c>
+                    </div>
+                    <div class="flex">
+                        <square-c
+                            data-value="{{ squares[3] }}"
+                            data-square-click="handleClick(3)"
+                        ></square-c>
+                        <square-c
+                            data-value="{{ squares[4] }}"
+                            data-square-click="handleClick(4)"
+                        ></square-c>
+                        <square-c
+                            data-value="{{ squares[5] }}"
+                            data-square-click="handleClick(5)"
+                        ></square-c>
+                    </div>
+                    <div class="flex">
+                        <square-c
+                            data-value="{{ squares[6] }}"
+                            data-square-click="handleClick(6)"
+                        ></square-c>
+                        <square-c
+                            data-value="{{ squares[7] }}"
+                            data-square-click="handleClick(7)"
+                        ></square-c>
+                        <square-c
+                            data-value="{{ squares[8] }}"
+                            data-square-click="handleClick(8)"
+                        ></square-c>
+                    </div>
+                </div>
+            </template>
+            <div class="game">
+                <div class="game-board">
+                    <board-c></board-c>
+                </div>
+                <div class="game-info">
+                    <ol>
+                        {{ history.map( (squares, move) => `
+                        <move-c data-click="jumpTo(${move})"
+                            >${move > 0 ? "Go to move #" + move : "Go to game
+                            start"}</move-c
+                        >
+                        ` ) }}
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <script src="/examples/dist/tic-tac-toe.js"></script>
+    </body>
+</html>
