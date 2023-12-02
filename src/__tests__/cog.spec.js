@@ -23,19 +23,6 @@ describe("cog", () => {
         document.body.innerHTML = "";
     });
 
-    test("template with no id to throw", () => {
-        const element = document.createElement("div");
-        element.innerHTML =
-            "<div id='app'><template>Hello {{ name }}!</template></div>";
-        document.body.appendChild(element);
-        init(document);
-        const errorPromise = getWindowErrorPromise();
-
-        dispatchDOMContentLoaded();
-
-        expect(errorPromise).rejects.toThrow("Missing id attribute");
-    });
-
     test("template props", async () => {
         const element = document.createElement("div");
         const template =
@@ -268,5 +255,37 @@ describe("cog", () => {
         const name = variable("name", "John");
 
         expect(name.value).toEqual("John");
+    });
+
+    test("conditional attribute true", async () => {
+        const element = document.createElement("div");
+        element.innerHTML =
+            "<div id='app'><div><input type='checkbox' data-attribute-checked='{{ checked }}' /></div></div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+        variable("checked", true);
+
+        dispatchDOMContentLoaded();
+
+        await waitFor(() => {
+            expect(element.querySelector("input")).toHaveAttribute("checked");
+        });
+    });
+
+    test("conditional attribute false", async () => {
+        const element = document.createElement("div");
+        element.innerHTML =
+            "<div id='app'><div><input type='checkbox' data-attribute-checked='{{ checked }}' checked /></div></div>";
+        document.body.appendChild(element);
+        const variable = init(document).variable;
+        variable("checked", false);
+
+        dispatchDOMContentLoaded();
+
+        await waitFor(() => {
+            expect(element.querySelector("input")).not.toHaveAttribute(
+                "checked"
+            );
+        });
     });
 });

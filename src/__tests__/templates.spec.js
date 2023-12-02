@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { loadTemplates } from "../util/loadTemplates";
+import { loadTemplates } from "../nodes/loadTemplates";
 
 describe("templates", () => {
     test("load templates", () => {

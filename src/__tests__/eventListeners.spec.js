@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
-import { addEventListeners } from "../util/eventListeners/addEventListeners";
-import { removeEventListeners } from "../util/eventListeners/removeEventListeners";
+import { addEventListeners } from "../eventListeners/addEventListeners";
+import { removeEventListeners } from "../eventListeners/removeEventListeners";
 import { getByText } from "@testing-library/dom";
 
 const getWindowErrorPromise = () =>

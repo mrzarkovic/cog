@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 
-import { evaluateExpression } from "../util/helpers/evaluateExpression";
+import { evaluateExpression } from "../expressions/evaluateExpression";
 
 const getWindowErrorPromise = () =>
     new Promise((resolve, reject) => {
