@@ -165,11 +165,11 @@ In the next example, there are two templates defined: `my-element` and `my-check
     <div class="bold">{{ children }}</div>
 </template>
 <template id="my-checkbox">
-    <label><input type="checkbox" /> {{ label }}</label>
+    <label><input type="checkbox" /> {{ dataLabel }}</label>
 </template>
 ```
 
-Each template has an `id` which is used to reference it in the rest of the HTML. Inside the templates, you can see `{{ children }}` and `{{ label }}`. These are placeholders for dynamic content.
+Each template has an `id` which is used to reference it in the rest of the HTML. Inside the templates, you can see `{{ children }}` and `{{ dataLabel }}`. These are placeholders for dynamic content.
 
 When a custom element like `<my-text>` or `<my-checkbox>` is used in the HTML, Cog replaces the custom element with the corresponding template's content. Any placeholders in the template are replaced with the corresponding data from the custom element.
 
@@ -182,7 +182,7 @@ When a custom element like `<my-text>` or `<my-checkbox>` is used in the HTML, C
 
 For example, in the line `<my-text>I'm the child</my-text>`, `I'm the child` replaces `{{ children }}` in the `my-text` template.
 
-In the case of `<my-checkbox data-label="Check it"></my-checkbox>`, the `data-label` attribute provides the data for the `{{ label }}` placeholder in the `my-checkbox` template.
+In the case of `<my-checkbox data-label="Check it"></my-checkbox>`, the `data-label` attribute provides the data for the `{{ dataLabel }}` placeholder in the `my-checkbox` template.
 
 ```html
 <!-- Becomes this -->
@@ -192,6 +192,59 @@ In the case of `<my-checkbox data-label="Check it"></my-checkbox>`, the `data-la
 ```
 
 This way, you can define a template once and then use it multiple times with different data, reducing repetition and making your HTML more maintainable.
+
+#### Custom Data Attributes and Template Expressions
+
+In addition to the `children` placeholder, Cog also supports custom data attributes in template expressions. These attributes are prefixed with `data-` and can be used to pass additional data to the template.
+
+When a custom data attribute is used on a custom element, Cog converts the attribute name to camelCase and makes it available as a variable inside the template expressions. This allows you to use the attribute's value in your template.
+
+For example, consider the following custom element:
+
+```html
+<my-checkbox data-label="Check it" data-is-checked="true"></my-checkbox>
+```
+
+In this case, `data-label` and `data-is-checked` are custom data attributes. Cog converts these attribute names to `dataLabel` and `dataIsChecked`, respectively, and you can use these variables in your template expressions.
+
+Here's how you might use these variables in the `my-checkbox` template:
+
+```html
+<template id="my-checkbox">
+    <label>
+        <input type="checkbox" data-attribute-checked="{{ dataIsChecked }}" />
+        {{ dataLabel }}
+    </label>
+</template>
+```
+
+In this template, `{{ dataLabel }}` is replaced with the value of the `data-label` attribute ("Check it"), and `data-attribute-checked="{{ dataIsChecked }}"` sets the `checked` attribute of the checkbox based on the value of the `data-is-checked` attribute.
+
+This feature allows you to pass any data you need to your templates, making them even more flexible and powerful.
+
+### Optional attributes `data-attribute-[name]`
+
+In Cog, we use a special attribute format `data-attribute-[name]` to handle dynamic attribute updates. This allows us to set or remove attributes based on their truthy or falsy values.
+
+#### How to Use
+
+1. **Setting the attribute**: To set an attribute on an HTML element, add `data-attribute-[name]` to the element, where `[name]` is the name of the attribute you want to set. For example, to set a `checked` attribute, you would add `data-attribute-checked` to your element.
+
+2. **Updating the attribute**: The value of `data-attribute-[name]` will be used to update the corresponding attribute on the element. If the value is truthy (i.e., a value that evaluates to `true` when converted to a boolean), the attribute will be set on the element. If the value is falsy (i.e., a value that evaluates to `false` when converted to a boolean), the attribute will be removed from the element.
+
+#### Important Note for Boolean Attributes
+
+For boolean attributes like `checked`, `disabled`, `readonly`, etc., the presence of the attribute means it is set, regardless of its value. So, `checked="false"` will still result in a checked checkbox. This is why we remove the attribute entirely to "unset" it.
+
+```html
+<input type="checkbox" data-attribute-checked="true" checked />
+```
+
+In this example, the `checked` attribute will be set on the checkbox because the value of `data-attribute-checked` is `"true"`, which is truthy. If you want to uncheck the checkbox, you would change the value of `data-attribute-checked` to a falsy value, like `0`, `false` or `""` (empty string).
+
+```html
+<input type="checkbox" data-attribute-checked="false" />
+```
 
 ## Basic concepts
 
