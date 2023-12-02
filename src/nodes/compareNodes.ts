@@ -33,17 +33,15 @@ function compareChildNodes(
         const oldChild = oldNode.childNodes[i];
         const newChild = newNode.childNodes[i];
 
-        if (
-            oldChild.nodeType === Node.TEXT_NODE &&
-            newChild?.nodeType === Node.TEXT_NODE
-        ) {
+        if (oldChild.nodeType === Node.TEXT_NODE) {
             if (oldChild.textContent !== newChild.textContent) {
-                changedChildren.push({
-                    node: oldNode,
-                    newNode: newNode,
-                    content: newNode.innerHTML,
-                });
-                break;
+                return [
+                    {
+                        node: oldNode,
+                        newNode: newNode,
+                        content: newNode.innerHTML,
+                    },
+                ];
             }
         } else {
             const changes = compareNodes(

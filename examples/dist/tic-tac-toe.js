@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["ts-module-todo"] = factory();
+		exports["tic-tac-toe"] = factory();
 	else
-		root["ts-module-todo"] = factory();
+		root["tic-tac-toe"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -568,44 +568,65 @@ var init = function init(document) {
 var _init = init(document),
   variable = _init.variable;
 
-;// CONCATENATED MODULE: ./examples/src/ts-module-todo.ts
+;// CONCATENATED MODULE: ./examples/src/tic-tac-toe.ts
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-var todos = variable("todos", [{
-  text: "hello",
-  done: false
-}]);
-variable("save", function () {
-  var todo = document.querySelector("[data-input=todo");
-  if (todo !== null && todo !== void 0 && todo.value) {
-    todos.set([].concat(_toConsumableArray(todos.value), [{
-      text: todo.value,
-      done: false
-    }]));
-    todo.value = "";
+var tic_tac_toe_history = variable("history", [Array(9).fill("")]);
+var currentMove = variable("currentMove", 0);
+var xIsNext = function xIsNext() {
+  return currentMove.value % 2 === 0;
+};
+var tic_tac_toe_status = variable("status", "Next player: " + (xIsNext() ? "X" : "O"));
+var squares = variable("squares", tic_tac_toe_history.value[currentMove.value]);
+function calculateWinner(squares) {
+  var lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  for (var i = 0; i < lines.length; i++) {
+    var _lines$i = _slicedToArray(lines[i], 3),
+      a = _lines$i[0],
+      b = _lines$i[1],
+      c = _lines$i[2];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      tic_tac_toe_status.set("Winner: " + squares[a]);
+      return squares[a];
+    }
   }
-});
-variable("toggleTodo", function (index) {
-  var newTodos = _toConsumableArray(todos.value);
-  newTodos[index].done = !newTodos[index].done;
-  todos.set(newTodos);
-});
-variable("Checkbox", function (_ref) {
-  var _ref$index = _ref.index,
-    index = _ref$index === void 0 ? -1 : _ref$index,
-    _ref$checked = _ref.checked,
-    checked = _ref$checked === void 0 ? false : _ref$checked;
-  return "<input type=\"checkbox\" id=\"todo".concat(index, "\" data-on-change=\"toggleTodo(").concat(index, ")\" ").concat(checked ? "checked" : "", " />");
-});
-var counter = variable("counter", 0);
-variable("increment", function () {
-  counter.set(counter.value + 1);
-});
+  return null;
+}
+function handlePlay(nextSquares) {
+  var nextHistory = [].concat(_toConsumableArray(tic_tac_toe_history.value.slice(0, currentMove.value + 1)), [nextSquares]);
+  tic_tac_toe_history.set(nextHistory);
+  var nextMove = nextHistory.length - 1;
+  currentMove.set(nextMove);
+  var xIsNext = nextMove % 2 === 0;
+  tic_tac_toe_status.set("Next player: " + (xIsNext ? "X" : "O"));
+  squares.set(nextHistory[nextMove]);
+  console.log(tic_tac_toe_history.value, squares.value[0]);
+}
+window.jumpTo = function (nextMove) {
+  currentMove.set(nextMove);
+};
+window.handleClick = function (i) {
+  var currentSquares = squares.value;
+  if (calculateWinner(currentSquares) || currentSquares[i]) {
+    return;
+  }
+  var nextSquares = currentSquares.slice();
+  if (xIsNext()) {
+    nextSquares[i] = "X";
+  } else {
+    nextSquares[i] = "O";
+  }
+  handlePlay(nextSquares);
+};
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

@@ -27,8 +27,8 @@ export const init = (document: Document): Cog => {
     }
 
     const onLoad = () => {
-        loadCustomElements(rootElement.value, state.value, customElements);
         loadNativeElements(rootElement.value, nativeElements);
+        loadCustomElements(rootElement.value, state.value, customElements);
         addAllEventListeners(rootElement.value, state.value);
         reRender();
     };

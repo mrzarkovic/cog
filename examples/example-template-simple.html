@@ -22,6 +22,13 @@
                     }}
                 </div>
             </template>
+            <template id="x-child2">
+                <div>
+                    {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
+                    Number(dataCount) % (Number(dataChild) + 2) }} {{ children
+                    }}
+                </div>
+            </template>
             <template id="x-parent">
                 <div>
                     <div class="p-4">
@@ -56,6 +63,13 @@
                 &lt;<span class="text-info-content">div</span>&gt;Counter: {{
                 "{{ counter }}" }}&lt;/<span class="text-info-content">div</span
                 >&gt;
+            </div>
+            <div class="p-4">
+                {{ names.map( (n, i) => `
+                <x-child2 data-count="${i + 1}" data-child="${i + 1}"
+                    >${n}</x-child2
+                >
+                `)}}
             </div>
         </div>
         <script src="/examples/dist/ts-html-in-expression.js"></script>

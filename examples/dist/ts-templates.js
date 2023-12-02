@@ -1,1 +1,583 @@
-!function(t,n){"object"==typeof exports&&"object"==typeof module?module.exports=n():"function"==typeof define&&define.amd?define([],n):"object"==typeof exports?exports["t"]=n():t["t"]=n()}(self,(()=>(()=>{"use strict";var t={};(t=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"o",{value:!0})})(t);var n=function(t){return t.split("-").reduce((function(t,n,e){return t+(e?n[0].toUpperCase()+n.slice(1):n)}),"")};function e(t){return"true"===t||"false"!==t&&(isNaN(Number(t))?t:Number(t))}var r=function(t,n){var e="return (state) => {".concat(Object.keys(n).map((function(t){return"const ".concat(t,' = state["').concat(t,'"];')})).join("\n")," return ").concat(t,"}");return Function(e)()};function o(t,n){try{var e=r(t,n)(n);return Array.isArray(e)&&(e=e.join("")),e}catch(n){throw new Error("Failed to create function from expression {{".concat(t,"}}: ").concat(n.message))}}function u(t,r){for(var u=Object.assign({},r),a=0;a<t.length;a++)u[n(t[a].name)]=e(t[a].u?o(t[a].value,r):t[a].value);return u}function a(t){for(var n=t.indexOf("{{"),e=0,r=n;r<t.length;r++)if("{{"===t.slice(r,r+2)?(e++,r++):"}}"===t.slice(r,r+2)&&(e--,r++),0===e)return{start:n,end:r};return{start:n,end:-1}}var i=function(t){return t.replace(/[\r\n]+\s*/g,"")},c=function(t,n){for(var e,r,u=t,c=!0,f="";c;){var l=a(u),s=l.start,v=l.end;if(-1===v){c=!1;break}var d=u.slice(s+2,v-1),h=u.slice(0,s),m=u.slice(v+1),p=o((e=i(d),r=void 0,(r=document.createElement("div")).innerHTML=function(t){return t.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(e),r.textContent||r.innerText||""),n);f+="".concat(h).concat(p),u=m}return f+u},f=/\{\{(.+?)\}\}/,l=function(t){return Array.from(t.attributes).map((function(t){var n=f.exec(t.value);return{name:t.name,value:n?n[1]:t.value,u:!!n}}))};function s(t,n,e){for(var r=function(t){for(var n=[],e=document.evaluate("template",t,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),r=e.iterateNext();r;)n.push(r),r=e.iterateNext();return n}(t),o=document.createDocumentFragment(),u=0;u<r.length;u++){var a=r[u].getAttribute("id");if(a){if(r[u].innerHTML=i(r[u].innerHTML),1!==r[u].content.childNodes.length)throw new Error("Template ".concat(a," should have a single child"));v(a,r[u],n,e),o.appendChild(r[u])}}o.textContent=""}function v(t,n,e,r){function o(){return Reflect.construct(HTMLElement,[],o)}o.prototype=Object.create(HTMLElement.prototype),o.prototype.constructor=o,o.prototype.connectedCallback=function(t,n,e){return function(){var r,o,a=l(this),i=u(a,n),f=t.innerHTML.replace(/\{\{\s*children\s*\}\}/g,this.innerHTML),s=c(f,i),v=document.createElement("div");v.innerHTML=s;var d=v.firstChild;null===(r=this.parentNode)||void 0===r||r.insertBefore(d,this),e.add({element:d,i:f,l:s,v:a}),e.h(),null===(o=this.parentNode)||void 0===o||o.removeChild(this)}}(n,e,r),customElements.define(t,o)}var d=function(t,n,e){var o=n.getAttribute("data-on-".concat(t));if(!o)throw new Error("Missing data-handler attribute");var u=r(o,e);return function(n){try{u(e),n.preventDefault()}catch(n){throw new Error("".concat(n.message,": data-on-").concat(t,"=").concat(o))}}};function h(t,n,e){t.querySelectorAll("[data-on-".concat(n,"]")).forEach((function(t){var r=d(n,t,e);t.addEventListener(n,r),t["".concat(n,"Handler")]=r}))}function m(t,n){h(t,"click",n),h(t,"change",n)}var p=function(t){return t.nodeType!==Node.TEXT_NODE&&-1!==t.tagName.indexOf("-")},b=function(t,n){for(var e=document.evaluate("self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",t,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),r=e.iterateNext();r;)p(r)||n.add({element:r,i:r.outerHTML,l:r.outerHTML,v:[]}),r=e.iterateNext()};function w(t,n){t.querySelectorAll("[data-on-".concat(n,"]")).forEach((function(t){var e=t["".concat(n,"Handler")];e&&t.removeEventListener(n,e)}))}function y(t,n){if(t.nodeType===Node.TEXT_NODE)return function(t,n){var e;return t.textContent!==n.textContent?[{node:t,m:n,content:null!==(e=n.textContent)&&void 0!==e?e:""}]:[]}(t,n);t.innerHTML=i(t.innerHTML),n.innerHTML=i(n.innerHTML);var r=function(t,n){for(var r=[],o=0;o<t.attributes.length;o++){var u=t.attributes[o],a=n.getAttribute(u.name);a!==u.value&&r.push({name:u.name,newValue:e(a||"")})}return r}(t,n);return(r.length>0?[{node:t,m:n,attributes:r}]:[]).concat(function(t,n){for(var e=[],r=0;r<t.childNodes.length;r++){var o=t.childNodes[r],u=n.childNodes[r];if(o.nodeType===Node.TEXT_NODE&&(null==u?void 0:u.nodeType)===Node.TEXT_NODE){if(o.textContent!==u.textContent){e.push({node:t,m:n,content:n.innerHTML});break}}else{var a=y(o,u);e=e.concat(a)}}return e}(t,n))}function g(t){return(new DOMParser).parseFromString(t,"text/html").body.firstChild}function N(t,n,e){for(var r=[],o=t;o!==n;)r.unshift(Array.prototype.indexOf.call(o.parentNode.childNodes,o)),o=o.parentNode;for(var u=e,a=0,i=r;a<i.length;a++){var c=i[a];if(!u.childNodes[c])return null;u=u.childNodes[c]}return u}var E=function(t,n,e,r,o){var u,a;if(p(n))null===(u=t.parentElement)||void 0===u||u.replaceChild(n,t);else if(void 0!==e)t.nodeType===Node.TEXT_NODE?t.textContent=e:(w(a=t,"click"),w(a,"change"),t.innerHTML=e,m(t,o));else if(void 0!==r)for(var i=0;i<r.length;i++){if(r[i].name.startsWith("data-attribute-")){var c=r[i].name.substring(15);r[i].newValue?t.setAttribute(c,r[i].newValue):t.removeAttribute(c)}t.setAttribute(r[i].name,r[i].newValue)}},x=function(t,n){for(var e=0;e<t.value.length;e++){var r=t.value[e],o=r.element,a=r.i,i=r.v,f=r.l,l=u(i,n),s=c(a,l),v=g(s),d=g(f),h=y(d,v);if(h.length>0){t.p(e,s);for(var m=0;m<h.length;m++){var p=N(h[m].node,d,o);E(p,h[m].m,h[m].content,h[m].attributes,l)}}}};function M(){return{list:[],get value(){return this.list},add:function(t){this.list.push(t)},p:function(t,n){this.list[t].l=n},h:function(){this.list=this.list.filter((function(t){var n=t.element;return document.body.contains(n)}))}}}var j=function(t){var n={list:[],get value(){return this.list},add:function(t){this.list.push(t)},p:function(t,n){this.list[t].l=n}},e=M(),r=function(t){return{element:null,get value(){if(this.element||(this.element=t.querySelector("#app")),!this.element)throw new Error("No app element found!");return this.element}}}(t),o={state:null,get value(){return this.state||(this.state={}),this.state},set:function(t,n){this.state||(this.state={}),this.state[t]=n}};function u(){x(n,o.value),x(e,o.value)}function a(t,n){setTimeout((function(){o.set(t,n),u()}),0)}var i=function(){s(r.value,o.value,e),b(r.value,n),m(r.value,o.value),u()},c=t.N;return c&&t.removeEventListener("DOMContentLoaded",c),t.addEventListener("DOMContentLoaded",i),t.N=i,{variable:function(t,n){return o.set(t,n),{set value(n){a(t,n)},get value(){return o.value[t]},set:function(n){a(t,n)}}}}}(document).variable;j("foo","bar"),j("myValue","My Attribute");var O=j("count",0);return window.increment=function(){O.value++},j("names",["Alice","Bob","Carol"]),t})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-templates"] = factory();
+	else
+		root["ts-templates"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/rootElement.ts
+function createRootElement(document) {
+  return {
+    element: null,
+    get value() {
+      if (!this.element) {
+        this.element = document.querySelector("#app");
+      }
+      if (!this.element) {
+        throw new Error("No app element found!");
+      }
+      return this.element;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/attributes/convertAttribute.ts
+var convertAttribute = function convertAttribute(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeValue.ts
+function convertAttributeValue(value) {
+  return value === "true" ? true : value === "false" ? false : !isNaN(Number(value)) ? Number(value) : value;
+}
+;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+    return "const ".concat(variable, " = state[\"").concat(variable, "\"];");
+  }).join("\n"), " return ").concat(expression, "}");
+  return Function(functionBody)();
+};
+;// CONCATENATED MODULE: ./src/expressions/evaluateExpression.ts
+
+function evaluateExpression(expression, state) {
+  try {
+    var expressionWithScope = createExpressionScope(expression, state);
+    var evaluated = expressionWithScope(state);
+    if (Array.isArray(evaluated)) {
+      evaluated = evaluated.join("");
+    }
+    return evaluated;
+  } catch (e) {
+    throw new Error("Failed to create function from expression {{".concat(expression, "}}: ").concat(e.message));
+  }
+}
+;// CONCATENATED MODULE: ./src/attributes/attributesToState.ts
+
+
+
+function attributesToState(attributes, state) {
+  var localState = Object.assign({}, state);
+  for (var i = 0; i < attributes.length; i++) {
+    localState[convertAttribute(attributes[i].name)] = convertAttributeValue(attributes[i].reactive ? evaluateExpression(attributes[i].value, state) : attributes[i].value);
+  }
+  return localState;
+}
+;// CONCATENATED MODULE: ./src/html/findNextTemplateExpression.ts
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText.slice(i, i + 2) === "{{") {
+      stack++;
+      i++;
+    } else if (htmlText.slice(i, i + 2) === "}}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+;// CONCATENATED MODULE: ./src/html/htmlToText.ts
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+;// CONCATENATED MODULE: ./src/html/evaluateTemplate.ts
+
+
+
+
+var evaluateTemplate = function evaluateTemplate(template, state) {
+  var restOfContent = template;
+  var hasTemplateExpression = true;
+  var updatedContent = "";
+  while (hasTemplateExpression) {
+    var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+      start = _findNextTemplateExpr.start,
+      end = _findNextTemplateExpr.end;
+    if (end === -1) {
+      hasTemplateExpression = false;
+      break;
+    }
+    var htmlValue = restOfContent.slice(start + 2, end - 1);
+    var before = restOfContent.slice(0, start);
+    var after = restOfContent.slice(end + 1);
+    var value = htmlToText(sanitizeHtml(htmlValue));
+    var evaluated = evaluateExpression(value, state);
+    updatedContent += "".concat(before).concat(evaluated);
+    restOfContent = after;
+  }
+  updatedContent += restOfContent;
+  return updatedContent;
+};
+;// CONCATENATED MODULE: ./src/expressions/templateExpressionRegex.ts
+var templateExpressionRegex = /\{\{(.+?)\}\}/;
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var reactiveMatch = templateExpressionRegex.exec(attribute.value);
+    return {
+      name: attribute.name,
+      value: reactiveMatch ? reactiveMatch[1] : attribute.value,
+      reactive: !!reactiveMatch
+    };
+  });
+  return attributes;
+};
+;// CONCATENATED MODULE: ./src/nodes/loadTemplates.ts
+function loadTemplates(rootElement) {
+  var xpath = "template";
+  var templates = [];
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    templates.push(element);
+    element = result.iterateNext();
+  }
+  return templates;
+}
+;// CONCATENATED MODULE: ./src/nodes/loadCustomElements.ts
+
+
+
+
+
+function loadCustomElements(rootElement, state, customElements) {
+  var templates = loadTemplates(rootElement);
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < templates.length; i++) {
+    var name = templates[i].getAttribute("id");
+    if (name) {
+      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+      if (templates[i].content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name, templates[i], state, customElements);
+      fragment.appendChild(templates[i]);
+    }
+  }
+  fragment.textContent = "";
+}
+function defineCustomElement(name, template, state, customElementsList) {
+  function CustomElement() {
+    return Reflect.construct(HTMLElement, [], CustomElement);
+  }
+  CustomElement.prototype = Object.create(HTMLElement.prototype);
+  CustomElement.prototype.constructor = CustomElement;
+  CustomElement.prototype.connectedCallback = renderCustomElement(template, state, customElementsList);
+  customElements.define(name, CustomElement);
+}
+function renderCustomElement(template, state, customElements) {
+  return function () {
+    var _this$parentNode, _this$parentNode2;
+    var attributes = getAttributes(this);
+    var localState = attributesToState(attributes, state);
+    var originalInvocation = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, this.innerHTML);
+    var evaluatedTemplate = evaluateTemplate(originalInvocation, localState);
+    var tempDiv = document.createElement("div");
+    tempDiv.innerHTML = evaluatedTemplate;
+    var newElement = tempDiv.firstChild;
+    (_this$parentNode = this.parentNode) === null || _this$parentNode === void 0 || _this$parentNode.insertBefore(newElement, this);
+    customElements.add({
+      element: newElement,
+      template: originalInvocation,
+      lastTemplateEvaluation: evaluatedTemplate,
+      parentAttributes: attributes
+    });
+    customElements.clean();
+    (_this$parentNode2 = this.parentNode) === null || _this$parentNode2 === void 0 || _this$parentNode2.removeChild(this);
+  };
+}
+;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
+
+var makeEventHandler = function makeEventHandler(eventName, element, state) {
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
+
+function addEventListeners(parent, eventName, state) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
+
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
+var isCustomElement = function isCustomElement(element) {
+  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
+};
+;// CONCATENATED MODULE: ./src/nodes/loadNativeElements.ts
+
+var loadNativeElements = function loadNativeElements(rootElement, nativeElements) {
+  var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (!isCustomElement(element)) {
+      nativeElements.add({
+        element: element,
+        template: element.outerHTML,
+        lastTemplateEvaluation: element.outerHTML,
+        parentAttributes: []
+      });
+    }
+    element = result.iterateNext();
+  }
+};
+;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
+function removeEventListeners(parent, eventName) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
+
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+;// CONCATENATED MODULE: ./src/attributes/getChangedAttributes.ts
+
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: convertAttributeValue(newAttrValue || "")
+      });
+    }
+  }
+  return changedAttributes;
+}
+;// CONCATENATED MODULE: ./src/nodes/compareNodes.ts
+
+
+
+// TODO: changed custom element like <my-element></my-element> will
+// be returned twice if both attributes and content changed.
+// But either way the entire element will be updated, so it's suboptimal
+// because the loop with changed elements will be longer for no reason.
+
+function compareTextNodes(oldNode, newNode) {
+  if (oldNode.textContent !== newNode.textContent) {
+    var _newNode$textContent;
+    return [{
+      node: oldNode,
+      newNode: newNode,
+      content: (_newNode$textContent = newNode.textContent) !== null && _newNode$textContent !== void 0 ? _newNode$textContent : ""
+    }];
+  }
+  return [];
+}
+function compareChildNodes(oldNode, newNode) {
+  var changedChildren = [];
+  for (var i = 0; i < oldNode.childNodes.length; i++) {
+    var oldChild = oldNode.childNodes[i];
+    var newChild = newNode.childNodes[i];
+    if (oldChild.nodeType === Node.TEXT_NODE) {
+      if (oldChild.textContent !== newChild.textContent) {
+        return [{
+          node: oldNode,
+          newNode: newNode,
+          content: newNode.innerHTML
+        }];
+      }
+    } else {
+      var changes = compareNodes(oldChild, newChild);
+      changedChildren = changedChildren.concat(changes);
+    }
+  }
+  return changedChildren;
+}
+function compareNodes(oldNode, newNode) {
+  if (oldNode.nodeType === Node.TEXT_NODE) {
+    return compareTextNodes(oldNode, newNode);
+  }
+  oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
+  newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
+  var changedAttributes = getChangedAttributes(oldNode, newNode);
+  var changedChildren = changedAttributes.length > 0 ? [{
+    node: oldNode,
+    newNode: newNode,
+    attributes: changedAttributes
+  }] : [];
+  return changedChildren.concat(compareChildNodes(oldNode, newNode));
+}
+;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
+function elementFromString(htmlString) {
+  var parser = new DOMParser();
+  var newElementDoc = parser.parseFromString(htmlString, "text/html");
+  return newElementDoc.body.firstChild;
+}
+;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
+function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var pathInA = [];
+  var temp = nodeInA;
+  while (temp !== rootA) {
+    pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
+    temp = temp.parentNode;
+  }
+  var correspondingNodeInB = rootB;
+  for (var _i = 0, _pathInA = pathInA; _i < _pathInA.length; _i++) {
+    var index = _pathInA[_i];
+    if (correspondingNodeInB.childNodes[index]) {
+      correspondingNodeInB = correspondingNodeInB.childNodes[index];
+    } else {
+      return null;
+    }
+  }
+  return correspondingNodeInB;
+}
+;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
+
+
+
+
+
+
+
+
+var updateElement = function updateElement(changedNode, newNode, content, attributes, localState) {
+  if (isCustomElement(newNode)) {
+    var _changedNode$parentEl;
+    (_changedNode$parentEl = changedNode.parentElement) === null || _changedNode$parentEl === void 0 || _changedNode$parentEl.replaceChild(newNode, changedNode);
+  } else {
+    if (content !== undefined) {
+      if (changedNode.nodeType === Node.TEXT_NODE) {
+        changedNode.textContent = content;
+      } else {
+        removeAllEventListeners(changedNode);
+        changedNode.innerHTML = content;
+        addAllEventListeners(changedNode, localState);
+      }
+    } else if (attributes !== undefined) {
+      for (var i = 0; i < attributes.length; i++) {
+        if (attributes[i].name.startsWith("data-attribute-")) {
+          var optionalAttribute = attributes[i].name.substring(15); // "data-attribute-".length
+          if (attributes[i].newValue) {
+            changedNode.setAttribute(optionalAttribute, attributes[i].newValue);
+          } else {
+            changedNode.removeAttribute(optionalAttribute);
+          }
+        }
+        changedNode.setAttribute(attributes[i].name, attributes[i].newValue);
+      }
+    }
+  }
+};
+var reconcile = function reconcile(reactiveNodes, state) {
+  for (var treeNodeIndex = 0; treeNodeIndex < reactiveNodes.value.length; treeNodeIndex++) {
+    var _reactiveNodes$value$ = reactiveNodes.value[treeNodeIndex],
+      element = _reactiveNodes$value$.element,
+      template = _reactiveNodes$value$.template,
+      parentAttributes = _reactiveNodes$value$.parentAttributes,
+      lastTemplateEvaluation = _reactiveNodes$value$.lastTemplateEvaluation;
+    var localState = attributesToState(parentAttributes, state);
+    var updatedContent = evaluateTemplate(template, localState);
+    var newElement = elementFromString(updatedContent);
+    var oldElement = elementFromString(lastTemplateEvaluation);
+    var changedNodes = compareNodes(oldElement, newElement);
+    if (changedNodes.length > 0) {
+      reactiveNodes.updateLastTemplateEvaluation(treeNodeIndex, updatedContent);
+      for (var i = 0; i < changedNodes.length; i++) {
+        var oldNode = findCorrespondingNode(changedNodes[i].node, oldElement, element);
+        updateElement(oldNode, changedNodes[i].newNode, changedNodes[i].content, changedNodes[i].attributes, localState);
+      }
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/state.ts
+function createState() {
+  return {
+    state: null,
+    get value() {
+      if (!this.state) {
+        this.state = {};
+      }
+      return this.state;
+    },
+    set: function set(key, value) {
+      if (!this.state) {
+        this.state = {};
+      }
+      this.state[key] = value;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nodes/cleanReactiveNodesList.ts
+var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
+  return reactiveNodes.filter(function (_ref) {
+    var element = _ref.element;
+    return document.body.contains(element);
+  });
+};
+;// CONCATENATED MODULE: ./src/customElements.ts
+
+function createCustomElements() {
+  return {
+    list: [],
+    get value() {
+      return this.list;
+    },
+    add: function add(item) {
+      this.list.push(item);
+    },
+    updateLastTemplateEvaluation: function updateLastTemplateEvaluation(index, value) {
+      this.list[index].lastTemplateEvaluation = value;
+    },
+    clean: function clean() {
+      this.list = cleanReactiveNodesList(this.list);
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nativeElements.ts
+function createNativeElements() {
+  return {
+    list: [],
+    get value() {
+      return this.list;
+    },
+    add: function add(item) {
+      this.list.push(item);
+    },
+    updateLastTemplateEvaluation: function updateLastTemplateEvaluation(index, value) {
+      this.list[index].lastTemplateEvaluation = value;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/cog.ts
+
+
+
+
+
+
+
+
+var init = function init(document) {
+  var nativeElements = createNativeElements();
+  var customElements = createCustomElements();
+  var rootElement = createRootElement(document);
+  var state = createState();
+  function reRender() {
+    reconcile(nativeElements, state.value);
+    reconcile(customElements, state.value);
+  }
+  function updateState(name, value) {
+    setTimeout(function () {
+      state.set(name, value);
+      reRender();
+    }, 0);
+  }
+  var onLoad = function onLoad() {
+    loadNativeElements(rootElement.value, nativeElements);
+    loadCustomElements(rootElement.value, state.value, customElements);
+    addAllEventListeners(rootElement.value, state.value);
+    reRender();
+  };
+  var onLoadHandler = document["onLoadHandler"];
+  if (onLoadHandler) {
+    document.removeEventListener("DOMContentLoaded", onLoadHandler);
+  }
+  document.addEventListener("DOMContentLoaded", onLoad);
+  document["onLoadHandler"] = onLoad;
+  return {
+    variable: function variable(name, value) {
+      state.set(name, value);
+      return {
+        set value(newVal) {
+          updateState(name, newVal);
+        },
+        get value() {
+          return state.value[name];
+        },
+        set: function set(newVal) {
+          updateState(name, newVal);
+        }
+      };
+    }
+  };
+};
+var _init = init(document),
+  variable = _init.variable;
+
+;// CONCATENATED MODULE: ./examples/src/ts-templates.ts
+
+variable("foo", "bar");
+variable("myValue", "My Attribute");
+var count = variable("count", 0);
+window.increment = function () {
+  count.value++;
+};
+variable("names", ["Alice", "Bob", "Carol"]);
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});
