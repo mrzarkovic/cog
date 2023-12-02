@@ -222,7 +222,7 @@ In this template, `{{ dataLabel }}` is replaced with the value of the `data-labe
 
 This feature allows you to pass any data you need to your templates, making them even more flexible and powerful.
 
-### Optional attributes `data-attribute-[name]`
+### Handling Boolean Attributes
 
 In Cog, we use a special attribute format `data-attribute-[name]` to handle dynamic attribute updates. This allows us to set or remove attributes based on their truthy or falsy values.
 
