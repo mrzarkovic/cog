@@ -7,6 +7,7 @@ import { elementFromString } from "./elementFromString";
 import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
 import { isCustomElement } from "./isCustomElement";
+import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 
 const updateElement = (
     changedNode: HTMLElement,
@@ -28,17 +29,7 @@ const updateElement = (
             }
         } else if (attributes !== undefined) {
             for (let i = 0; i < attributes.length; i++) {
-                if (attributes[i].name.startsWith("data-attribute-")) {
-                    const optionalAttribute = attributes[i].name.substring(15); // "data-attribute-".length
-                    if (attributes[i].newValue) {
-                        changedNode.setAttribute(
-                            optionalAttribute,
-                            attributes[i].newValue as string
-                        );
-                    } else {
-                        changedNode.removeAttribute(optionalAttribute);
-                    }
-                }
+                handleBooleanAttribute(changedNode, attributes[i]);
                 changedNode.setAttribute(
                     attributes[i].name,
                     attributes[i].newValue as string

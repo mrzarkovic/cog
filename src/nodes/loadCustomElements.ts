@@ -18,6 +18,7 @@ export function loadCustomElements(
 
         if (name) {
             templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+
             if (templates[i].content.childNodes.length !== 1) {
                 throw new Error(`Template ${name} should have a single child`);
             }

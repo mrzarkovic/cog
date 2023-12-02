@@ -7,7 +7,7 @@ import { sanitizeHtml } from "../html/sanitizeHtml";
 // But either way the entire element will be updated, so it's suboptimal
 // because the loop with changed elements will be longer for no reason.
 
-function compareTextNodes(
+export function compareTextNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
@@ -23,7 +23,7 @@ function compareTextNodes(
     return [];
 }
 
-function compareChildNodes(
+export function compareChildNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
