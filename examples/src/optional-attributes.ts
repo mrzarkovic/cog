@@ -1,3 +1,7 @@
 import { variable } from "../../src/cog";
 
-variable("myAttribute", "checked");
+const checked = variable("checked", false);
+
+window.toggleChecked = () => {
+    checked.value = !checked.value;
+};

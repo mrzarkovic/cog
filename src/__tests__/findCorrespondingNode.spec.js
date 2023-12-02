@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 
-import { findCorrespondingNode } from "../util/helpers/findCorrespondingNode";
+import { findCorrespondingNode } from "../nodes/findCorrespondingNode";
 
 describe("findCorrespondingNode", () => {
     beforeEach(() => {});

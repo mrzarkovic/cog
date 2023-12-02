@@ -1,17 +1,17 @@
 import { type Cog, type DocumentWithHandler } from "./types";
-import { createAppElement } from "./util/appElement";
-import { defineCustomElements } from "./util/defineCustomElements";
-import { addAllEventListeners } from "./util/eventListeners/addAllEventListeners";
-import { loadNativeElements } from "./util/loadNativeElements";
-import { reconcile } from "./util/reconcile";
-import { createState } from "./util/state";
-import { createCustomElements } from "./util/customElements";
-import { createNativeElements } from "./util/nativeElements";
+import { createRootElement } from "./rootElement";
+import { loadCustomElements } from "./nodes/loadCustomElements";
+import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
+import { loadNativeElements } from "./nodes/loadNativeElements";
+import { reconcile } from "./nodes/reconcile";
+import { createState } from "./state";
+import { createCustomElements } from "./customElements";
+import { createNativeElements } from "./nativeElements";
 
 export const init = (document: Document): Cog => {
     const nativeElements = createNativeElements();
     const customElements = createCustomElements();
-    const appElement = createAppElement(document);
+    const rootElement = createRootElement(document);
     const state = createState();
 
     function reRender() {
@@ -27,10 +27,9 @@ export const init = (document: Document): Cog => {
     }
 
     const onLoad = () => {
-        defineCustomElements(appElement.value, state.value, customElements);
-        loadNativeElements(appElement.value, nativeElements);
-        console.log(nativeElements.value);
-        addAllEventListeners(appElement.value, state.value);
+        loadCustomElements(rootElement.value, state.value, customElements);
+        loadNativeElements(rootElement.value, nativeElements);
+        addAllEventListeners(rootElement.value, state.value);
         reRender();
     };
 

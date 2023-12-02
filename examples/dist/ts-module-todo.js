@@ -1,1 +1,613 @@
-!function(t,n){"object"==typeof exports&&"object"==typeof module?module.exports=n():"function"==typeof define&&define.amd?define([],n):"object"==typeof exports?exports["t"]=n():t["t"]=n()}(self,(()=>(()=>{"use strict";var t={};(t=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(t,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(t,"o",{value:!0})})(t);var n=function(t){return t.split("-").reduce((function(t,n,e){return t+(e?n[0].toUpperCase()+n.slice(1):n)}),"")},e=function(t,n){var e="return (state) => {".concat(Object.keys(n).map((function(t){return"const ".concat(t,' = state["').concat(t,'"];')})).join("\n")," return ").concat(t,"}");return Function(e)()};function r(t,n){try{var r=e(t,n)(n);return Array.isArray(r)&&(r=r.join("")),r}catch(n){throw new Error("Failed to create function from expression {{".concat(t,"}}: ").concat(n.message))}}function o(t,e){for(var o=Object.assign({},e),u=0;u<t.length;u++)o[n(t[u].name)]=t[u].u?r(t[u].value,e):t[u].value;return o}function u(t){for(var n=t.indexOf("{{"),e=0,r=n;r<t.length;r++)if("{{"===t.slice(r,r+2)?(e++,r++):"}}"===t.slice(r,r+2)&&(e--,r++),0===e)return{start:n,end:r};return{start:n,end:-1}}var a=function(t){return t.replace(/[\r\n]+\s*/g,"")},i=function(t,n){for(var e,o,i=t,c=!0,f="";c;){var l=u(i),d=l.start,s=l.end;if(-1===s){c=!1;break}var v=i.slice(d+2,s-1),h=i.slice(0,d),m=i.slice(s+1),p=r((e=a(v),o=void 0,(o=document.createElement("div")).innerHTML=function(t){return t.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(e),o.textContent||o.innerText||""),n);f+="".concat(h).concat(p),i=m}return f+i},c=/\{\{(.+?)\}\}/,f=function(t){return Array.from(t.attributes).map((function(t){var n=c.exec(t.value);return{name:t.name,value:n?n[1]:t.value,u:!!n}}))};function l(t,n,e){for(var r=function(t){for(var n=[],e=document.evaluate("template",t,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),r=e.iterateNext();r;)n.push(r),r=e.iterateNext();return n}(t),o=document.createDocumentFragment(),u=0;u<r.length;u++){var i=r[u].getAttribute("id");if(i){if(r[u].innerHTML=a(r[u].innerHTML),1!==r[u].content.childNodes.length)throw new Error("Template ".concat(i," should have a single child"));d(i,r[u],n,e),o.appendChild(r[u])}}o.textContent=""}function d(t,n,e,r){function u(){return Reflect.construct(HTMLElement,[],u)}u.prototype=Object.create(HTMLElement.prototype),u.prototype.constructor=u,u.prototype.connectedCallback=function(t,n,e){return function(){var r,u,a=f(this),c=o(a,n),l=t.innerHTML.replace(/\{\{\s*children\s*\}\}/g,this.innerHTML),d=i(l,c),s=document.createElement("div");s.innerHTML=d;var v=s.firstChild;null===(r=this.parentNode)||void 0===r||r.insertBefore(v,this),e.add({element:v,i:l,l:d,v:a}),e.h(),null===(u=this.parentNode)||void 0===u||u.removeChild(this)}}(n,e,r),customElements.define(t,u)}var s=function(t,n,r){var o=n.getAttribute("data-on-".concat(t));if(!o)throw new Error("Missing data-handler attribute");var u=e(o,r);return function(n){try{u(r),n.preventDefault()}catch(n){throw new Error("".concat(n.message,": data-on-").concat(t,"=").concat(o))}}};function v(t,n,e){t.querySelectorAll("[data-on-".concat(n,"]")).forEach((function(t){var r=s(n,t,e);t.addEventListener(n,r),t["".concat(n,"Handler")]=r}))}function h(t,n){v(t,"click",n),v(t,"change",n)}var m=function(t){return t.nodeType!==Node.TEXT_NODE&&-1!==t.tagName.indexOf("-")},p=function(t,n){for(var e=document.evaluate("self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",t,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),r=e.iterateNext();r;)m(r)||n.add({element:r,i:r.outerHTML,l:r.outerHTML,v:[]}),r=e.iterateNext()};function b(t,n){t.querySelectorAll("[data-on-".concat(n,"]")).forEach((function(t){var e=t["".concat(n,"Handler")];e&&t.removeEventListener(n,e)}))}function y(t,n){if(t.nodeType===Node.TEXT_NODE)return function(t,n){var e;return t.textContent!==n.textContent?[{node:t,m:n,content:null!==(e=n.textContent)&&void 0!==e?e:""}]:[]}(t,n);t.innerHTML=a(t.innerHTML),n.innerHTML=a(n.innerHTML);var e=function(t,n){for(var e=[],r=0;r<t.attributes.length;r++){var o=t.attributes[r],u=n.getAttribute(o.name);u!==o.value&&e.push({name:o.name,newValue:u||""})}return e}(t,n);return(e.length>0?[{node:t,m:n,attributes:e}]:[]).concat(function(t,n){for(var e=[],r=0;r<t.childNodes.length;r++){var o=t.childNodes[r],u=n.childNodes[r];if(o.nodeType===Node.TEXT_NODE&&(null==u?void 0:u.nodeType)===Node.TEXT_NODE){if(o.textContent!==u.textContent){e.push({node:t,m:n,content:n.innerHTML});break}}else{var a=y(o,u);e=e.concat(a)}}return e}(t,n))}function g(t){return(new DOMParser).parseFromString(t,"text/html").body.firstChild}function w(t,n,e){for(var r=[],o=t;o!==n;)r.unshift(Array.prototype.indexOf.call(o.parentNode.childNodes,o)),o=o.parentNode;for(var u=e,a=0,i=r;a<i.length;a++){var c=i[a];if(!u.childNodes[c])return null;u=u.childNodes[c]}return u}var x=function(t,n,e,r,o){var u,a;if(m(n))null===(u=t.parentElement)||void 0===u||u.replaceChild(n,t);else if(void 0!==e)t.nodeType===Node.TEXT_NODE?t.textContent=e:(b(a=t,"click"),b(a,"change"),t.innerHTML=e,h(t,o));else if(void 0!==r)for(var i=0;i<r.length;i++)t.setAttribute(r[i].name,r[i].newValue)},E=function(t,n){for(var e=0;e<t.value.length;e++){var r=t.value[e],u=r.element,a=r.i,c=r.v,f=r.l,l=o(c,n),d=i(a,l),s=g(d),v=g(f),h=y(v,s);if(h.length>0){t.p(e,d);for(var m=0;m<h.length;m++){var p=w(h[m].node,v,u);x(p,h[m].m,h[m].content,h[m].attributes,l)}}}};function j(){return{list:[],get value(){return this.list},add:function(t){this.list.push(t)},p:function(t,n){this.list[t].l=n},h:function(){this.list=this.list.filter((function(t){var n=t.element;return document.body.contains(n)}))}}}var A=function(t){var n={list:[],get value(){return this.list},add:function(t){this.list.push(t)},p:function(t,n){this.list[t].l=n}},e=j(),r=function(t){return{element:null,get value(){if(this.element||(this.element=t.querySelector("#app")),!this.element)throw new Error("No app element found!");return this.element}}}(t),o={state:null,get value(){return this.state||(this.state={}),this.state},set:function(t,n){this.state||(this.state={}),this.state[t]=n}};function u(){E(n,o.value),E(e,o.value)}function a(t,n){setTimeout((function(){o.set(t,n),u()}),0)}var i=function(){l(r.value,o.value,e),p(r.value,n),console.log(n.value),h(r.value,o.value),u()},c=t.j;return c&&t.removeEventListener("DOMContentLoaded",c),t.addEventListener("DOMContentLoaded",i),t.j=i,{variable:function(t,n){return o.set(t,n),{set value(n){a(t,n)},get value(){return o.value[t]},set:function(n){a(t,n)}}}}}(document).variable;function T(t){return function(t){if(Array.isArray(t))return O(t)}(t)||function(t){if("undefined"!=typeof Symbol&&null!=t[Symbol.iterator]||null!=t["@@iterator"])return Array.from(t)}(t)||function(t,n){if(t){if("string"==typeof t)return O(t,n);var e=Object.prototype.toString.call(t).slice(8,-1);return"Object"===e&&t.constructor&&(e=t.constructor.name),"Map"===e||"Set"===e?Array.from(t):"Arguments"===e||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(e)?O(t,n):void 0}}(t)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function O(t,n){(null==n||n>t.length)&&(n=t.length);for(var e=0,r=new Array(n);e<n;e++)r[e]=t[e];return r}var M=A("todos",[{text:"hello",done:!1}]);A("save",(function(){var t=document.querySelector("[data-input=todo");null!=t&&t.value&&(M.set([].concat(T(M.value),[{text:t.value,done:!1}])),t.value="")})),A("toggleTodo",(function(t){var n=T(M.value);n[t].done=!n[t].done,M.set(n)})),A("Checkbox",(function(t){var n=t.index,e=void 0===n?-1:n,r=t.checked,o=void 0!==r&&r;return'<input type="checkbox" id="todo'.concat(e,'" data-on-change="toggleTodo(').concat(e,')" ').concat(o?"checked":""," />")}));var N=A("counter",0);return A("increment",(function(){N.set(N.value+1)})),t})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-module-todo"] = factory();
+	else
+		root["ts-module-todo"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/rootElement.ts
+function createRootElement(document) {
+  return {
+    element: null,
+    get value() {
+      if (!this.element) {
+        this.element = document.querySelector("#app");
+      }
+      if (!this.element) {
+        throw new Error("No app element found!");
+      }
+      return this.element;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/attributes/convertAttribute.ts
+var convertAttribute = function convertAttribute(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeValue.ts
+function convertAttributeValue(value) {
+  return value === "true" ? true : value === "false" ? false : !isNaN(Number(value)) ? Number(value) : value;
+}
+;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+    return "const ".concat(variable, " = state[\"").concat(variable, "\"];");
+  }).join("\n"), " return ").concat(expression, "}");
+  return Function(functionBody)();
+};
+;// CONCATENATED MODULE: ./src/expressions/evaluateExpression.ts
+
+function evaluateExpression(expression, state) {
+  try {
+    var expressionWithScope = createExpressionScope(expression, state);
+    var evaluated = expressionWithScope(state);
+    if (Array.isArray(evaluated)) {
+      evaluated = evaluated.join("");
+    }
+    return evaluated;
+  } catch (e) {
+    throw new Error("Failed to create function from expression {{".concat(expression, "}}: ").concat(e.message));
+  }
+}
+;// CONCATENATED MODULE: ./src/attributes/attributesToState.ts
+
+
+
+function attributesToState(attributes, state) {
+  var localState = Object.assign({}, state);
+  for (var i = 0; i < attributes.length; i++) {
+    localState[convertAttribute(attributes[i].name)] = convertAttributeValue(attributes[i].reactive ? evaluateExpression(attributes[i].value, state) : attributes[i].value);
+  }
+  return localState;
+}
+;// CONCATENATED MODULE: ./src/html/findNextTemplateExpression.ts
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText.slice(i, i + 2) === "{{") {
+      stack++;
+      i++;
+    } else if (htmlText.slice(i, i + 2) === "}}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+;// CONCATENATED MODULE: ./src/html/htmlToText.ts
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+;// CONCATENATED MODULE: ./src/html/evaluateTemplate.ts
+
+
+
+
+var evaluateTemplate = function evaluateTemplate(template, state) {
+  var restOfContent = template;
+  var hasTemplateExpression = true;
+  var updatedContent = "";
+  while (hasTemplateExpression) {
+    var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+      start = _findNextTemplateExpr.start,
+      end = _findNextTemplateExpr.end;
+    if (end === -1) {
+      hasTemplateExpression = false;
+      break;
+    }
+    var htmlValue = restOfContent.slice(start + 2, end - 1);
+    var before = restOfContent.slice(0, start);
+    var after = restOfContent.slice(end + 1);
+    var value = htmlToText(sanitizeHtml(htmlValue));
+    var evaluated = evaluateExpression(value, state);
+    updatedContent += "".concat(before).concat(evaluated);
+    restOfContent = after;
+  }
+  updatedContent += restOfContent;
+  return updatedContent;
+};
+;// CONCATENATED MODULE: ./src/expressions/templateExpressionRegex.ts
+var templateExpressionRegex = /\{\{(.+?)\}\}/;
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var reactiveMatch = templateExpressionRegex.exec(attribute.value);
+    return {
+      name: attribute.name,
+      value: reactiveMatch ? reactiveMatch[1] : attribute.value,
+      reactive: !!reactiveMatch
+    };
+  });
+  return attributes;
+};
+;// CONCATENATED MODULE: ./src/nodes/loadTemplates.ts
+function loadTemplates(rootElement) {
+  var xpath = "template";
+  var templates = [];
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    templates.push(element);
+    element = result.iterateNext();
+  }
+  return templates;
+}
+;// CONCATENATED MODULE: ./src/nodes/loadCustomElements.ts
+
+
+
+
+
+function loadCustomElements(rootElement, state, customElements) {
+  var templates = loadTemplates(rootElement);
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < templates.length; i++) {
+    var name = templates[i].getAttribute("id");
+    if (name) {
+      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+      if (templates[i].content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name, templates[i], state, customElements);
+      fragment.appendChild(templates[i]);
+    }
+  }
+  fragment.textContent = "";
+}
+function defineCustomElement(name, template, state, customElementsList) {
+  function CustomElement() {
+    return Reflect.construct(HTMLElement, [], CustomElement);
+  }
+  CustomElement.prototype = Object.create(HTMLElement.prototype);
+  CustomElement.prototype.constructor = CustomElement;
+  CustomElement.prototype.connectedCallback = renderCustomElement(template, state, customElementsList);
+  customElements.define(name, CustomElement);
+}
+function renderCustomElement(template, state, customElements) {
+  return function () {
+    var _this$parentNode, _this$parentNode2;
+    var attributes = getAttributes(this);
+    var localState = attributesToState(attributes, state);
+    var originalInvocation = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, this.innerHTML);
+    var evaluatedTemplate = evaluateTemplate(originalInvocation, localState);
+    var tempDiv = document.createElement("div");
+    tempDiv.innerHTML = evaluatedTemplate;
+    var newElement = tempDiv.firstChild;
+    (_this$parentNode = this.parentNode) === null || _this$parentNode === void 0 || _this$parentNode.insertBefore(newElement, this);
+    customElements.add({
+      element: newElement,
+      template: originalInvocation,
+      lastTemplateEvaluation: evaluatedTemplate,
+      parentAttributes: attributes
+    });
+    customElements.clean();
+    (_this$parentNode2 = this.parentNode) === null || _this$parentNode2 === void 0 || _this$parentNode2.removeChild(this);
+  };
+}
+;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
+
+var makeEventHandler = function makeEventHandler(eventName, element, state) {
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
+
+function addEventListeners(parent, eventName, state) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
+
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
+var isCustomElement = function isCustomElement(element) {
+  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
+};
+;// CONCATENATED MODULE: ./src/nodes/loadNativeElements.ts
+
+var loadNativeElements = function loadNativeElements(rootElement, nativeElements) {
+  var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (!isCustomElement(element)) {
+      nativeElements.add({
+        element: element,
+        template: element.outerHTML,
+        lastTemplateEvaluation: element.outerHTML,
+        parentAttributes: []
+      });
+    }
+    element = result.iterateNext();
+  }
+};
+;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
+function removeEventListeners(parent, eventName) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
+
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+;// CONCATENATED MODULE: ./src/attributes/getChangedAttributes.ts
+
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: convertAttributeValue(newAttrValue || "")
+      });
+    }
+  }
+  return changedAttributes;
+}
+;// CONCATENATED MODULE: ./src/nodes/compareNodes.ts
+
+
+
+// TODO: changed custom element like <my-element></my-element> will
+// be returned twice if both attributes and content changed.
+// But either way the entire element will be updated, so it's suboptimal
+// because the loop with changed elements will be longer for no reason.
+
+function compareTextNodes(oldNode, newNode) {
+  if (oldNode.textContent !== newNode.textContent) {
+    var _newNode$textContent;
+    return [{
+      node: oldNode,
+      newNode: newNode,
+      content: (_newNode$textContent = newNode.textContent) !== null && _newNode$textContent !== void 0 ? _newNode$textContent : ""
+    }];
+  }
+  return [];
+}
+function compareChildNodes(oldNode, newNode) {
+  var changedChildren = [];
+  for (var i = 0; i < oldNode.childNodes.length; i++) {
+    var oldChild = oldNode.childNodes[i];
+    var newChild = newNode.childNodes[i];
+    if (oldChild.nodeType === Node.TEXT_NODE && (newChild === null || newChild === void 0 ? void 0 : newChild.nodeType) === Node.TEXT_NODE) {
+      if (oldChild.textContent !== newChild.textContent) {
+        changedChildren.push({
+          node: oldNode,
+          newNode: newNode,
+          content: newNode.innerHTML
+        });
+        break;
+      }
+    } else {
+      var changes = compareNodes(oldChild, newChild);
+      changedChildren = changedChildren.concat(changes);
+    }
+  }
+  return changedChildren;
+}
+function compareNodes(oldNode, newNode) {
+  if (oldNode.nodeType === Node.TEXT_NODE) {
+    return compareTextNodes(oldNode, newNode);
+  }
+  oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
+  newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
+  var changedAttributes = getChangedAttributes(oldNode, newNode);
+  var changedChildren = changedAttributes.length > 0 ? [{
+    node: oldNode,
+    newNode: newNode,
+    attributes: changedAttributes
+  }] : [];
+  return changedChildren.concat(compareChildNodes(oldNode, newNode));
+}
+;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
+function elementFromString(htmlString) {
+  var parser = new DOMParser();
+  var newElementDoc = parser.parseFromString(htmlString, "text/html");
+  return newElementDoc.body.firstChild;
+}
+;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
+function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var pathInA = [];
+  var temp = nodeInA;
+  while (temp !== rootA) {
+    pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
+    temp = temp.parentNode;
+  }
+  var correspondingNodeInB = rootB;
+  for (var _i = 0, _pathInA = pathInA; _i < _pathInA.length; _i++) {
+    var index = _pathInA[_i];
+    if (correspondingNodeInB.childNodes[index]) {
+      correspondingNodeInB = correspondingNodeInB.childNodes[index];
+    } else {
+      return null;
+    }
+  }
+  return correspondingNodeInB;
+}
+;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
+
+
+
+
+
+
+
+
+var updateElement = function updateElement(changedNode, newNode, content, attributes, localState) {
+  if (isCustomElement(newNode)) {
+    var _changedNode$parentEl;
+    (_changedNode$parentEl = changedNode.parentElement) === null || _changedNode$parentEl === void 0 || _changedNode$parentEl.replaceChild(newNode, changedNode);
+  } else {
+    if (content !== undefined) {
+      if (changedNode.nodeType === Node.TEXT_NODE) {
+        changedNode.textContent = content;
+      } else {
+        removeAllEventListeners(changedNode);
+        changedNode.innerHTML = content;
+        addAllEventListeners(changedNode, localState);
+      }
+    } else if (attributes !== undefined) {
+      for (var i = 0; i < attributes.length; i++) {
+        if (attributes[i].name.startsWith("data-attribute-")) {
+          var optionalAttribute = attributes[i].name.substring(15); // "data-attribute-".length
+          if (attributes[i].newValue) {
+            changedNode.setAttribute(optionalAttribute, attributes[i].newValue);
+          } else {
+            changedNode.removeAttribute(optionalAttribute);
+          }
+        }
+        changedNode.setAttribute(attributes[i].name, attributes[i].newValue);
+      }
+    }
+  }
+};
+var reconcile = function reconcile(reactiveNodes, state) {
+  for (var treeNodeIndex = 0; treeNodeIndex < reactiveNodes.value.length; treeNodeIndex++) {
+    var _reactiveNodes$value$ = reactiveNodes.value[treeNodeIndex],
+      element = _reactiveNodes$value$.element,
+      template = _reactiveNodes$value$.template,
+      parentAttributes = _reactiveNodes$value$.parentAttributes,
+      lastTemplateEvaluation = _reactiveNodes$value$.lastTemplateEvaluation;
+    var localState = attributesToState(parentAttributes, state);
+    var updatedContent = evaluateTemplate(template, localState);
+    var newElement = elementFromString(updatedContent);
+    var oldElement = elementFromString(lastTemplateEvaluation);
+    var changedNodes = compareNodes(oldElement, newElement);
+    if (changedNodes.length > 0) {
+      reactiveNodes.updateLastTemplateEvaluation(treeNodeIndex, updatedContent);
+      for (var i = 0; i < changedNodes.length; i++) {
+        var oldNode = findCorrespondingNode(changedNodes[i].node, oldElement, element);
+        updateElement(oldNode, changedNodes[i].newNode, changedNodes[i].content, changedNodes[i].attributes, localState);
+      }
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/state.ts
+function createState() {
+  return {
+    state: null,
+    get value() {
+      if (!this.state) {
+        this.state = {};
+      }
+      return this.state;
+    },
+    set: function set(key, value) {
+      if (!this.state) {
+        this.state = {};
+      }
+      this.state[key] = value;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nodes/cleanReactiveNodesList.ts
+var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
+  return reactiveNodes.filter(function (_ref) {
+    var element = _ref.element;
+    return document.body.contains(element);
+  });
+};
+;// CONCATENATED MODULE: ./src/customElements.ts
+
+function createCustomElements() {
+  return {
+    list: [],
+    get value() {
+      return this.list;
+    },
+    add: function add(item) {
+      this.list.push(item);
+    },
+    updateLastTemplateEvaluation: function updateLastTemplateEvaluation(index, value) {
+      this.list[index].lastTemplateEvaluation = value;
+    },
+    clean: function clean() {
+      this.list = cleanReactiveNodesList(this.list);
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nativeElements.ts
+function createNativeElements() {
+  return {
+    list: [],
+    get value() {
+      return this.list;
+    },
+    add: function add(item) {
+      this.list.push(item);
+    },
+    updateLastTemplateEvaluation: function updateLastTemplateEvaluation(index, value) {
+      this.list[index].lastTemplateEvaluation = value;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/cog.ts
+
+
+
+
+
+
+
+
+var init = function init(document) {
+  var nativeElements = createNativeElements();
+  var customElements = createCustomElements();
+  var rootElement = createRootElement(document);
+  var state = createState();
+  function reRender() {
+    reconcile(nativeElements, state.value);
+    reconcile(customElements, state.value);
+  }
+  function updateState(name, value) {
+    setTimeout(function () {
+      state.set(name, value);
+      reRender();
+    }, 0);
+  }
+  var onLoad = function onLoad() {
+    loadCustomElements(rootElement.value, state.value, customElements);
+    loadNativeElements(rootElement.value, nativeElements);
+    addAllEventListeners(rootElement.value, state.value);
+    reRender();
+  };
+  var onLoadHandler = document["onLoadHandler"];
+  if (onLoadHandler) {
+    document.removeEventListener("DOMContentLoaded", onLoadHandler);
+  }
+  document.addEventListener("DOMContentLoaded", onLoad);
+  document["onLoadHandler"] = onLoad;
+  return {
+    variable: function variable(name, value) {
+      state.set(name, value);
+      return {
+        set value(newVal) {
+          updateState(name, newVal);
+        },
+        get value() {
+          return state.value[name];
+        },
+        set: function set(newVal) {
+          updateState(name, newVal);
+        }
+      };
+    }
+  };
+};
+var _init = init(document),
+  variable = _init.variable;
+
+;// CONCATENATED MODULE: ./examples/src/ts-module-todo.ts
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+var todos = variable("todos", [{
+  text: "hello",
+  done: false
+}]);
+variable("save", function () {
+  var todo = document.querySelector("[data-input=todo");
+  if (todo !== null && todo !== void 0 && todo.value) {
+    todos.set([].concat(_toConsumableArray(todos.value), [{
+      text: todo.value,
+      done: false
+    }]));
+    todo.value = "";
+  }
+});
+variable("toggleTodo", function (index) {
+  var newTodos = _toConsumableArray(todos.value);
+  newTodos[index].done = !newTodos[index].done;
+  todos.set(newTodos);
+});
+variable("Checkbox", function (_ref) {
+  var _ref$index = _ref.index,
+    index = _ref$index === void 0 ? -1 : _ref$index,
+    _ref$checked = _ref.checked,
+    checked = _ref$checked === void 0 ? false : _ref$checked;
+  return "<input type=\"checkbox\" id=\"todo".concat(index, "\" data-on-change=\"toggleTodo(").concat(index, ")\" ").concat(checked ? "checked" : "", " />");
+});
+var counter = variable("counter", 0);
+variable("increment", function () {
+  counter.set(counter.value + 1);
+});
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});

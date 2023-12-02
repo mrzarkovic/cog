@@ -31,7 +31,7 @@ export type ReactiveNode = {
 
 export type ChangedAttribute = {
     name: string;
-    newValue: string;
+    newValue: string | number | boolean;
 };
 
 export type ChangedNode = {

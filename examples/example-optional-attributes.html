@@ -12,7 +12,8 @@
     </head>
     <body>
         <div id="app" class="py-40 px-8 max-w-sm mx-auto">
-            <div {{ myAttribute }}></div>
+            <input type="checkbox" data-attribute-checked="{{ checked }}" />
+            <button onclick="toggleChecked()">Toggle</button>
         </div>
         <script src="/examples/dist/optional-attributes.js"></script>
     </body>
