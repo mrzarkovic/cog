@@ -23,7 +23,7 @@ export type ReactiveNode = {
 };
 export type ChangedAttribute = {
     name: string;
-    newValue: string;
+    newValue: string | number | boolean;
 };
 export type ChangedNode = {
     node: HTMLElement;
@@ -43,12 +43,12 @@ export type ElementWithHandler = Element & {
 export type DocumentWithHandler = Document & {
     onLoadHandler: () => void;
 };
-export type ReactiveNodesStack = {
-    stack: ReactiveNode[];
+export type ReactiveNodesList = {
+    list: ReactiveNode[];
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
     updateLastTemplateEvaluation: (index: number, value: string) => void;
 };
-export type CustomElementsStack = ReactiveNodesStack & {
+export type CustomElementsList = ReactiveNodesList & {
     clean: () => void;
 };
