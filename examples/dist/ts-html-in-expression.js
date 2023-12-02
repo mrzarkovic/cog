@@ -53,7 +53,7 @@ var convertAttribute = function convertAttribute(attribute) {
 };
 ;// CONCATENATED MODULE: ./src/attributes/convertAttributeValue.ts
 function convertAttributeValue(value) {
-  return value === "true" ? true : value === "false" ? false : !isNaN(Number(value)) ? Number(value) : value;
+  return value === "true" ? true : value === "false" ? false : value === "null" ? null : value === "undefined" ? undefined : value === "" ? "" : !isNaN(Number(value)) ? Number(value) : value;
 }
 ;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
 var createExpressionScope = function createExpressionScope(expression, state) {
@@ -269,20 +269,32 @@ var isCustomElement = function isCustomElement(element) {
 };
 ;// CONCATENATED MODULE: ./src/nodes/loadNativeElements.ts
 
-var loadNativeElements = function loadNativeElements(rootElement, nativeElements) {
+
+var loadNativeElements = function loadNativeElements(rootElement, state, nativeElements) {
+  var elements = [];
   var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
   var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
   var element = result.iterateNext();
   while (element) {
     if (!isCustomElement(element)) {
-      nativeElements.add({
-        element: element,
-        template: element.outerHTML,
-        lastTemplateEvaluation: element.outerHTML,
-        parentAttributes: []
-      });
+      elements.push(element);
     }
     element = result.iterateNext();
+  }
+  for (var i = 0; i < elements.length; i++) {
+    var _elements$i$parentNod;
+    var originalInvocation = elements[i].outerHTML;
+    var evaluatedTemplate = evaluateTemplate(originalInvocation, state);
+    var tempDiv = document.createElement("div");
+    tempDiv.innerHTML = evaluatedTemplate;
+    var newElement = tempDiv.firstChild;
+    (_elements$i$parentNod = elements[i].parentNode) === null || _elements$i$parentNod === void 0 || _elements$i$parentNod.replaceChild(newElement, elements[i]);
+    nativeElements.add({
+      element: newElement,
+      template: originalInvocation,
+      lastTemplateEvaluation: evaluatedTemplate,
+      parentAttributes: []
+    });
   }
 };
 ;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
@@ -338,21 +350,29 @@ function compareTextNodes(oldNode, newNode) {
 }
 function compareChildNodes(oldNode, newNode) {
   var changedChildren = [];
-  for (var i = 0; i < oldNode.childNodes.length; i++) {
+  var differentChildren = false;
+  var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
+  for (var i = 0; i < nodesLength; i++) {
     var oldChild = oldNode.childNodes[i];
     var newChild = newNode.childNodes[i];
-    if (oldChild.nodeType === Node.TEXT_NODE) {
+    if (typeof oldChild !== "undefined" && oldChild.nodeType === Node.TEXT_NODE && typeof newChild !== "undefined" && newChild.nodeType === Node.TEXT_NODE) {
       if (oldChild.textContent !== newChild.textContent) {
-        return [{
-          node: oldNode,
-          newNode: newNode,
-          content: newNode.innerHTML
-        }];
+        differentChildren = true;
+        break;
       }
+    } else if (typeof oldChild === "undefined" || typeof newChild === "undefined") {
+      differentChildren = true;
+      break;
     } else {
-      var changes = compareNodes(oldChild, newChild);
-      changedChildren = changedChildren.concat(changes);
+      changedChildren = changedChildren.concat(compareNodes(oldChild, newChild));
     }
+  }
+  if (differentChildren) {
+    return [{
+      node: oldNode,
+      newNode: newNode,
+      content: newNode.innerHTML
+    }];
   }
   return changedChildren;
 }
@@ -537,11 +557,12 @@ var init = function init(document) {
     }, 0);
   }
   var onLoad = function onLoad() {
-    loadNativeElements(rootElement.value, nativeElements);
+    loadNativeElements(rootElement.value, state.value, nativeElements);
     loadCustomElements(rootElement.value, state.value, customElements);
     addAllEventListeners(rootElement.value, state.value);
-    reRender();
+    // reRender();
   };
+
   var onLoadHandler = document["onLoadHandler"];
   if (onLoadHandler) {
     document.removeEventListener("DOMContentLoaded", onLoadHandler);
@@ -574,6 +595,9 @@ variable("names", ["Alice", "Bob", "Carol"]);
 var count = variable("count", 0);
 window.increment = function () {
   count.value++;
+};
+window.decrement = function () {
+  count.value--;
 };
 /******/ 	return __webpack_exports__;
 /******/ })()

@@ -1,10 +1,13 @@
-import { ReactiveNodesList } from "../types";
+import { evaluateTemplate } from "../html/evaluateTemplate";
+import { ReactiveNodesList, State } from "../types";
 import { isCustomElement } from "./isCustomElement";
 
 export const loadNativeElements = (
     rootElement: Node,
+    state: State,
     nativeElements: ReactiveNodesList
 ) => {
+    const elements: HTMLElement[] = [];
     const xpath =
         "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
 
@@ -19,14 +22,27 @@ export const loadNativeElements = (
 
     while (element) {
         if (!isCustomElement(element)) {
-            nativeElements.add({
-                element,
-                template: element.outerHTML,
-                lastTemplateEvaluation: element.outerHTML,
-                parentAttributes: [],
-            });
+            elements.push(element);
         }
 
         element = <HTMLElement>result.iterateNext();
+    }
+
+    for (let i = 0; i < elements.length; i++) {
+        const originalInvocation = elements[i].outerHTML;
+        const evaluatedTemplate = evaluateTemplate(originalInvocation, state);
+
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = evaluatedTemplate;
+        const newElement = tempDiv.firstChild as HTMLElement;
+
+        elements[i].parentNode?.replaceChild(newElement, elements[i]);
+
+        nativeElements.add({
+            element: newElement,
+            template: originalInvocation,
+            lastTemplateEvaluation: evaluatedTemplate,
+            parentAttributes: [],
+        });
     }
 };

@@ -18,14 +18,14 @@
                 </li>
             </template>
             <template id="square-c">
-                <button class="btn" onclick="{{ dataSquareClick }}">
+                <button class="btn w-10 h-10" onclick="{{ dataSquareClick }}">
                     {{ dataValue }}
                 </button>
             </template>
             <template id="board-c">
                 <div>
-                    <div className="status">{{ status }}</div>
-                    <div className="board-row">
+                    <div class="status">{{ status }}</div>
+                    <div class="flex">
                         <square-c
                             data-value="{{ squares[0] }}"
                             data-square-click="handleClick(0)"
@@ -39,7 +39,7 @@
                             data-square-click="handleClick(2)"
                         ></square-c>
                     </div>
-                    <div className="board-row">
+                    <div class="flex">
                         <square-c
                             data-value="{{ squares[3] }}"
                             data-square-click="handleClick(3)"
@@ -53,7 +53,7 @@
                             data-square-click="handleClick(5)"
                         ></square-c>
                     </div>
-                    <div className="board-row">
+                    <div class="flex">
                         <square-c
                             data-value="{{ squares[6] }}"
                             data-square-click="handleClick(6)"
@@ -69,14 +69,14 @@
                     </div>
                 </div>
             </template>
-            <div className="game">
-                <div className="game-board">
+            <div class="game">
+                <div class="game-board">
                     <board-c></board-c>
                 </div>
-                <div className="game-info">
+                <div class="game-info">
                     <ol>
                         {{ history.map( (squares, move) => `
-                        <move-c data-click="jumpTo(1)"
+                        <move-c data-click="jumpTo(${move})"
                             >${move > 0 ? "Go to move #" + move : "Go to game
                             start"}</move-c
                         >
