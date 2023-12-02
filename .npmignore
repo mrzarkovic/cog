@@ -1,1 +1,5 @@
 node_modules/
+lib/examples/
+src/__tests__/
+examples/
+coverage/
