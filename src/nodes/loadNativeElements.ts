@@ -4,6 +4,7 @@ import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { evaluateExpression } from "../expressions/evaluateExpression";
 import { evaluateTemplate } from "../html/evaluateTemplate";
 import { ReactiveNodesList, State } from "../types";
+import { elementFromString } from "./elementFromString";
 import { isCustomElement } from "./isCustomElement";
 
 export const loadNativeElements = (
@@ -33,14 +34,10 @@ export const loadNativeElements = (
     }
 
     for (let i = 0; i < elements.length; i++) {
-        const originalInvocation = elements[i].outerHTML;
         const attributes = getAttributes(elements[i]);
-
+        const originalInvocation = elements[i].outerHTML;
         const evaluatedTemplate = evaluateTemplate(originalInvocation, state);
-
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = evaluatedTemplate;
-        const newElement = tempDiv.firstChild as HTMLElement;
+        const newElement = elementFromString(evaluatedTemplate);
 
         attributes.map((attribute) =>
             handleBooleanAttribute(newElement, {

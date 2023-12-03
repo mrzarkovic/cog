@@ -4,6 +4,7 @@ import { evaluateTemplate } from "../html/evaluateTemplate";
 import { getAttributes } from "../attributes/getAttributes";
 import { sanitizeHtml } from "../html/sanitizeHtml";
 import { loadTemplates } from "./loadTemplates";
+import { elementFromString } from "./elementFromString";
 
 export function loadCustomElements(
     rootElement: Node,
@@ -70,10 +71,9 @@ function renderCustomElement(
             originalInvocation,
             localState
         );
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = evaluatedTemplate;
-        const newElement = tempDiv.firstChild as HTMLElement;
-        this.parentNode?.insertBefore(newElement, this);
+
+        const newElement = elementFromString(evaluatedTemplate);
+        this.parentNode?.replaceChild(newElement, this);
 
         customElements.add({
             element: newElement,
@@ -82,7 +82,5 @@ function renderCustomElement(
             parentAttributes: attributes,
         });
         customElements.clean();
-
-        this.parentNode?.removeChild(this);
     };
 }
