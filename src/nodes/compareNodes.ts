@@ -24,6 +24,7 @@ export function compareChildNodes(
     let changedChildren: ChangedNode[] = [];
     let differentChildren = false;
     let childAdded = false;
+    const toBeRemoved: Node[] = [];
 
     const nodesLength = Math.max(
         oldNode.childNodes.length,
@@ -48,23 +49,27 @@ export function compareChildNodes(
             typeof oldChild === "undefined" &&
             typeof newChild !== "undefined"
         ) {
-            return [
-                {
-                    node: oldNode,
-                    childAdded: newChild,
-                },
-            ];
+            changedChildren.push({
+                node: oldNode,
+                childAdded: newChild,
+            });
         } else if (
-            typeof oldChild === "undefined" ||
+            typeof oldChild !== "undefined" &&
             typeof newChild === "undefined"
         ) {
-            differentChildren = true;
-            break;
+            toBeRemoved.push(oldChild);
         } else {
             changedChildren = changedChildren.concat(
                 compareNodes(oldChild, newChild)
             );
         }
+    }
+
+    if (toBeRemoved.length > 0) {
+        changedChildren.push({
+            node: oldNode,
+            toBeRemoved,
+        });
     }
 
     if (differentChildren) {

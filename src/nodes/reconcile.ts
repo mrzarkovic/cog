@@ -18,6 +18,7 @@ const updateElement = (
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
     childAdded: HTMLElement | undefined,
+    removeChildren: HTMLElement[],
     localState: State
 ) => {
     if (content !== undefined) {
@@ -39,6 +40,10 @@ const updateElement = (
         }
     } else if (childAdded !== undefined) {
         changedNode.appendChild(childAdded);
+    } else if (removeChildren.length) {
+        for (let i = 0; i < removeChildren.length; i++) {
+            changedNode.removeChild(removeChildren[i]);
+        }
     }
 };
 
@@ -110,12 +115,32 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
                         oldElement,
                         element
                     ) as HTMLElement;
+                    let removeChildren = [];
+
+                    if (changedNodes[i].toBeRemoved !== undefined) {
+                        for (
+                            let j = 0;
+                            j < changedNodes[i].toBeRemoved.length;
+                            j++
+                        ) {
+                            removeChildren.push(
+                                findCorrespondingNode(
+                                    changedNodes[i].toBeRemoved[j],
+                                    oldElement,
+                                    element
+                                )
+                            );
+                        }
+                    }
+
+                    console.log({ removeChildren });
 
                     updateElement(
                         oldNode,
                         changedNodes[i].content,
                         changedNodes[i].attributes,
                         changedNodes[i].childAdded,
+                        removeChildren,
                         localState
                     );
                 }

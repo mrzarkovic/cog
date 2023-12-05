@@ -383,6 +383,7 @@ function compareChildNodes(oldNode, newNode) {
   var changedChildren = [];
   var differentChildren = false;
   var childAdded = false;
+  var toBeRemoved = [];
   var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
   for (var i = 0; i < nodesLength; i++) {
     var oldChild = oldNode.childNodes[i];
@@ -394,16 +395,21 @@ function compareChildNodes(oldNode, newNode) {
         break;
       }
     } else if (typeof oldChild === "undefined" && typeof newChild !== "undefined") {
-      return [{
+      changedChildren.push({
         node: oldNode,
         childAdded: newChild
-      }];
-    } else if (typeof oldChild === "undefined" || typeof newChild === "undefined") {
-      differentChildren = true;
-      break;
+      });
+    } else if (typeof oldChild !== "undefined" && typeof newChild === "undefined") {
+      toBeRemoved.push(oldChild);
     } else {
       changedChildren = changedChildren.concat(compareNodes(oldChild, newChild));
     }
+  }
+  if (toBeRemoved.length > 0) {
+    changedChildren.push({
+      node: oldNode,
+      toBeRemoved: toBeRemoved
+    });
   }
   if (differentChildren) {
     return [{
@@ -428,13 +434,23 @@ function compareNodes(oldNode, newNode) {
 }
 ;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
 function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var _nodeValue;
   var pathInA = [];
   var temp = nodeInA;
   while (temp !== rootA) {
+    console.log("childNodesA", temp.parentNode.childNodes);
+    console.log("childNodesB", rootB.childNodes);
+    console.log("temp", temp);
     pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
     temp = temp.parentNode;
   }
+  console.log("pathInA", pathInA);
+  if (rootB.firstChild && ((_nodeValue = rootB.firstChild.nodeValue) === null || _nodeValue === void 0 ? void 0 : _nodeValue.trim()) === "") {
+    rootB.removeChild(rootB.firstChild);
+  }
   var correspondingNodeInB = rootB;
+  // TODO: refactor for of
+
   for (var _i = 0, _pathInA = pathInA; _i < _pathInA.length; _i++) {
     var index = _pathInA[_i];
     if (correspondingNodeInB.childNodes[index]) {
@@ -466,7 +482,7 @@ function handleBooleanAttribute(changedNode, attribute) {
 
 
 
-var updateElement = function updateElement(changedNode, content, attributes, childAdded, localState) {
+var updateElement = function updateElement(changedNode, content, attributes, childAdded, removeChildren, localState) {
   if (content !== undefined) {
     if (changedNode.nodeType === Node.TEXT_NODE) {
       changedNode.textContent = content;
@@ -482,6 +498,10 @@ var updateElement = function updateElement(changedNode, content, attributes, chi
     }
   } else if (childAdded !== undefined) {
     changedNode.appendChild(childAdded);
+  } else if (removeChildren.length) {
+    for (var _i = 0; _i < removeChildren.length; _i++) {
+      changedNode.removeChild(removeChildren[_i]);
+    }
   }
 };
 function reconcile_getLocalState(node, globalState, reactiveNodes) {
@@ -518,7 +538,16 @@ var reconcile = function reconcile(reactiveNodes, state) {
         reactiveNodes.update(treeNodeIndex, "lastTemplateEvaluation", updatedContent);
         for (var i = 0; i < changedNodes.length; i++) {
           var oldNode = findCorrespondingNode(changedNodes[i].node, oldElement, element);
-          updateElement(oldNode, changedNodes[i].content, changedNodes[i].attributes, changedNodes[i].childAdded, localState);
+          var removeChildren = [];
+          if (changedNodes[i].toBeRemoved !== undefined) {
+            for (var j = 0; j < changedNodes[i].toBeRemoved.length; j++) {
+              removeChildren.push(findCorrespondingNode(changedNodes[i].toBeRemoved[j], oldElement, element));
+            }
+          }
+          console.log({
+            removeChildren: removeChildren
+          });
+          updateElement(oldNode, changedNodes[i].content, changedNodes[i].attributes, changedNodes[i].childAdded, removeChildren, localState);
         }
       }
     }
