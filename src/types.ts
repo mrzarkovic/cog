@@ -23,10 +23,12 @@ export type Attribute = {
 };
 
 export type ReactiveNode = {
+    id: number;
+    parentId: number | null;
     element: HTMLElement;
     template: HTMLString;
-    lastTemplateEvaluation: HTMLString;
-    parentAttributes: Attribute[];
+    lastTemplateEvaluation: HTMLString | null;
+    attributes: Attribute[];
 };
 
 export type ChangedAttribute = {
@@ -36,7 +38,6 @@ export type ChangedAttribute = {
 
 export type ChangedNode = {
     node: HTMLElement;
-    newNode: HTMLElement;
     content?: HTMLString;
     attributes?: ChangedAttribute[];
 };
@@ -57,9 +58,10 @@ export type ReactiveNodesList = {
     list: ReactiveNode[];
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
-    updateLastTemplateEvaluation: (index: number, value: string) => void;
-};
-
-export type CustomElementsList = ReactiveNodesList & {
-    clean: () => void;
+    update: (
+        index: number,
+        property: keyof ReactiveNode,
+        value: ReactiveNode[keyof ReactiveNode]
+    ) => void;
+    clean: (list: ReactiveNode[]) => void;
 };

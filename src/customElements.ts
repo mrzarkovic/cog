@@ -1,7 +1,7 @@
-import { CustomElementsList, ReactiveNode } from "./types";
+import { ReactiveNodesList, ReactiveNode } from "./types";
 import { cleanReactiveNodesList } from "./nodes/cleanReactiveNodesList";
 
-export function createCustomElements(): CustomElementsList {
+export function createReactiveNodes(): ReactiveNodesList {
     return {
         list: [] as ReactiveNode[],
         get value() {
@@ -10,11 +10,11 @@ export function createCustomElements(): CustomElementsList {
         add(item: ReactiveNode) {
             this.list.push(item);
         },
-        updateLastTemplateEvaluation(index: number, value: string) {
-            this.list[index].lastTemplateEvaluation = value;
+        update(index: number, property: keyof ReactiveNode, value: unknown) {
+            this.list[index][property] = value as never;
         },
-        clean() {
-            this.list = cleanReactiveNodesList(this.list);
+        clean(list: ReactiveNode[]) {
+            this.list = cleanReactiveNodesList(list);
         },
     };
 }

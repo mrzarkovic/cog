@@ -1,17 +1,35 @@
-import { CustomElementsList, State } from "../types";
-import { attributesToState } from "../attributes/attributesToState";
-import { evaluateTemplate } from "../html/evaluateTemplate";
 import { getAttributes } from "../attributes/getAttributes";
 import { sanitizeHtml } from "../html/sanitizeHtml";
-import { loadTemplates } from "./loadTemplates";
+import { ReactiveNodesList } from "../types";
 import { elementFromString } from "./elementFromString";
+import { registerReactiveNode } from "./registerReactiveNode";
 
-export function loadCustomElements(
+function findTemplates(rootElement: Node) {
+    const xpath = "template";
+    const templates: HTMLTemplateElement[] = [];
+
+    const result = document.evaluate(
+        xpath,
+        rootElement,
+        null,
+        XPathResult.ORDERED_NODE_ITERATOR_TYPE,
+        null
+    );
+    let element = <HTMLTemplateElement>result.iterateNext();
+
+    while (element) {
+        templates.push(element);
+        element = <HTMLTemplateElement>result.iterateNext();
+    }
+
+    return templates;
+}
+
+export function loadTemplates(
     rootElement: Node,
-    state: State,
-    customElements: CustomElementsList
+    reactiveNodes: ReactiveNodesList
 ) {
-    const templates = loadTemplates(rootElement);
+    const templates = findTemplates(rootElement);
     const fragment = document.createDocumentFragment();
 
     for (let i = 0; i < templates.length; i++) {
@@ -24,7 +42,7 @@ export function loadCustomElements(
                 throw new Error(`Template ${name} should have a single child`);
             }
 
-            defineCustomElement(name, templates[i], state, customElements);
+            defineCustomElement(name, templates[i], reactiveNodes);
 
             fragment.appendChild(templates[i]);
         }
@@ -36,8 +54,7 @@ export function loadCustomElements(
 function defineCustomElement(
     name: string,
     template: HTMLTemplateElement,
-    state: State,
-    customElementsList: CustomElementsList
+    reactiveNodes: ReactiveNodesList
 ) {
     function CustomElement() {
         return Reflect.construct(HTMLElement, [], CustomElement);
@@ -46,41 +63,42 @@ function defineCustomElement(
     CustomElement.prototype = Object.create(HTMLElement.prototype);
     CustomElement.prototype.constructor = CustomElement;
 
-    CustomElement.prototype.connectedCallback = renderCustomElement(
+    CustomElement.prototype.connectedCallback = registerCustomElement(
         template,
-        state,
-        customElementsList
+        reactiveNodes
     );
 
     customElements.define(name, CustomElement as never);
 }
 
-function renderCustomElement(
+function registerCustomElement(
     template: HTMLTemplateElement,
-    state: State,
-    customElements: CustomElementsList
+    reactiveNodes: ReactiveNodesList
 ) {
     return function (this: HTMLElement) {
+        const elementId = reactiveNodes.list.length + 1;
         const attributes = getAttributes(this);
-        const localState = attributesToState(attributes, state);
-        const originalInvocation = template.innerHTML.replace(
+        const templateWithChildren = template.innerHTML.replace(
             /\{\{\s*children\s*\}\}/g,
             this.innerHTML
         );
-        const evaluatedTemplate = evaluateTemplate(
-            originalInvocation,
-            localState
-        );
-
-        const newElement = elementFromString(evaluatedTemplate);
-        this.parentNode?.replaceChild(newElement, this);
-
-        customElements.add({
-            element: newElement,
-            template: originalInvocation,
-            lastTemplateEvaluation: evaluatedTemplate,
-            parentAttributes: attributes,
+        const newElement = elementFromString(templateWithChildren);
+        const childElements = newElement.querySelectorAll("*");
+        childElements.forEach((child) => {
+            if (child.tagName.includes("-")) {
+                child.setAttribute("data-parent-id", String(elementId));
+            }
         });
-        customElements.clean();
+
+        console.log("custom", newElement.innerHTML);
+        const originalInvocation = this.outerHTML;
+        this.parentElement?.replaceChild(newElement, this);
+        registerReactiveNode(
+            elementId,
+            reactiveNodes,
+            newElement,
+            originalInvocation,
+            attributes
+        );
     };
 }

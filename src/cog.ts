@@ -1,49 +1,52 @@
-import { type Cog, type DocumentWithHandler } from "./types";
+import { type Cog } from "./types";
 import { createRootElement } from "./rootElement";
-import { loadCustomElements } from "./nodes/loadCustomElements";
+import { loadTemplates } from "./nodes/loadCustomElements";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
-import { loadNativeElements } from "./nodes/loadNativeElements";
+import { registerNativeElements } from "./nodes/loadNativeElements";
 import { reconcile } from "./nodes/reconcile";
 import { createState } from "./state";
-import { createCustomElements } from "./customElements";
-import { createNativeElements } from "./nativeElements";
+import { createReactiveNodes } from "./customElements";
 
 export const init = (document: Document): Cog => {
-    const nativeElements = createNativeElements();
-    const customElements = createCustomElements();
+    const reactiveNodes = createReactiveNodes();
     const rootElement = createRootElement(document);
+    let updateStateTimeout: number | null = null;
     const state = createState();
 
     function reRender() {
-        reconcile(nativeElements, state.value);
-        reconcile(customElements, state.value);
+        reconcile(reactiveNodes, state.value);
     }
 
     function updateState<T>(name: string, value: T) {
-        setTimeout(() => {
-            state.set(name, value);
+        state.set(name, value);
+        if (updateStateTimeout !== null) {
+            clearTimeout(updateStateTimeout);
+        }
+        updateStateTimeout = setTimeout(() => {
+            console.log("rerendering");
             reRender();
         }, 0);
     }
 
     const onLoad = () => {
-        loadNativeElements(rootElement.value, state.value, nativeElements);
-        loadCustomElements(rootElement.value, state.value, customElements);
+        loadTemplates(rootElement.value, reactiveNodes);
+        registerNativeElements(rootElement.value, reactiveNodes);
         addAllEventListeners(rootElement.value, state.value);
-        // reRender();
     };
 
-    const onLoadHandler = (document as DocumentWithHandler)["onLoadHandler"];
-    if (onLoadHandler) {
-        document.removeEventListener("DOMContentLoaded", onLoadHandler);
-    }
-    document.addEventListener("DOMContentLoaded", onLoad);
-    (document as DocumentWithHandler)["onLoadHandler"] = onLoad;
+    onLoad();
+
+    // const onLoadHandler = (document as DocumentWithHandler)["onLoadHandler"];
+    // if (onLoadHandler) {
+    //     document.removeEventListener("DOMContentLoaded", onLoadHandler);
+    // }
+    // document.addEventListener("DOMContentLoaded", onLoad);
+    // (document as DocumentWithHandler)["onLoadHandler"] = onLoad;
 
     return {
         variable: <T>(name: string, value: T) => {
+            // updateState(name, value);
             state.set(name, value);
-
             return {
                 set value(newVal: T) {
                     updateState(name, newVal);

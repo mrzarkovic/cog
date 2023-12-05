@@ -1,4 +1,9 @@
-import { ChangedAttribute, ReactiveNodesList, State } from "../types";
+import {
+    ChangedAttribute,
+    ReactiveNode,
+    ReactiveNodesList,
+    State,
+} from "../types";
 import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "../eventListeners/removeAllEventListeners";
 import { attributesToState } from "../attributes/attributesToState";
@@ -6,38 +11,57 @@ import { compareNodes } from "./compareNodes";
 import { elementFromString } from "./elementFromString";
 import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
-import { isCustomElement } from "./isCustomElement";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 
 const updateElement = (
     changedNode: HTMLElement,
-    newNode: HTMLElement,
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
     localState: State
 ) => {
-    if (isCustomElement(newNode)) {
-        changedNode.parentElement?.replaceChild(newNode, changedNode);
-    } else {
-        if (content !== undefined) {
-            if (changedNode.nodeType === Node.TEXT_NODE) {
-                changedNode.textContent = content;
-            } else {
-                removeAllEventListeners(changedNode);
-                changedNode.innerHTML = content;
-                addAllEventListeners(changedNode, localState);
-            }
-        } else if (attributes !== undefined) {
-            for (let i = 0; i < attributes.length; i++) {
-                handleBooleanAttribute(changedNode, attributes[i]);
-                changedNode.setAttribute(
-                    attributes[i].name,
-                    attributes[i].newValue as string
-                );
-            }
+    if (content !== undefined) {
+        if (changedNode.nodeType === Node.TEXT_NODE) {
+            changedNode.textContent = content;
+        } else {
+            removeAllEventListeners(changedNode);
+            console.log({ content });
+            changedNode.innerHTML = content;
+            addAllEventListeners(changedNode, localState);
+        }
+    } else if (attributes !== undefined) {
+        for (let i = 0; i < attributes.length; i++) {
+            handleBooleanAttribute(changedNode, attributes[i]);
+            changedNode.setAttribute(
+                attributes[i].name,
+                attributes[i].newValue as string
+            );
         }
     }
 };
+
+function getLocalState(
+    node: ReactiveNode,
+    globalState: State,
+    reactiveNodes: ReactiveNode[]
+) {
+    if (node.parentId === null) {
+        return attributesToState(node.attributes, globalState);
+    }
+
+    const parentNode = reactiveNodes.find((rn) => rn.id === node.parentId);
+
+    const parentState: State = getLocalState(
+        parentNode!,
+        globalState,
+        reactiveNodes
+    );
+
+    return Object.assign(
+        {},
+        parentState,
+        attributesToState(node.attributes, parentState)
+    );
+}
 
 export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
     for (
@@ -45,34 +69,58 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
         treeNodeIndex < reactiveNodes.value.length;
         treeNodeIndex++
     ) {
-        const { element, template, parentAttributes, lastTemplateEvaluation } =
+        const { element, template, lastTemplateEvaluation } =
             reactiveNodes.value[treeNodeIndex];
-        const localState = attributesToState(parentAttributes, state);
+
+        const localState = getLocalState(
+            reactiveNodes.value[treeNodeIndex],
+            state,
+            reactiveNodes.list
+        );
+
         const updatedContent = evaluateTemplate(template, localState);
         const newElement = elementFromString(updatedContent);
-        const oldElement = elementFromString(lastTemplateEvaluation);
-        const changedNodes = compareNodes(oldElement, newElement);
 
-        if (changedNodes.length > 0) {
-            reactiveNodes.updateLastTemplateEvaluation(
+        if (lastTemplateEvaluation === null) {
+            console.log("first render", element.nodeName);
+            reactiveNodes.update(
                 treeNodeIndex,
+                "lastTemplateEvaluation",
                 updatedContent
             );
+            reactiveNodes.update(treeNodeIndex, "element", newElement);
+            element.parentNode?.replaceChild(newElement, element);
+        } else {
+            const oldElement = elementFromString(lastTemplateEvaluation);
+            const changedNodes = compareNodes(oldElement, newElement);
+            console.log(
+                "comparing",
+                newElement.innerHTML,
+                oldElement.innerHTML,
+                changedNodes
+            );
 
-            for (let i = 0; i < changedNodes.length; i++) {
-                const oldNode = findCorrespondingNode(
-                    changedNodes[i].node,
-                    oldElement,
-                    element
-                ) as HTMLElement;
-
-                updateElement(
-                    oldNode,
-                    changedNodes[i].newNode,
-                    changedNodes[i].content,
-                    changedNodes[i].attributes,
-                    localState
+            if (changedNodes.length > 0) {
+                reactiveNodes.update(
+                    treeNodeIndex,
+                    "lastTemplateEvaluation",
+                    updatedContent
                 );
+
+                for (let i = 0; i < changedNodes.length; i++) {
+                    const oldNode = findCorrespondingNode(
+                        changedNodes[i].node,
+                        oldElement,
+                        element
+                    ) as HTMLElement;
+
+                    updateElement(
+                        oldNode,
+                        changedNodes[i].content,
+                        changedNodes[i].attributes,
+                        localState
+                    );
+                }
             }
         }
     }

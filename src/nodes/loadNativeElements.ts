@@ -1,16 +1,10 @@
-import { convertAttributeValue } from "../attributes/convertAttributeValue";
-import { getAttributes } from "../attributes/getAttributes";
-import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
-import { evaluateExpression } from "../expressions/evaluateExpression";
-import { evaluateTemplate } from "../html/evaluateTemplate";
-import { ReactiveNodesList, State } from "../types";
-import { elementFromString } from "./elementFromString";
+import { ReactiveNodesList } from "../types";
 import { isCustomElement } from "./isCustomElement";
+import { registerReactiveNode } from "./registerReactiveNode";
 
-export const loadNativeElements = (
+export const registerNativeElements = (
     rootElement: Node,
-    state: State,
-    nativeElements: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList
 ) => {
     const elements: HTMLElement[] = [];
     const xpath =
@@ -34,29 +28,24 @@ export const loadNativeElements = (
     }
 
     for (let i = 0; i < elements.length; i++) {
-        const attributes = getAttributes(elements[i]);
-        const originalInvocation = elements[i].outerHTML;
-        const evaluatedTemplate = evaluateTemplate(originalInvocation, state);
-        const newElement = elementFromString(evaluatedTemplate);
-
-        attributes.map((attribute) =>
-            handleBooleanAttribute(newElement, {
-                name: attribute.name,
-                newValue: convertAttributeValue(
-                    attribute.reactive
-                        ? evaluateExpression(attribute.value, state)
-                        : attribute.value
-                ),
-            })
+        const elementId = reactiveNodes.list.length + 1;
+        console.log("native", elements[i]);
+        registerReactiveNode(
+            elementId,
+            reactiveNodes,
+            elements[i],
+            elements[i].outerHTML
         );
-
-        elements[i].parentNode?.replaceChild(newElement, elements[i]);
-
-        nativeElements.add({
-            element: newElement,
-            template: originalInvocation,
-            lastTemplateEvaluation: evaluatedTemplate,
-            parentAttributes: [],
-        });
     }
 };
+
+function generateUUID() {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+            const r = (Math.random() * 16) | 0,
+                v = c === "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        }
+    );
+}

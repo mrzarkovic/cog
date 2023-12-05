@@ -2,11 +2,6 @@ import { ChangedNode } from "../types";
 import { getChangedAttributes } from "../attributes/getChangedAttributes";
 import { sanitizeHtml } from "../html/sanitizeHtml";
 
-// TODO: changed custom element like <my-element></my-element> will
-// be returned twice if both attributes and content changed.
-// But either way the entire element will be updated, so it's suboptimal
-// because the loop with changed elements will be longer for no reason.
-
 export function compareTextNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
@@ -15,7 +10,6 @@ export function compareTextNodes(
         return [
             {
                 node: oldNode,
-                newNode: newNode,
                 content: newNode.textContent ?? "",
             },
         ];
@@ -66,7 +60,6 @@ export function compareChildNodes(
         return [
             {
                 node: oldNode,
-                newNode: newNode,
                 content: newNode.innerHTML,
             },
         ];
@@ -92,7 +85,6 @@ export function compareNodes(
             ? [
                   {
                       node: oldNode,
-                      newNode: newNode,
                       attributes: changedAttributes,
                   },
               ]

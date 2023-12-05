@@ -6,7 +6,7 @@ export const getAttributes = (element: HTMLElement): Attribute[] => {
         const reactiveMatch = templateExpressionRegex.exec(attribute.value);
         return {
             name: attribute.name,
-            value: reactiveMatch ? reactiveMatch[1] : attribute.value,
+            value: attribute.value,
             reactive: !!reactiveMatch,
         };
     });
