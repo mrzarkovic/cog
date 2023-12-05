@@ -23,14 +23,13 @@ export const init = (document: Document): Cog => {
             clearTimeout(updateStateTimeout);
         }
         updateStateTimeout = setTimeout(() => {
-            console.log("rerendering");
             reRender();
         }, 0);
     }
 
     const onLoad = () => {
-        loadTemplates(rootElement.value, reactiveNodes);
         registerNativeElements(rootElement.value, reactiveNodes);
+        loadTemplates(rootElement.value, state.value, reactiveNodes);
         addAllEventListeners(rootElement.value, state.value);
     };
 

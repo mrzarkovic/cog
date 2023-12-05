@@ -17,6 +17,7 @@ const updateElement = (
     changedNode: HTMLElement,
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
+    childAdded: HTMLElement | undefined,
     localState: State
 ) => {
     if (content !== undefined) {
@@ -24,7 +25,7 @@ const updateElement = (
             changedNode.textContent = content;
         } else {
             removeAllEventListeners(changedNode);
-            console.log({ content });
+
             changedNode.innerHTML = content;
             addAllEventListeners(changedNode, localState);
         }
@@ -36,6 +37,8 @@ const updateElement = (
                 attributes[i].newValue as string
             );
         }
+    } else if (childAdded !== undefined) {
+        changedNode.appendChild(childAdded);
     }
 };
 
@@ -82,7 +85,6 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
         const newElement = elementFromString(updatedContent);
 
         if (lastTemplateEvaluation === null) {
-            console.log("first render", element.nodeName);
             reactiveNodes.update(
                 treeNodeIndex,
                 "lastTemplateEvaluation",
@@ -93,12 +95,7 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
         } else {
             const oldElement = elementFromString(lastTemplateEvaluation);
             const changedNodes = compareNodes(oldElement, newElement);
-            console.log(
-                "comparing",
-                newElement.innerHTML,
-                oldElement.innerHTML,
-                changedNodes
-            );
+            console.log({ changedNodes });
 
             if (changedNodes.length > 0) {
                 reactiveNodes.update(
@@ -118,6 +115,7 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
                         oldNode,
                         changedNodes[i].content,
                         changedNodes[i].attributes,
+                        changedNodes[i].childAdded,
                         localState
                     );
                 }

@@ -29,7 +29,6 @@ export const registerNativeElements = (
 
     for (let i = 0; i < elements.length; i++) {
         const elementId = reactiveNodes.list.length + 1;
-        console.log("native", elements[i]);
         registerReactiveNode(
             elementId,
             reactiveNodes,

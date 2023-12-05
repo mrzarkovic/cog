@@ -23,6 +23,7 @@ export function compareChildNodes(
 ): ChangedNode[] {
     let changedChildren: ChangedNode[] = [];
     let differentChildren = false;
+    let childAdded = false;
 
     const nodesLength = Math.max(
         oldNode.childNodes.length,
@@ -39,10 +40,20 @@ export function compareChildNodes(
             typeof newChild !== "undefined" &&
             newChild.nodeType === Node.TEXT_NODE
         ) {
-            if (oldChild.textContent !== newChild.textContent) {
+            if (oldChild.textContent?.trim() !== newChild.textContent?.trim()) {
                 differentChildren = true;
                 break;
             }
+        } else if (
+            typeof oldChild === "undefined" &&
+            typeof newChild !== "undefined"
+        ) {
+            return [
+                {
+                    node: oldNode,
+                    childAdded: newChild,
+                },
+            ];
         } else if (
             typeof oldChild === "undefined" ||
             typeof newChild === "undefined"

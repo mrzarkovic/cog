@@ -1,6 +1,8 @@
+import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
+import { evaluateTemplate } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
-import { ReactiveNodesList } from "../types";
+import { Attribute, ReactiveNode, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 import { registerReactiveNode } from "./registerReactiveNode";
 
@@ -27,6 +29,7 @@ function findTemplates(rootElement: Node) {
 
 export function loadTemplates(
     rootElement: Node,
+    state: State,
     reactiveNodes: ReactiveNodesList
 ) {
     const templates = findTemplates(rootElement);
@@ -42,7 +45,7 @@ export function loadTemplates(
                 throw new Error(`Template ${name} should have a single child`);
             }
 
-            defineCustomElement(name, templates[i], reactiveNodes);
+            defineCustomElement(name, templates[i], state, reactiveNodes);
 
             fragment.appendChild(templates[i]);
         }
@@ -54,6 +57,7 @@ export function loadTemplates(
 function defineCustomElement(
     name: string,
     template: HTMLTemplateElement,
+    state: State,
     reactiveNodes: ReactiveNodesList
 ) {
     function CustomElement() {
@@ -65,14 +69,42 @@ function defineCustomElement(
 
     CustomElement.prototype.connectedCallback = registerCustomElement(
         template,
+        state,
         reactiveNodes
     );
 
     customElements.define(name, CustomElement as never);
 }
 
+function getLocalState(
+    parentId: number | null,
+    attributes: Attribute[],
+    globalState: State,
+    reactiveNodes: ReactiveNode[]
+) {
+    if (parentId === null) {
+        return attributesToState(attributes, globalState);
+    }
+
+    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
+
+    const parentState: State = getLocalState(
+        parentNode!.parentId,
+        parentNode!.attributes,
+        globalState,
+        reactiveNodes
+    );
+
+    return Object.assign(
+        {},
+        parentState,
+        attributesToState(attributes, parentState)
+    );
+}
+
 function registerCustomElement(
     template: HTMLTemplateElement,
+    state: State,
     reactiveNodes: ReactiveNodesList
 ) {
     return function (this: HTMLElement) {
@@ -89,16 +121,28 @@ function registerCustomElement(
                 child.setAttribute("data-parent-id", String(elementId));
             }
         });
+        const refinedTemplate = newElement.outerHTML;
 
-        console.log("custom", newElement.innerHTML);
-        const originalInvocation = this.outerHTML;
-        this.parentElement?.replaceChild(newElement, this);
-        registerReactiveNode(
-            elementId,
-            reactiveNodes,
-            newElement,
-            originalInvocation,
-            attributes
+        const parentId = this.dataset.parentId
+            ? Number(this.dataset.parentId)
+            : null;
+
+        const localState = getLocalState(
+            parentId,
+            attributes,
+            state,
+            reactiveNodes.list
         );
+        const updatedContent = evaluateTemplate(refinedTemplate, localState);
+        const evaluatedElement = elementFromString(updatedContent);
+
+        this.parentElement?.replaceChild(evaluatedElement, this);
+        // registerReactiveNode(
+        //     elementId,
+        //     reactiveNodes,
+        //     newElement,
+        //     originalInvocation,
+        //     attributes
+        // );
     };
 }

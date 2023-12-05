@@ -45,109 +45,6 @@ function createRootElement(document) {
     }
   };
 }
-;// CONCATENATED MODULE: ./src/expressions/templateExpressionRegex.ts
-var templateExpressionRegex = /\{\{(.+?)\}\}/;
-;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
-
-var getAttributes = function getAttributes(element) {
-  var attributes = Array.from(element.attributes).map(function (attribute) {
-    var reactiveMatch = templateExpressionRegex.exec(attribute.value);
-    return {
-      name: attribute.name,
-      value: attribute.value,
-      reactive: !!reactiveMatch
-    };
-  });
-  return attributes;
-};
-;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
-var sanitizeHtml = function sanitizeHtml(html) {
-  return html.replace(/[\r\n]+\s*/g, "");
-};
-;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
-function elementFromString(htmlString) {
-  var parser = new DOMParser();
-  var newElementDoc = parser.parseFromString(htmlString, "text/html");
-  return newElementDoc.body.firstChild;
-}
-;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
-function registerReactiveNode(elementId, reactiveNodes, element, originalInvocation) {
-  var attributes = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
-  var parentId = element.dataset.parentId ? Number(element.dataset.parentId) : null;
-  console.log("register", element.nodeName, elementId, parentId);
-  reactiveNodes.add({
-    id: elementId,
-    parentId: parentId,
-    element: element,
-    template: originalInvocation,
-    lastTemplateEvaluation: null,
-    attributes: attributes
-  });
-  reactiveNodes.clean(reactiveNodes.list);
-  console.log({
-    reactiveNodes: reactiveNodes
-  });
-}
-;// CONCATENATED MODULE: ./src/nodes/loadCustomElements.ts
-
-
-
-
-function findTemplates(rootElement) {
-  var xpath = "template";
-  var templates = [];
-  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-  var element = result.iterateNext();
-  while (element) {
-    templates.push(element);
-    element = result.iterateNext();
-  }
-  return templates;
-}
-function loadTemplates(rootElement, reactiveNodes) {
-  var templates = findTemplates(rootElement);
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < templates.length; i++) {
-    var name = templates[i].getAttribute("id");
-    if (name) {
-      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
-      if (templates[i].content.childNodes.length !== 1) {
-        throw new Error("Template ".concat(name, " should have a single child"));
-      }
-      defineCustomElement(name, templates[i], reactiveNodes);
-      fragment.appendChild(templates[i]);
-    }
-  }
-  fragment.textContent = "";
-}
-function defineCustomElement(name, template, reactiveNodes) {
-  function CustomElement() {
-    return Reflect.construct(HTMLElement, [], CustomElement);
-  }
-  CustomElement.prototype = Object.create(HTMLElement.prototype);
-  CustomElement.prototype.constructor = CustomElement;
-  CustomElement.prototype.connectedCallback = registerCustomElement(template, reactiveNodes);
-  customElements.define(name, CustomElement);
-}
-function registerCustomElement(template, reactiveNodes) {
-  return function () {
-    var _this$parentElement;
-    var elementId = reactiveNodes.list.length + 1;
-    var attributes = getAttributes(this);
-    var templateWithChildren = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, this.innerHTML);
-    var newElement = elementFromString(templateWithChildren);
-    var childElements = newElement.querySelectorAll("*");
-    childElements.forEach(function (child) {
-      if (child.tagName.includes("-")) {
-        child.setAttribute("data-parent-id", String(elementId));
-      }
-    });
-    console.log("custom", newElement.innerHTML);
-    var originalInvocation = this.outerHTML;
-    (_this$parentElement = this.parentElement) === null || _this$parentElement === void 0 || _this$parentElement.replaceChild(newElement, this);
-    registerReactiveNode(elementId, reactiveNodes, newElement, originalInvocation, attributes);
-  };
-}
 ;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
 var createExpressionScope = function createExpressionScope(expression, state) {
   var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
@@ -155,84 +52,6 @@ var createExpressionScope = function createExpressionScope(expression, state) {
   }).join("\n"), " return ").concat(expression, "}");
   return Function(functionBody)();
 };
-;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
-
-var makeEventHandler = function makeEventHandler(eventName, element, state) {
-  var handler = element.getAttribute("data-on-".concat(eventName));
-  if (!handler) {
-    throw new Error("Missing data-handler attribute");
-  }
-  var handlerWithScope = createExpressionScope(handler, state);
-  return function (e) {
-    try {
-      handlerWithScope(state);
-      e.preventDefault();
-    } catch (e) {
-      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
-    }
-  };
-};
-;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
-
-function addEventListeners(parent, eventName, state) {
-  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
-    var handler = makeEventHandler(eventName, element, state);
-    element.addEventListener(eventName, handler);
-    element["".concat(eventName, "Handler")] = handler;
-  });
-}
-;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
-
-function addAllEventListeners(parent, state) {
-  addEventListeners(parent, "click", state);
-  addEventListeners(parent, "change", state);
-}
-;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
-var isCustomElement = function isCustomElement(element) {
-  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
-};
-;// CONCATENATED MODULE: ./src/nodes/loadNativeElements.ts
-
-
-var registerNativeElements = function registerNativeElements(rootElement, reactiveNodes) {
-  var elements = [];
-  var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
-  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-  var element = result.iterateNext();
-  while (element) {
-    if (!isCustomElement(element)) {
-      elements.push(element);
-    }
-    element = result.iterateNext();
-  }
-  for (var i = 0; i < elements.length; i++) {
-    var elementId = reactiveNodes.list.length + 1;
-    console.log("native", elements[i]);
-    registerReactiveNode(elementId, reactiveNodes, elements[i], elements[i].outerHTML);
-  }
-};
-function generateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0,
-      v = c === "x" ? r : r & 0x3 | 0x8;
-    return v.toString(16);
-  });
-}
-;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
-function removeEventListeners(parent, eventName) {
-  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
-    var handler = element["".concat(eventName, "Handler")];
-    if (handler) {
-      element.removeEventListener(eventName, handler);
-    }
-  });
-}
-;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
-
-function removeAllEventListeners(parent) {
-  removeEventListeners(parent, "click");
-  removeEventListeners(parent, "change");
-}
 ;// CONCATENATED MODULE: ./src/expressions/sanitizeExpression.ts
 function sanitizeExpression(expression) {
   return expression.replace(/[\r\n]+/g, "");
@@ -335,6 +154,202 @@ function attributesToState(attributes, state) {
   }
   return localState;
 }
+;// CONCATENATED MODULE: ./src/expressions/templateExpressionRegex.ts
+var templateExpressionRegex = /\{\{(.+?)\}\}/;
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var reactiveMatch = templateExpressionRegex.exec(attribute.value);
+    return {
+      name: attribute.name,
+      value: attribute.value,
+      reactive: !!reactiveMatch
+    };
+  });
+  return attributes;
+};
+;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
+function elementFromString(htmlString) {
+  var parser = new DOMParser();
+  var newElementDoc = parser.parseFromString(htmlString, "text/html");
+  return newElementDoc.body.firstChild;
+}
+;// CONCATENATED MODULE: ./src/nodes/loadCustomElements.ts
+
+
+
+
+
+function findTemplates(rootElement) {
+  var xpath = "template";
+  var templates = [];
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    templates.push(element);
+    element = result.iterateNext();
+  }
+  return templates;
+}
+function loadTemplates(rootElement, state, reactiveNodes) {
+  var templates = findTemplates(rootElement);
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < templates.length; i++) {
+    var name = templates[i].getAttribute("id");
+    if (name) {
+      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+      if (templates[i].content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name, templates[i], state, reactiveNodes);
+      fragment.appendChild(templates[i]);
+    }
+  }
+  fragment.textContent = "";
+}
+function defineCustomElement(name, template, state, reactiveNodes) {
+  function CustomElement() {
+    return Reflect.construct(HTMLElement, [], CustomElement);
+  }
+  CustomElement.prototype = Object.create(HTMLElement.prototype);
+  CustomElement.prototype.constructor = CustomElement;
+  CustomElement.prototype.connectedCallback = registerCustomElement(template, state, reactiveNodes);
+  customElements.define(name, CustomElement);
+}
+function getLocalState(parentId, attributes, globalState, reactiveNodes) {
+  if (parentId === null) {
+    return attributesToState(attributes, globalState);
+  }
+  var parentNode = reactiveNodes.find(function (rn) {
+    return rn.id === parentId;
+  });
+  var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, reactiveNodes);
+  return Object.assign({}, parentState, attributesToState(attributes, parentState));
+}
+function registerCustomElement(template, state, reactiveNodes) {
+  return function () {
+    var _this$parentElement;
+    var elementId = reactiveNodes.list.length + 1;
+    var attributes = getAttributes(this);
+    var templateWithChildren = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, this.innerHTML);
+    var newElement = elementFromString(templateWithChildren);
+    var childElements = newElement.querySelectorAll("*");
+    childElements.forEach(function (child) {
+      if (child.tagName.includes("-")) {
+        child.setAttribute("data-parent-id", String(elementId));
+      }
+    });
+    var refinedTemplate = newElement.outerHTML;
+    var parentId = this.dataset.parentId ? Number(this.dataset.parentId) : null;
+    var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
+    var updatedContent = evaluateTemplate(refinedTemplate, localState);
+    var evaluatedElement = elementFromString(updatedContent);
+    (_this$parentElement = this.parentElement) === null || _this$parentElement === void 0 || _this$parentElement.replaceChild(evaluatedElement, this);
+    // registerReactiveNode(
+    //     elementId,
+    //     reactiveNodes,
+    //     newElement,
+    //     originalInvocation,
+    //     attributes
+    // );
+  };
+}
+;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
+
+var makeEventHandler = function makeEventHandler(eventName, element, state) {
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
+
+function addEventListeners(parent, eventName, state) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
+
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
+var isCustomElement = function isCustomElement(element) {
+  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
+};
+;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
+function registerReactiveNode(elementId, reactiveNodes, element, originalInvocation) {
+  var attributes = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
+  var parentId = element.dataset.parentId ? Number(element.dataset.parentId) : null;
+  reactiveNodes.add({
+    id: elementId,
+    parentId: parentId,
+    element: element,
+    template: originalInvocation,
+    lastTemplateEvaluation: null,
+    attributes: attributes
+  });
+  reactiveNodes.clean(reactiveNodes.list);
+}
+;// CONCATENATED MODULE: ./src/nodes/loadNativeElements.ts
+
+
+var registerNativeElements = function registerNativeElements(rootElement, reactiveNodes) {
+  var elements = [];
+  var xpath = "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (!isCustomElement(element)) {
+      elements.push(element);
+    }
+    element = result.iterateNext();
+  }
+  for (var i = 0; i < elements.length; i++) {
+    var elementId = reactiveNodes.list.length + 1;
+    registerReactiveNode(elementId, reactiveNodes, elements[i], elements[i].outerHTML);
+  }
+};
+function generateUUID() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = Math.random() * 16 | 0,
+      v = c === "x" ? r : r & 0x3 | 0x8;
+    return v.toString(16);
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
+function removeEventListeners(parent, eventName) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
+
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
 ;// CONCATENATED MODULE: ./src/attributes/getChangedAttributes.ts
 
 function getChangedAttributes(oldElement, newElement) {
@@ -367,15 +382,22 @@ function compareTextNodes(oldNode, newNode) {
 function compareChildNodes(oldNode, newNode) {
   var changedChildren = [];
   var differentChildren = false;
+  var childAdded = false;
   var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
   for (var i = 0; i < nodesLength; i++) {
     var oldChild = oldNode.childNodes[i];
     var newChild = newNode.childNodes[i];
     if (typeof oldChild !== "undefined" && oldChild.nodeType === Node.TEXT_NODE && typeof newChild !== "undefined" && newChild.nodeType === Node.TEXT_NODE) {
-      if (oldChild.textContent !== newChild.textContent) {
+      var _oldChild$textContent, _newChild$textContent;
+      if (((_oldChild$textContent = oldChild.textContent) === null || _oldChild$textContent === void 0 ? void 0 : _oldChild$textContent.trim()) !== ((_newChild$textContent = newChild.textContent) === null || _newChild$textContent === void 0 ? void 0 : _newChild$textContent.trim())) {
         differentChildren = true;
         break;
       }
+    } else if (typeof oldChild === "undefined" && typeof newChild !== "undefined") {
+      return [{
+        node: oldNode,
+        childAdded: newChild
+      }];
     } else if (typeof oldChild === "undefined" || typeof newChild === "undefined") {
       differentChildren = true;
       break;
@@ -444,15 +466,12 @@ function handleBooleanAttribute(changedNode, attribute) {
 
 
 
-var updateElement = function updateElement(changedNode, content, attributes, localState) {
+var updateElement = function updateElement(changedNode, content, attributes, childAdded, localState) {
   if (content !== undefined) {
     if (changedNode.nodeType === Node.TEXT_NODE) {
       changedNode.textContent = content;
     } else {
       removeAllEventListeners(changedNode);
-      console.log({
-        content: content
-      });
       changedNode.innerHTML = content;
       addAllEventListeners(changedNode, localState);
     }
@@ -461,16 +480,18 @@ var updateElement = function updateElement(changedNode, content, attributes, loc
       handleBooleanAttribute(changedNode, attributes[i]);
       changedNode.setAttribute(attributes[i].name, attributes[i].newValue);
     }
+  } else if (childAdded !== undefined) {
+    changedNode.appendChild(childAdded);
   }
 };
-function getLocalState(node, globalState, reactiveNodes) {
+function reconcile_getLocalState(node, globalState, reactiveNodes) {
   if (node.parentId === null) {
     return attributesToState(node.attributes, globalState);
   }
   var parentNode = reactiveNodes.find(function (rn) {
     return rn.id === node.parentId;
   });
-  var parentState = getLocalState(parentNode, globalState, reactiveNodes);
+  var parentState = reconcile_getLocalState(parentNode, globalState, reactiveNodes);
   return Object.assign({}, parentState, attributesToState(node.attributes, parentState));
 }
 var reconcile = function reconcile(reactiveNodes, state) {
@@ -479,24 +500,25 @@ var reconcile = function reconcile(reactiveNodes, state) {
       element = _reactiveNodes$value$.element,
       template = _reactiveNodes$value$.template,
       lastTemplateEvaluation = _reactiveNodes$value$.lastTemplateEvaluation;
-    var localState = getLocalState(reactiveNodes.value[treeNodeIndex], state, reactiveNodes.list);
+    var localState = reconcile_getLocalState(reactiveNodes.value[treeNodeIndex], state, reactiveNodes.list);
     var updatedContent = evaluateTemplate(template, localState);
     var newElement = elementFromString(updatedContent);
     if (lastTemplateEvaluation === null) {
       var _element$parentNode;
-      console.log("first render", element.nodeName);
       reactiveNodes.update(treeNodeIndex, "lastTemplateEvaluation", updatedContent);
       reactiveNodes.update(treeNodeIndex, "element", newElement);
       (_element$parentNode = element.parentNode) === null || _element$parentNode === void 0 || _element$parentNode.replaceChild(newElement, element);
     } else {
       var oldElement = elementFromString(lastTemplateEvaluation);
       var changedNodes = compareNodes(oldElement, newElement);
-      console.log("comparing", newElement.innerHTML, oldElement.innerHTML, changedNodes);
+      console.log({
+        changedNodes: changedNodes
+      });
       if (changedNodes.length > 0) {
         reactiveNodes.update(treeNodeIndex, "lastTemplateEvaluation", updatedContent);
         for (var i = 0; i < changedNodes.length; i++) {
           var oldNode = findCorrespondingNode(changedNodes[i].node, oldElement, element);
-          updateElement(oldNode, changedNodes[i].content, changedNodes[i].attributes, localState);
+          updateElement(oldNode, changedNodes[i].content, changedNodes[i].attributes, changedNodes[i].childAdded, localState);
         }
       }
     }
@@ -525,7 +547,6 @@ var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
   return reactiveNodes.filter(function (_ref) {
     var element = _ref.element;
     var contains = document.body.contains(element);
-    console.log("contains", contains, element);
     return contains;
   });
 };
@@ -570,13 +591,12 @@ var init = function init(document) {
       clearTimeout(updateStateTimeout);
     }
     updateStateTimeout = setTimeout(function () {
-      console.log("rerendering");
       reRender();
     }, 0);
   }
   var onLoad = function onLoad() {
-    loadTemplates(rootElement.value, reactiveNodes);
     registerNativeElements(rootElement.value, reactiveNodes);
+    loadTemplates(rootElement.value, state.value, reactiveNodes);
     addAllEventListeners(rootElement.value, state.value);
   };
   onLoad();

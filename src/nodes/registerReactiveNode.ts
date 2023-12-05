@@ -11,8 +11,6 @@ export function registerReactiveNode(
         ? Number(element.dataset.parentId)
         : null;
 
-    console.log("register", element.nodeName, elementId, parentId);
-
     reactiveNodes.add({
         id: elementId,
         parentId,
@@ -22,5 +20,4 @@ export function registerReactiveNode(
         attributes,
     });
     reactiveNodes.clean(reactiveNodes.list);
-    console.log({ reactiveNodes });
 }
