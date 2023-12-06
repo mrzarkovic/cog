@@ -12,8 +12,13 @@
     </head>
     <body>
         <div id="app" class="py-40 px-8 max-w-md mx-auto">
+            <div
+                class="{{ fps > 60 ? 'text-green-600' : 'text-yellow-600' }} fixed top-4 right-4"
+            >
+                FPS: {{ fps }}
+            </div>
             <template id="my-template">
-                Hello {{ dataName }}! {{ dataCount }}
+                <div>Hello {{ dataName }}! {{ dataCount }}</div>
             </template>
             <template id="x-child">
                 <div>
@@ -25,17 +30,18 @@
             </template>
             <template id="x-child2">
                 <div>
-                    <span>{{count}}</span> {{ dataCount }} % {{
-                    Number(dataChild) + 2 }} = {{ Number(dataCount) %
-                    (Number(dataChild) + 2) }} {{ children }}
+                    <span>{{ count }}</span>
+                    {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
+                    Number(dataCount) % (Number(dataChild) + 2) }} {{ children
+                    }}
                 </div>
             </template>
             <template id="x-parent">
-                <div class="p-4">
+                <div class="p-2">
                     {{ names.map( (n, i) => `
-                    <x-child data-count="${ dataParent }" data-child="${i}"
-                        >${n} {{ dataParent }}</x-child
-                    >
+                    <x-child data-count="{{ dataParent }}" data-child="${i}"
+                        >${n} {{ dataParent}}
+                    </x-child>
                     `)}}
                 </div>
             </template>
@@ -55,7 +61,7 @@
                     class="checkbox"
                     type="checkbox"
                     data-attribute-checked="{{ checked }}"
-                    checked
+                    onchange="handleCheckbox()"
                 />
                 <button class="btn btn-primary" onclick="toggleChecked()">
                     Toggle
@@ -72,7 +78,7 @@
             </div>
             <div class="flex">
                 <div class="flex-1">
-                    <div class="p-4">
+                    <div class="p-2">
                         {{ new Array(count).fill(0).map( (n, i) => `
                         <x-child2 data-count="${i}" data-child="${i}"
                             >${i}</x-child2

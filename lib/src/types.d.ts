@@ -13,6 +13,7 @@ export type RootElement = {
 export type Attribute = {
     name: string;
     value: string;
+    expressions: Expression[];
     reactive: boolean;
 };
 export type ReactiveNode = {
@@ -22,6 +23,8 @@ export type ReactiveNode = {
     template: HTMLString;
     lastTemplateEvaluation: HTMLString | null;
     attributes: Attribute[];
+    expressions: Expression[];
+    shouldUpdate: boolean;
 };
 export type ChangedAttribute = {
     name: string;
@@ -36,8 +39,10 @@ export type ChangedNode = {
 };
 export type StateObject = {
     state: State | null;
+    updatedKeys: string[];
     get value(): State;
     set: <T>(name: string, value: T) => void;
+    clearUpdates: () => void;
 };
 export type State = Record<string, unknown>;
 export type ElementWithHandler = Element & {
@@ -46,10 +51,24 @@ export type ElementWithHandler = Element & {
 export type DocumentWithHandler = Document & {
     onLoadHandler: () => void;
 };
+export type ReactiveNodeIndex = {
+    [id: number]: number;
+};
 export type ReactiveNodesList = {
+    index: ReactiveNodeIndex;
     list: ReactiveNode[];
+    lastId: number;
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
     update: (index: number, property: keyof ReactiveNode, value: ReactiveNode[keyof ReactiveNode]) => void;
     clean: (list: ReactiveNode[]) => void;
+    id: () => number;
+};
+export type CogHTMLElement = HTMLElement & {
+    cogAnchorId: number;
+};
+export type Expression = {
+    start: number;
+    end: number;
+    value: string;
 };

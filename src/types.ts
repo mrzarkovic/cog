@@ -19,6 +19,7 @@ export type RootElement = {
 export type Attribute = {
     name: string;
     value: string;
+    expressions: Expression[];
     reactive: boolean;
 };
 
@@ -29,6 +30,8 @@ export type ReactiveNode = {
     template: HTMLString;
     lastTemplateEvaluation: HTMLString | null;
     attributes: Attribute[];
+    expressions: Expression[];
+    shouldUpdate: boolean;
 };
 
 export type ChangedAttribute = {
@@ -46,8 +49,10 @@ export type ChangedNode = {
 
 export type StateObject = {
     state: State | null;
+    updatedKeys: string[];
     get value(): State;
     set: <T>(name: string, value: T) => void;
+    clearUpdates: () => void;
 };
 export type State = Record<string, unknown>;
 
@@ -75,4 +80,10 @@ export type ReactiveNodesList = {
 
 export type CogHTMLElement = HTMLElement & {
     cogAnchorId: number;
+};
+
+export type Expression = {
+    start: number;
+    end: number;
+    value: string;
 };

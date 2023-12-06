@@ -1,6 +1,9 @@
 import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
-import { evaluateTemplate } from "../html/evaluateTemplate";
+import {
+    evaluateTemplate,
+    extractTemplateExpressions,
+} from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
 import { Attribute, ReactiveNode, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
@@ -137,6 +140,9 @@ function registerCustomElement(
             : null;
 
         let evaluatedElement = elementFromString(refinedTemplate);
+
+        const expressions = extractTemplateExpressions(refinedTemplate);
+
         try {
             const localState = getLocalState(
                 parentId,
@@ -146,6 +152,7 @@ function registerCustomElement(
             );
             const updatedContent = evaluateTemplate(
                 refinedTemplate,
+                expressions,
                 localState
             );
             evaluatedElement = elementFromString(updatedContent);
@@ -163,7 +170,8 @@ function registerCustomElement(
             refinedTemplate,
             null,
             attributes,
-            parentId
+            parentId,
+            expressions
         );
     };
 }

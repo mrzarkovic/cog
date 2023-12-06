@@ -1,4 +1,5 @@
 import {
+    Attribute,
     ChangedAttribute,
     CogHTMLElement,
     ReactiveNode,
@@ -15,6 +16,16 @@ import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
 import { changedAttributesToAttributes } from "../attributes/getAttributes";
+
+function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
+    const merged = oldArray.concat(newArray);
+    const attributes: Record<string, Attribute> = {};
+    for (let i = 0; i < merged.length; i++) {
+        attributes[merged[i].name] = merged[i];
+    }
+
+    return Object.values(attributes);
+}
 
 const updateElement = (
     originalNode: CogHTMLElement,
@@ -34,10 +45,11 @@ const updateElement = (
                 changedAttributesToAttributes(changedAttributes);
             const nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
             const reactiveNode = reactiveNodes.list[nodeIndex];
+
             reactiveNodes.update(
                 nodeIndex,
                 "attributes",
-                reactiveNode.attributes.concat(newAttributes)
+                mergeAttributes(reactiveNode.attributes, newAttributes)
             );
         }
 
@@ -76,18 +88,20 @@ const updateElement = (
 };
 
 function getLocalState(
-    node: ReactiveNode,
+    parentId: number | null,
+    attributes: Attribute[],
     globalState: State,
     reactiveNodes: ReactiveNode[]
 ) {
-    if (node.parentId === null) {
-        return attributesToState(node.attributes, globalState);
+    if (parentId === null) {
+        return attributesToState(attributes, globalState);
     }
 
-    const parentNode = reactiveNodes.find((rn) => rn.id === node.parentId);
+    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
 
     const parentState: State = getLocalState(
-        parentNode!,
+        parentNode!.parentId,
+        parentNode!.attributes,
         globalState,
         reactiveNodes
     );
@@ -95,27 +109,96 @@ function getLocalState(
     return Object.assign(
         {},
         parentState,
-        attributesToState(node.attributes, parentState)
+        attributesToState(attributes, parentState)
     );
 }
 
-export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
+function getAttributesRecursive(
+    parentId: number | null,
+    attributes: Attribute[],
+    reactiveNodes: ReactiveNode[]
+): Attribute[] {
+    if (parentId === null) {
+        return attributes;
+    }
+    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
+
+    const parentAttributes = getAttributesRecursive(
+        parentNode!.parentId,
+        parentNode!.attributes,
+        reactiveNodes
+    );
+
+    return parentAttributes.concat(attributes);
+}
+
+const hasDependencies = (updatedStateKeys: string[], expression: string) => {
+    const shouldUpdate = updatedStateKeys.some((key) => {
+        const regex = new RegExp(
+            `(\\s${key}\\s|{${key}\\s|\\s${key}}|{${key}}|(${key}))`,
+            "gm"
+        );
+        return regex.test(expression);
+    });
+
+    return shouldUpdate;
+};
+
+export const reconcile = (
+    reactiveNodes: ReactiveNodesList,
+    state: State,
+    updatedStateKeys: string[]
+) => {
     for (
         let treeNodeIndex = 0;
         treeNodeIndex < reactiveNodes.value.length;
         treeNodeIndex++
     ) {
-        const { id, element, template, lastTemplateEvaluation } =
-            reactiveNodes.value[treeNodeIndex];
+        const {
+            id,
+            parentId,
+            attributes,
+            element,
+            template,
+            lastTemplateEvaluation,
+            expressions,
+            shouldUpdate,
+        } = reactiveNodes.value[treeNodeIndex];
+
+        const attributesRecursive = getAttributesRecursive(
+            parentId,
+            attributes,
+            reactiveNodes.list
+        );
+
+        const stateUpdateAffects = hasDependencies(
+            updatedStateKeys,
+            template + " " + attributesRecursive.map((a) => a.value).join(" ")
+        );
+
+        if (!stateUpdateAffects && !shouldUpdate) {
+            continue;
+        }
+
+        if (shouldUpdate) {
+            reactiveNodes.update(treeNodeIndex, "shouldUpdate", false);
+        }
+
         let updatedContent = null;
 
         const localState = getLocalState(
-            reactiveNodes.value[treeNodeIndex],
+            parentId,
+            attributes,
             state,
             reactiveNodes.list
         );
+
         try {
-            updatedContent = evaluateTemplate(template, localState);
+            updatedContent = evaluateTemplate(
+                template,
+                expressions,
+                localState
+            );
         } catch (e) {
             console.error(e);
             continue;
@@ -173,9 +256,6 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
                             }
                         }
                     }
-                    const clone = originalNode.cloneNode(
-                        true
-                    ) as CogHTMLElement;
 
                     updateElement(
                         originalNode,
@@ -187,8 +267,6 @@ export const reconcile = (reactiveNodes: ReactiveNodesList, state: State) => {
                         localState,
                         reactiveNodes
                     );
-
-                    originalNode.parentNode?.replaceChild(clone, originalNode);
                 }
             }
         }

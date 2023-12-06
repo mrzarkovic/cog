@@ -14,18 +14,20 @@ export const init = (document: Document): Cog => {
     const state = createState();
 
     function reRender() {
-        console.log("reRender", reactiveNodes.list.length);
-        reconcile(reactiveNodes, state.value);
+        console.time("reRender");
+        reconcile(reactiveNodes, state.value, state.updatedKeys);
+        console.timeEnd("reRender");
+        state.clearUpdates();
     }
 
     function updateState<T>(name: string, value: T) {
         state.set(name, value);
         if (updateStateTimeout !== null) {
-            clearTimeout(updateStateTimeout);
+            cancelAnimationFrame(updateStateTimeout);
         }
-        updateStateTimeout = setTimeout(() => {
+        updateStateTimeout = requestAnimationFrame(() => {
             reRender();
-        }, 0);
+        });
     }
 
     const onLoad = () => {

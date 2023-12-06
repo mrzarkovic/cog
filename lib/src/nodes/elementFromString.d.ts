@@ -1,1 +1,2 @@
-export declare function elementFromString(htmlString: string): HTMLElement;
+import { CogHTMLElement } from "../types";
+export declare function elementFromString(htmlString: string): CogHTMLElement;

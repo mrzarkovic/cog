@@ -36,7 +36,7 @@ function calculateWinner(squares: string[]) {
     }
 
     // If all squares are filled and there's no winner, it's a draw
-    if (history.value.length === 9) {
+    if (history.value.length === 10) {
         status.set("Draw");
         return null;
     }

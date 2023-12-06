@@ -1,4 +1,5 @@
-import { sanitizeHtml } from "../html/sanitizeHtml";
+import { extractTemplateExpressions } from "../html/evaluateTemplate";
+
 import { ReactiveNodesList } from "../types";
 import { isCustomElement } from "./isCustomElement";
 import { registerReactiveNode } from "./registerReactiveNode";
@@ -31,13 +32,21 @@ export const registerNativeElements = (
     for (let i = 0; i < elements.length; i++) {
         const elementId = reactiveNodes.id();
         const element = elements[i];
-        element.innerHTML = sanitizeHtml(element.innerHTML);
+
+        // element.innerHTML = sanitizeHtml(element.innerHTML);
+        element.innerHTML = element.innerHTML.trim();
+        const template = element.outerHTML;
+        const expressions = extractTemplateExpressions(template);
+
         registerReactiveNode(
             elementId,
             reactiveNodes,
             element,
-            element.outerHTML,
-            element.outerHTML
+            template,
+            template.indexOf("data-attribute") !== -1 ? template : null,
+            [],
+            null,
+            expressions
         );
     }
 };

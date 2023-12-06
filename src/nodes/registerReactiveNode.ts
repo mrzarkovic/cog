@@ -1,13 +1,14 @@
-import { Attribute, ReactiveNodesList } from "../types";
+import { Attribute, Expression, ReactiveNodesList } from "../types";
 
 export function registerReactiveNode(
     elementId: number,
     reactiveNodes: ReactiveNodesList,
     element: HTMLElement,
     originalInvocation: string,
-    lastTemplateEvaluation: string | null = null,
+    lastTemplateEvaluation: string | null,
     attributes: Attribute[] = [],
-    parentId: number | null = null
+    parentId: number | null = null,
+    expressions: Expression[] = []
 ) {
     reactiveNodes.add({
         id: elementId,
@@ -16,5 +17,7 @@ export function registerReactiveNode(
         template: originalInvocation,
         lastTemplateEvaluation,
         attributes,
+        expressions,
+        shouldUpdate: false,
     });
 }
