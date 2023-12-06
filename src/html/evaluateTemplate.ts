@@ -2,7 +2,6 @@ import { State } from "../types";
 import { evaluateExpression } from "../expressions/evaluateExpression";
 import { findNextTemplateExpression } from "./findNextTemplateExpression";
 import { htmlToText } from "./htmlToText";
-// import { sanitizeHtml } from "./sanitizeHtml";
 
 export const evaluateTemplate = (template: string, state: State): string => {
     let restOfContent = template;

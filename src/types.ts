@@ -40,6 +40,8 @@ export type ChangedNode = {
     node: HTMLElement;
     content?: HTMLString;
     attributes?: ChangedAttribute[];
+    toBeAdded?: HTMLElement[];
+    toBeRemoved?: HTMLElement[];
 };
 
 export type StateObject = {
@@ -54,8 +56,12 @@ export type ElementWithHandler = Element & {
 };
 export type DocumentWithHandler = Document & { onLoadHandler: () => void };
 
+export type ReactiveNodeIndex = { [id: number]: number };
+
 export type ReactiveNodesList = {
+    index: ReactiveNodeIndex;
     list: ReactiveNode[];
+    lastId: number;
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
     update: (
@@ -64,4 +70,9 @@ export type ReactiveNodesList = {
         value: ReactiveNode[keyof ReactiveNode]
     ) => void;
     clean: (list: ReactiveNode[]) => void;
+    id: () => number;
+};
+
+export type CogHTMLElement = HTMLElement & {
+    cogAnchorId: number;
 };

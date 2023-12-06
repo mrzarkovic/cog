@@ -1,2 +1,2 @@
-import { ReactiveNodesList, State } from "../types";
-export declare const loadNativeElements: (rootElement: Node, state: State, nativeElements: ReactiveNodesList) => void;
+import { ReactiveNodesList } from "../types";
+export declare const registerNativeElements: (rootElement: Node, reactiveNodes: ReactiveNodesList) => void;

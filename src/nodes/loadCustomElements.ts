@@ -82,11 +82,11 @@ function getLocalState(
     globalState: State,
     reactiveNodes: ReactiveNode[]
 ) {
-    if (parentId === null) {
+    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
+
+    if (!parentNode) {
         return attributesToState(attributes, globalState);
     }
-
-    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
 
     const parentState: State = getLocalState(
         parentNode!.parentId,
@@ -108,41 +108,62 @@ function registerCustomElement(
     reactiveNodes: ReactiveNodesList
 ) {
     return function (this: HTMLElement) {
-        const elementId = reactiveNodes.list.length + 1;
+        const elementId = reactiveNodes.id();
+
         const attributes = getAttributes(this);
         const templateWithChildren = template.innerHTML.replace(
             /\{\{\s*children\s*\}\}/g,
             this.innerHTML
         );
+
         const newElement = elementFromString(templateWithChildren);
-        const childElements = newElement.querySelectorAll("*");
-        childElements.forEach((child) => {
-            if (child.tagName.includes("-")) {
-                child.setAttribute("data-parent-id", String(elementId));
+        if (newElement.nodeType !== Node.TEXT_NODE) {
+            const childElements = newElement.querySelectorAll("*");
+            for (let i = 0; i < childElements.length; i++) {
+                const child = childElements[i];
+                if (child.tagName.includes("-")) {
+                    child.setAttribute("data-parent-id", String(elementId));
+                }
             }
-        });
-        const refinedTemplate = newElement.outerHTML;
+        }
+
+        let refinedTemplate = newElement.outerHTML;
+        if (!refinedTemplate) {
+            refinedTemplate = newElement.textContent || "";
+        }
 
         const parentId = this.dataset.parentId
             ? Number(this.dataset.parentId)
             : null;
 
-        const localState = getLocalState(
-            parentId,
-            attributes,
-            state,
-            reactiveNodes.list
-        );
-        const updatedContent = evaluateTemplate(refinedTemplate, localState);
-        const evaluatedElement = elementFromString(updatedContent);
+        let evaluatedElement = elementFromString(refinedTemplate);
+        try {
+            const localState = getLocalState(
+                parentId,
+                attributes,
+                state,
+                reactiveNodes.list
+            );
+            const updatedContent = evaluateTemplate(
+                refinedTemplate,
+                localState
+            );
+            evaluatedElement = elementFromString(updatedContent);
 
+            // eslint-disable-next-line no-empty
+        } catch (e) {}
+
+        evaluatedElement.cogAnchorId = elementId;
         this.parentElement?.replaceChild(evaluatedElement, this);
-        // registerReactiveNode(
-        //     elementId,
-        //     reactiveNodes,
-        //     newElement,
-        //     originalInvocation,
-        //     attributes
-        // );
+
+        registerReactiveNode(
+            elementId,
+            reactiveNodes,
+            evaluatedElement,
+            refinedTemplate,
+            null,
+            attributes,
+            parentId
+        );
     };
 }

@@ -108,8 +108,6 @@ function htmlToText(html) {
 
 
 
-// import { sanitizeHtml } from "./sanitizeHtml";
-
 var evaluateTemplate = function evaluateTemplate(template, state) {
   var restOfContent = template;
   var hasTemplateExpression = true;
@@ -169,6 +167,16 @@ var getAttributes = function getAttributes(element) {
   });
   return attributes;
 };
+var changedAttributesToAttributes = function changedAttributesToAttributes(changedAttributes) {
+  return changedAttributes.map(function (attribute) {
+    var reactiveMatch = templateExpressionRegex.exec(attribute.newValue);
+    return {
+      name: attribute.name,
+      value: attribute.newValue,
+      reactive: !!reactiveMatch
+    };
+  });
+};
 ;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
 var sanitizeHtml = function sanitizeHtml(html) {
   return html.replace(/[\r\n]+\s*/g, "");
@@ -179,7 +187,22 @@ function elementFromString(htmlString) {
   var newElementDoc = parser.parseFromString(htmlString, "text/html");
   return newElementDoc.body.firstChild;
 }
+;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
+function registerReactiveNode(elementId, reactiveNodes, element, originalInvocation) {
+  var lastTemplateEvaluation = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+  var attributes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
+  var parentId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+  reactiveNodes.add({
+    id: elementId,
+    parentId: parentId,
+    element: element,
+    template: originalInvocation,
+    lastTemplateEvaluation: lastTemplateEvaluation,
+    attributes: attributes
+  });
+}
 ;// CONCATENATED MODULE: ./src/nodes/loadCustomElements.ts
+
 
 
 
@@ -222,41 +245,47 @@ function defineCustomElement(name, template, state, reactiveNodes) {
   customElements.define(name, CustomElement);
 }
 function getLocalState(parentId, attributes, globalState, reactiveNodes) {
-  if (parentId === null) {
-    return attributesToState(attributes, globalState);
-  }
   var parentNode = reactiveNodes.find(function (rn) {
     return rn.id === parentId;
   });
+  if (!parentNode) {
+    return attributesToState(attributes, globalState);
+  }
   var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, reactiveNodes);
   return Object.assign({}, parentState, attributesToState(attributes, parentState));
 }
 function registerCustomElement(template, state, reactiveNodes) {
   return function () {
     var _this$parentElement;
-    var elementId = reactiveNodes.list.length + 1;
+    var elementId = reactiveNodes.id();
     var attributes = getAttributes(this);
     var templateWithChildren = template.innerHTML.replace(/\{\{\s*children\s*\}\}/g, this.innerHTML);
     var newElement = elementFromString(templateWithChildren);
-    var childElements = newElement.querySelectorAll("*");
-    childElements.forEach(function (child) {
-      if (child.tagName.includes("-")) {
-        child.setAttribute("data-parent-id", String(elementId));
+    if (newElement.nodeType !== Node.TEXT_NODE) {
+      var childElements = newElement.querySelectorAll("*");
+      for (var i = 0; i < childElements.length; i++) {
+        var child = childElements[i];
+        if (child.tagName.includes("-")) {
+          child.setAttribute("data-parent-id", String(elementId));
+        }
       }
-    });
+    }
     var refinedTemplate = newElement.outerHTML;
+    if (!refinedTemplate) {
+      refinedTemplate = newElement.textContent || "";
+    }
     var parentId = this.dataset.parentId ? Number(this.dataset.parentId) : null;
-    var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
-    var updatedContent = evaluateTemplate(refinedTemplate, localState);
-    var evaluatedElement = elementFromString(updatedContent);
+    var evaluatedElement = elementFromString(refinedTemplate);
+    try {
+      var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
+      var updatedContent = evaluateTemplate(refinedTemplate, localState);
+      evaluatedElement = elementFromString(updatedContent);
+
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+    evaluatedElement.cogAnchorId = elementId;
     (_this$parentElement = this.parentElement) === null || _this$parentElement === void 0 || _this$parentElement.replaceChild(evaluatedElement, this);
-    // registerReactiveNode(
-    //     elementId,
-    //     reactiveNodes,
-    //     newElement,
-    //     originalInvocation,
-    //     attributes
-    // );
+    registerReactiveNode(elementId, reactiveNodes, evaluatedElement, refinedTemplate, null, attributes, parentId);
   };
 }
 ;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
@@ -295,21 +324,8 @@ function addAllEventListeners(parent, state) {
 var isCustomElement = function isCustomElement(element) {
   return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
 };
-;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
-function registerReactiveNode(elementId, reactiveNodes, element, originalInvocation) {
-  var attributes = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
-  var parentId = element.dataset.parentId ? Number(element.dataset.parentId) : null;
-  reactiveNodes.add({
-    id: elementId,
-    parentId: parentId,
-    element: element,
-    template: originalInvocation,
-    lastTemplateEvaluation: null,
-    attributes: attributes
-  });
-  reactiveNodes.clean(reactiveNodes.list);
-}
 ;// CONCATENATED MODULE: ./src/nodes/loadNativeElements.ts
+
 
 
 var registerNativeElements = function registerNativeElements(rootElement, reactiveNodes) {
@@ -324,17 +340,23 @@ var registerNativeElements = function registerNativeElements(rootElement, reacti
     element = result.iterateNext();
   }
   for (var i = 0; i < elements.length; i++) {
-    var elementId = reactiveNodes.list.length + 1;
-    registerReactiveNode(elementId, reactiveNodes, elements[i], elements[i].outerHTML);
+    var elementId = reactiveNodes.id();
+    var _element = elements[i];
+    _element.innerHTML = sanitizeHtml(_element.innerHTML);
+    registerReactiveNode(elementId, reactiveNodes, _element, _element.outerHTML, _element.outerHTML);
   }
 };
-function generateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0,
-      v = c === "x" ? r : r & 0x3 | 0x8;
-    return v.toString(16);
-  });
-}
+
+// function generateUUID() {
+//     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+//         /[xy]/g,
+//         function (c) {
+//             const r = (Math.random() * 16) | 0,
+//                 v = c === "x" ? r : (r & 0x3) | 0x8;
+//             return v.toString(16);
+//         }
+//     );
+// }
 ;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
 function removeEventListeners(parent, eventName) {
   parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
@@ -382,8 +404,8 @@ function compareTextNodes(oldNode, newNode) {
 function compareChildNodes(oldNode, newNode) {
   var changedChildren = [];
   var differentChildren = false;
-  var childAdded = false;
   var toBeRemoved = [];
+  var toBeAdded = [];
   var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
   for (var i = 0; i < nodesLength; i++) {
     var oldChild = oldNode.childNodes[i];
@@ -395,10 +417,7 @@ function compareChildNodes(oldNode, newNode) {
         break;
       }
     } else if (typeof oldChild === "undefined" && typeof newChild !== "undefined") {
-      changedChildren.push({
-        node: oldNode,
-        childAdded: newChild
-      });
+      toBeAdded.push(newChild);
     } else if (typeof oldChild !== "undefined" && typeof newChild === "undefined") {
       toBeRemoved.push(oldChild);
     } else {
@@ -409,6 +428,12 @@ function compareChildNodes(oldNode, newNode) {
     changedChildren.push({
       node: oldNode,
       toBeRemoved: toBeRemoved
+    });
+  }
+  if (toBeAdded.length > 0) {
+    changedChildren.push({
+      node: oldNode,
+      toBeAdded: toBeAdded
     });
   }
   if (differentChildren) {
@@ -434,25 +459,15 @@ function compareNodes(oldNode, newNode) {
 }
 ;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
 function findCorrespondingNode(nodeInA, rootA, rootB) {
-  var _nodeValue;
   var pathInA = [];
   var temp = nodeInA;
   while (temp !== rootA) {
-    console.log("childNodesA", temp.parentNode.childNodes);
-    console.log("childNodesB", rootB.childNodes);
-    console.log("temp", temp);
     pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
     temp = temp.parentNode;
   }
-  console.log("pathInA", pathInA);
-  if (rootB.firstChild && ((_nodeValue = rootB.firstChild.nodeValue) === null || _nodeValue === void 0 ? void 0 : _nodeValue.trim()) === "") {
-    rootB.removeChild(rootB.firstChild);
-  }
   var correspondingNodeInB = rootB;
-  // TODO: refactor for of
-
-  for (var _i = 0, _pathInA = pathInA; _i < _pathInA.length; _i++) {
-    var index = _pathInA[_i];
+  for (var i = 0; i < pathInA.length; i++) {
+    var index = pathInA[i];
     if (correspondingNodeInB.childNodes[index]) {
       correspondingNodeInB = correspondingNodeInB.childNodes[index];
     } else {
@@ -482,25 +497,42 @@ function handleBooleanAttribute(changedNode, attribute) {
 
 
 
-var updateElement = function updateElement(changedNode, content, attributes, childAdded, removeChildren, localState) {
+
+
+var updateElement = function updateElement(originalNode, changedNode, content, attributes, addChildren, removeChildren, localState, reactiveNodes) {
+  if (isCustomElement(changedNode)) {
+    var _attributes$slice;
+    var changedAttributes = (_attributes$slice = attributes === null || attributes === void 0 ? void 0 : attributes.slice()) !== null && _attributes$slice !== void 0 ? _attributes$slice : [];
+    if (changedAttributes.length) {
+      var newAttributes = changedAttributesToAttributes(changedAttributes);
+      var nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
+      var reactiveNode = reactiveNodes.list[nodeIndex];
+      reactiveNodes.update(nodeIndex, "attributes", reactiveNode.attributes.concat(newAttributes));
+    }
+    return;
+  }
   if (content !== undefined) {
-    if (changedNode.nodeType === Node.TEXT_NODE) {
-      changedNode.textContent = content;
+    if (originalNode.nodeType === Node.TEXT_NODE) {
+      originalNode.textContent = content;
     } else {
-      removeAllEventListeners(changedNode);
-      changedNode.innerHTML = content;
-      addAllEventListeners(changedNode, localState);
+      removeAllEventListeners(originalNode);
+      originalNode.innerHTML = content;
+      addAllEventListeners(originalNode, localState);
     }
   } else if (attributes !== undefined) {
     for (var i = 0; i < attributes.length; i++) {
-      handleBooleanAttribute(changedNode, attributes[i]);
-      changedNode.setAttribute(attributes[i].name, attributes[i].newValue);
+      handleBooleanAttribute(originalNode, attributes[i]);
+      originalNode.setAttribute(attributes[i].name, attributes[i].newValue);
     }
-  } else if (childAdded !== undefined) {
-    changedNode.appendChild(childAdded);
+  } else if (addChildren.length) {
+    var fragment = document.createDocumentFragment();
+    for (var _i = 0; _i < addChildren.length; _i++) {
+      fragment.appendChild(addChildren[_i]);
+    }
+    originalNode.appendChild(fragment);
   } else if (removeChildren.length) {
-    for (var _i = 0; _i < removeChildren.length; _i++) {
-      changedNode.removeChild(removeChildren[_i]);
+    for (var _i2 = 0; _i2 < removeChildren.length; _i2++) {
+      originalNode.removeChild(removeChildren[_i2]);
     }
   }
 };
@@ -517,41 +549,54 @@ function reconcile_getLocalState(node, globalState, reactiveNodes) {
 var reconcile = function reconcile(reactiveNodes, state) {
   for (var treeNodeIndex = 0; treeNodeIndex < reactiveNodes.value.length; treeNodeIndex++) {
     var _reactiveNodes$value$ = reactiveNodes.value[treeNodeIndex],
+      id = _reactiveNodes$value$.id,
       element = _reactiveNodes$value$.element,
       template = _reactiveNodes$value$.template,
       lastTemplateEvaluation = _reactiveNodes$value$.lastTemplateEvaluation;
+    var updatedContent = null;
     var localState = reconcile_getLocalState(reactiveNodes.value[treeNodeIndex], state, reactiveNodes.list);
-    var updatedContent = evaluateTemplate(template, localState);
+    try {
+      updatedContent = evaluateTemplate(template, localState);
+    } catch (e) {
+      console.error(e);
+      continue;
+    }
     var newElement = elementFromString(updatedContent);
     if (lastTemplateEvaluation === null) {
       var _element$parentNode;
       reactiveNodes.update(treeNodeIndex, "lastTemplateEvaluation", updatedContent);
       reactiveNodes.update(treeNodeIndex, "element", newElement);
+      newElement.cogAnchorId = id;
       (_element$parentNode = element.parentNode) === null || _element$parentNode === void 0 || _element$parentNode.replaceChild(newElement, element);
     } else {
       var oldElement = elementFromString(lastTemplateEvaluation);
       var changedNodes = compareNodes(oldElement, newElement);
-      console.log({
-        changedNodes: changedNodes
-      });
       if (changedNodes.length > 0) {
         reactiveNodes.update(treeNodeIndex, "lastTemplateEvaluation", updatedContent);
         for (var i = 0; i < changedNodes.length; i++) {
-          var oldNode = findCorrespondingNode(changedNodes[i].node, oldElement, element);
+          var _originalNode$parentN;
+          var originalNode = findCorrespondingNode(changedNodes[i].node, oldElement, element);
           var removeChildren = [];
+          var addChildren = [];
+          if (changedNodes[i].toBeAdded !== undefined) {
+            addChildren = changedNodes[i].toBeAdded;
+          }
           if (changedNodes[i].toBeRemoved !== undefined) {
             for (var j = 0; j < changedNodes[i].toBeRemoved.length; j++) {
-              removeChildren.push(findCorrespondingNode(changedNodes[i].toBeRemoved[j], oldElement, element));
+              var child = findCorrespondingNode(changedNodes[i].toBeRemoved[j], oldElement, element);
+              if (child) {
+                removeChildren.push(child);
+              }
             }
           }
-          console.log({
-            removeChildren: removeChildren
-          });
-          updateElement(oldNode, changedNodes[i].content, changedNodes[i].attributes, changedNodes[i].childAdded, removeChildren, localState);
+          var clone = originalNode.cloneNode(true);
+          updateElement(originalNode, changedNodes[i].node, changedNodes[i].content, changedNodes[i].attributes, addChildren, removeChildren, localState, reactiveNodes);
+          (_originalNode$parentN = originalNode.parentNode) === null || _originalNode$parentN === void 0 || _originalNode$parentN.replaceChild(clone, originalNode);
         }
       }
     }
   }
+  reactiveNodes.clean(reactiveNodes.list);
 };
 ;// CONCATENATED MODULE: ./src/state.ts
 function createState() {
@@ -579,22 +624,32 @@ var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
     return contains;
   });
 };
-;// CONCATENATED MODULE: ./src/customElements.ts
+;// CONCATENATED MODULE: ./src/createReactiveNodes.ts
 
 function createReactiveNodes() {
   return {
+    lastId: 0,
     list: [],
+    index: {},
     get value() {
       return this.list;
     },
     add: function add(item) {
       this.list.push(item);
+      this.index[item.id] = this.list.length - 1;
     },
     update: function update(index, property, value) {
       this.list[index][property] = value;
     },
     clean: function clean(list) {
       this.list = cleanReactiveNodesList(list);
+      this.index = this.list.reduce(function (index, item, i) {
+        index[item.id] = i;
+        return index;
+      }, {});
+    },
+    id: function id() {
+      return this.lastId++;
     }
   };
 }
@@ -612,6 +667,7 @@ var init = function init(document) {
   var updateStateTimeout = null;
   var state = createState();
   function reRender() {
+    console.log("reRender", reactiveNodes.list.length);
     reconcile(reactiveNodes, state.value);
   }
   function updateState(name, value) {
@@ -639,8 +695,7 @@ var init = function init(document) {
 
   return {
     variable: function variable(name, value) {
-      // updateState(name, value);
-      state.set(name, value);
+      updateState(name, value);
       return {
         set value(newVal) {
           updateState(name, newVal);

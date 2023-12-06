@@ -1,2 +1,2 @@
-import { CustomElementsList } from "./types";
-export declare function createCustomElements(): CustomElementsList;
+import { ReactiveNodesList } from "./types";
+export declare function createReactiveNodes(): ReactiveNodesList;

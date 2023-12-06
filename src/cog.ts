@@ -5,7 +5,7 @@ import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { registerNativeElements } from "./nodes/loadNativeElements";
 import { reconcile } from "./nodes/reconcile";
 import { createState } from "./state";
-import { createReactiveNodes } from "./customElements";
+import { createReactiveNodes } from "./createReactiveNodes";
 
 export const init = (document: Document): Cog => {
     const reactiveNodes = createReactiveNodes();
@@ -14,6 +14,7 @@ export const init = (document: Document): Cog => {
     const state = createState();
 
     function reRender() {
+        console.log("reRender", reactiveNodes.list.length);
         reconcile(reactiveNodes, state.value);
     }
 
@@ -44,8 +45,8 @@ export const init = (document: Document): Cog => {
 
     return {
         variable: <T>(name: string, value: T) => {
-            // updateState(name, value);
-            state.set(name, value);
+            updateState(name, value);
+
             return {
                 set value(newVal: T) {
                     updateState(name, newVal);

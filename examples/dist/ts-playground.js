@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["optional-attributes"] = factory();
+		exports["ts-playground"] = factory();
 	else
-		root["optional-attributes"] = factory();
+		root["ts-playground"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -713,12 +713,30 @@ var init = function init(document) {
 var _init = init(document),
   variable = _init.variable;
 
-;// CONCATENATED MODULE: ./examples/src/optional-attributes.ts
+;// CONCATENATED MODULE: ./examples/src/ts-playground.ts
 
+var names = variable("names", ["Alice", "Bob", "Carol"]);
+var count = variable("count", 0);
 var checked = variable("checked", false);
 window.toggleChecked = function () {
   checked.value = !checked.value;
 };
+window.increment = function () {
+  count.value++;
+  names.value.push(generateRandomString());
+};
+window.decrement = function () {
+  count.value--;
+};
+function generateRandomString() {
+  var result = "";
+  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var charactersLength = characters.length;
+  for (var i = 0; i < 5; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

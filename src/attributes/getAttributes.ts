@@ -1,4 +1,4 @@
-import { Attribute } from "../types";
+import { Attribute, ChangedAttribute } from "../types";
 import { templateExpressionRegex } from "../expressions/templateExpressionRegex";
 
 export const getAttributes = (element: HTMLElement): Attribute[] => {
@@ -12,4 +12,19 @@ export const getAttributes = (element: HTMLElement): Attribute[] => {
     });
 
     return attributes;
+};
+
+export const changedAttributesToAttributes = (
+    changedAttributes: ChangedAttribute[]
+): Attribute[] => {
+    return changedAttributes.map((attribute) => {
+        const reactiveMatch = templateExpressionRegex.exec(
+            attribute.newValue as string
+        );
+        return {
+            name: attribute.name,
+            value: attribute.newValue as string,
+            reactive: !!reactiveMatch,
+        };
+    });
 };

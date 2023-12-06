@@ -1,3 +1,4 @@
+import { sanitizeHtml } from "../html/sanitizeHtml";
 import { ReactiveNodesList } from "../types";
 import { isCustomElement } from "./isCustomElement";
 import { registerReactiveNode } from "./registerReactiveNode";
@@ -28,23 +29,26 @@ export const registerNativeElements = (
     }
 
     for (let i = 0; i < elements.length; i++) {
-        const elementId = reactiveNodes.list.length + 1;
+        const elementId = reactiveNodes.id();
+        const element = elements[i];
+        element.innerHTML = sanitizeHtml(element.innerHTML);
         registerReactiveNode(
             elementId,
             reactiveNodes,
-            elements[i],
-            elements[i].outerHTML
+            element,
+            element.outerHTML,
+            element.outerHTML
         );
     }
 };
 
-function generateUUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            const r = (Math.random() * 16) | 0,
-                v = c === "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        }
-    );
-}
+// function generateUUID() {
+//     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+//         /[xy]/g,
+//         function (c) {
+//             const r = (Math.random() * 16) | 0,
+//                 v = c === "x" ? r : (r & 0x3) | 0x8;
+//             return v.toString(16);
+//         }
+//     );
+// }

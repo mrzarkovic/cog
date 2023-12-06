@@ -5,19 +5,16 @@ export function registerReactiveNode(
     reactiveNodes: ReactiveNodesList,
     element: HTMLElement,
     originalInvocation: string,
-    attributes: Attribute[] = []
+    lastTemplateEvaluation: string | null = null,
+    attributes: Attribute[] = [],
+    parentId: number | null = null
 ) {
-    const parentId = element.dataset.parentId
-        ? Number(element.dataset.parentId)
-        : null;
-
     reactiveNodes.add({
         id: elementId,
         parentId,
         element,
         template: originalInvocation,
-        lastTemplateEvaluation: null,
+        lastTemplateEvaluation,
         attributes,
     });
-    reactiveNodes.clean(reactiveNodes.list);
 }

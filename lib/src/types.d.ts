@@ -16,10 +16,12 @@ export type Attribute = {
     reactive: boolean;
 };
 export type ReactiveNode = {
+    id: number;
+    parentId: number | null;
     element: HTMLElement;
     template: HTMLString;
-    lastTemplateEvaluation: HTMLString;
-    parentAttributes: Attribute[];
+    lastTemplateEvaluation: HTMLString | null;
+    attributes: Attribute[];
 };
 export type ChangedAttribute = {
     name: string;
@@ -27,9 +29,10 @@ export type ChangedAttribute = {
 };
 export type ChangedNode = {
     node: HTMLElement;
-    newNode: HTMLElement;
     content?: HTMLString;
     attributes?: ChangedAttribute[];
+    toBeAdded?: HTMLElement[];
+    toBeRemoved?: HTMLElement[];
 };
 export type StateObject = {
     state: State | null;
@@ -47,8 +50,6 @@ export type ReactiveNodesList = {
     list: ReactiveNode[];
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
-    updateLastTemplateEvaluation: (index: number, value: string) => void;
-};
-export type CustomElementsList = ReactiveNodesList & {
-    clean: () => void;
+    update: (index: number, property: keyof ReactiveNode, value: ReactiveNode[keyof ReactiveNode]) => void;
+    clean: (list: ReactiveNode[]) => void;
 };
