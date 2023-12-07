@@ -15,20 +15,11 @@ export const evaluateTemplate = (
 
     for (let i = 0; i < expressions.length; i++) {
         const { start, end, value } = expressions[i];
-
         const before = restOfContent.slice(0, start);
-
         const after = restOfContent.slice(end + 1);
-
-        // console.time("createExpressionScope");
         const expressionWithScope = createExpressionScope(value, state);
-        // console.timeEnd("createExpressionScope");
-
-        // console.time("evaluateExpression");
         const evaluated = evaluateExpression(expressionWithScope, state);
-        // console.timeEnd("evaluateExpression");
         updatedContent += `${before}${evaluated}`;
-
         restOfContent = after;
     }
 

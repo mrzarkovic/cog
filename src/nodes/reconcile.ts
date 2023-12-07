@@ -156,22 +156,30 @@ const functionStateUsageRegex = (key: string) =>
 const stateFunctionRegex = (key: string) =>
     new RegExp(`(${key})\\((.*?)\\)`, "gm");
 
-const hasDependencies = (
+function findInString(
+    items: string[],
+    string: string,
+    regexFactory: (key: string) => RegExp
+) {
+    const regexes = items.map(regexFactory);
+    const found = regexes.some((re) => re.test(string));
+
+    return found;
+}
+
+function checkIfChangedStateIsUsedInExpression(
+    updatedStateKeys: string[],
+    expression: string
+) {
+    return findInString(updatedStateKeys, expression, stateUsageRegex);
+}
+
+function checkIfChangedStateIsUsedInFunctionUsedInExpression(
     updatedStateKeys: string[],
     state: State,
     expression: string
-) => {
-    const usageRegexes = updatedStateKeys.map(stateUsageRegex);
-    const shouldUpdateFromUsage = usageRegexes.some((regex) =>
-        regex.test(expression)
-    );
-
-    if (shouldUpdateFromUsage) {
-        return true;
-    }
-
+) {
     const functionRegexes = Object.keys(state).map(stateFunctionRegex);
-
     const usesFunctions = functionRegexes.flatMap((regex) => {
         const matches = [];
         let match;
@@ -183,15 +191,41 @@ const hasDependencies = (
 
     for (let i = 0; i < usesFunctions.length; i++) {
         const functionBody = (state[usesFunctions[i]] as object).toString();
-        const functionBodyUsageRegexes = updatedStateKeys.map(
+        const usesInFunctionBody = findInString(
+            updatedStateKeys,
+            functionBody,
             functionStateUsageRegex
         );
-        const usesFunctionBody = functionBodyUsageRegexes.some((regex) =>
-            regex.test(functionBody)
-        );
-        if (usesFunctionBody) {
+
+        if (usesInFunctionBody) {
             return true;
         }
+    }
+
+    return false;
+}
+
+const hasDependencies = (
+    updatedStateKeys: string[],
+    state: State,
+    expression: string
+) => {
+    const stateUsedInExpression = checkIfChangedStateIsUsedInExpression(
+        updatedStateKeys,
+        expression
+    );
+    if (stateUsedInExpression) {
+        return true;
+    }
+
+    const functionThatUsesStateUsedInExpression =
+        checkIfChangedStateIsUsedInFunctionUsedInExpression(
+            updatedStateKeys,
+            state,
+            expression
+        );
+    if (functionThatUsesStateUsedInExpression) {
+        return true;
     }
 
     return false;
@@ -258,15 +292,38 @@ function handleChildrenChanges(
     return { addChildren, removeChildren };
 }
 
+function nodeNeedsUpdate(
+    state: State,
+    updatedStateKeys: string[],
+    node: ReactiveNode,
+    nodes: ReactiveNode[]
+) {
+    if (node.shouldUpdate) {
+        return true;
+    }
+
+    const attributesRecursive = getAttributesRecursive(
+        node.parentId,
+        node.attributes,
+        nodes
+    );
+
+    return hasDependencies(
+        updatedStateKeys,
+        state,
+        node.template + " " + attributesRecursive.map((a) => a.value).join(" ")
+    );
+}
+
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
     state: State,
     updatedStateKeys: string[]
 ) => {
     for (
-        let treeNodeIndex = 0;
-        treeNodeIndex < reactiveNodes.value.length;
-        treeNodeIndex++
+        let nodeIndex = 0;
+        nodeIndex < reactiveNodes.value.length;
+        nodeIndex++
     ) {
         const {
             parentId,
@@ -275,25 +332,19 @@ export const reconcile = (
             template,
             lastTemplateEvaluation,
             expressions,
-            shouldUpdate,
-        } = reactiveNodes.value[treeNodeIndex];
+        } = reactiveNodes.value[nodeIndex];
 
-        const attributesRecursive = getAttributesRecursive(
-            parentId,
-            attributes,
-            reactiveNodes.list
-        );
-
-        const stateUpdateAffects = hasDependencies(
-            updatedStateKeys,
+        const shouldUpdate = nodeNeedsUpdate(
             state,
-            template + " " + attributesRecursive.map((a) => a.value).join(" ")
+            updatedStateKeys,
+            reactiveNodes.value[nodeIndex],
+            reactiveNodes.value
         );
 
-        if (!stateUpdateAffects && !shouldUpdate) {
+        if (!shouldUpdate) {
             continue;
         } else {
-            reactiveNodes.update(treeNodeIndex, "shouldUpdate", false);
+            reactiveNodes.update(nodeIndex, "shouldUpdate", false);
         }
 
         const localState = getLocalState(
@@ -314,7 +365,7 @@ export const reconcile = (
 
         if (changedNodes.length > 0) {
             reactiveNodes.update(
-                treeNodeIndex,
+                nodeIndex,
                 "lastTemplateEvaluation",
                 updatedContent
             );

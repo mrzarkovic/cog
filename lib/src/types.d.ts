@@ -1,4 +1,5 @@
 export interface Cog {
+    render: (rootElement: HTMLElement) => void;
     variable: <T>(name: string, value: T) => {
         set value(newVal: T);
         get value(): T;
@@ -21,7 +22,7 @@ export type ReactiveNode = {
     parentId: number | null;
     element: HTMLElement;
     template: HTMLString;
-    lastTemplateEvaluation: HTMLString | null;
+    lastTemplateEvaluation: HTMLString;
     attributes: Attribute[];
     expressions: Expression[];
     shouldUpdate: boolean;
@@ -61,7 +62,7 @@ export type ReactiveNodesList = {
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
     update: (index: number, property: keyof ReactiveNode, value: ReactiveNode[keyof ReactiveNode]) => void;
-    clean: (list: ReactiveNode[]) => void;
+    clean: () => void;
     id: () => number;
 };
 export type CogHTMLElement = HTMLElement & {

@@ -20,40 +20,28 @@ export function compareChildNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
-    let changedChildren: ChangedNode[] = [];
-    let differentChildren = false;
-
     const toBeRemoved: HTMLElement[] = [];
     const toBeAdded: HTMLElement[] = [];
-
     const nodesLength = Math.max(
         oldNode.childNodes.length,
         newNode.childNodes.length
     );
+    let changedChildren: ChangedNode[] = [];
 
     for (let i = 0; i < nodesLength; i++) {
         const oldChild = oldNode.childNodes[i] as HTMLElement;
         const newChild = newNode.childNodes[i] as HTMLElement;
 
         if (
-            typeof oldChild !== "undefined" &&
-            oldChild.nodeType === Node.TEXT_NODE &&
-            typeof newChild !== "undefined" &&
-            newChild.nodeType === Node.TEXT_NODE
+            oldChild?.nodeType === Node.TEXT_NODE &&
+            newChild?.nodeType === Node.TEXT_NODE
         ) {
             if (oldChild.textContent?.trim() !== newChild.textContent?.trim()) {
-                differentChildren = true;
-                break;
+                return [{ node: oldNode, content: newNode.innerHTML }];
             }
-        } else if (
-            typeof oldChild === "undefined" &&
-            typeof newChild !== "undefined"
-        ) {
+        } else if (!oldChild) {
             toBeAdded.push(newChild);
-        } else if (
-            typeof oldChild !== "undefined" &&
-            typeof newChild === "undefined"
-        ) {
+        } else if (!newChild) {
             toBeRemoved.push(oldChild);
         } else {
             changedChildren = changedChildren.concat(
@@ -62,27 +50,11 @@ export function compareChildNodes(
         }
     }
 
-    if (toBeRemoved.length > 0) {
-        changedChildren.push({
-            node: oldNode,
-            toBeRemoved,
-        });
+    if (toBeRemoved.length) {
+        changedChildren.push({ node: oldNode, toBeRemoved });
     }
-
-    if (toBeAdded.length > 0) {
-        changedChildren.push({
-            node: oldNode,
-            toBeAdded,
-        });
-    }
-
-    if (differentChildren) {
-        return [
-            {
-                node: oldNode,
-                content: newNode.innerHTML,
-            },
-        ];
+    if (toBeAdded.length) {
+        changedChildren.push({ node: oldNode, toBeAdded });
     }
 
     return changedChildren;
