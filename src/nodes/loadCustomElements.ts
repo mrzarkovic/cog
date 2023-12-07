@@ -1,11 +1,11 @@
-import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
+import { getLocalState } from "../attributes/getLocalState";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
-import { Attribute, ReactiveNode, ReactiveNodesList, State } from "../types";
+import { ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 import { registerReactiveNode } from "./registerReactiveNode";
 
@@ -77,32 +77,6 @@ function defineCustomElement(
     );
 
     customElements.define(name, CustomElement as never);
-}
-
-function getLocalState(
-    parentId: number | null,
-    attributes: Attribute[],
-    globalState: State,
-    reactiveNodes: ReactiveNode[]
-) {
-    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
-
-    if (!parentNode) {
-        return attributesToState(attributes, globalState);
-    }
-
-    const parentState: State = getLocalState(
-        parentNode!.parentId,
-        parentNode!.attributes,
-        globalState,
-        reactiveNodes
-    );
-
-    return Object.assign(
-        {},
-        parentState,
-        attributesToState(attributes, parentState)
-    );
 }
 
 function registerCustomElement(

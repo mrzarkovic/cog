@@ -8,7 +8,7 @@ import {
 } from "../types";
 import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "../eventListeners/removeAllEventListeners";
-import { attributesToState } from "../attributes/attributesToState";
+
 import { compareNodes } from "./compareNodes";
 import { elementFromString } from "./elementFromString";
 import { evaluateTemplate } from "../html/evaluateTemplate";
@@ -16,6 +16,7 @@ import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
 import { changedAttributesToAttributes } from "../attributes/getAttributes";
+import { getLocalState } from "../attributes/getLocalState";
 
 function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
     const merged = oldArray.concat(newArray);
@@ -92,32 +93,6 @@ const updateElement = (
     }
 };
 
-function getLocalState(
-    parentId: number | null,
-    attributes: Attribute[],
-    globalState: State,
-    reactiveNodes: ReactiveNode[]
-) {
-    if (parentId === null) {
-        return attributesToState(attributes, globalState);
-    }
-
-    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
-
-    const parentState: State = getLocalState(
-        parentNode!.parentId,
-        parentNode!.attributes,
-        globalState,
-        reactiveNodes
-    );
-
-    return Object.assign(
-        {},
-        parentState,
-        attributesToState(attributes, parentState)
-    );
-}
-
 function getAttributesRecursive(
     parentId: number | null,
     attributes: Attribute[],
@@ -137,14 +112,12 @@ function getAttributesRecursive(
     return parentAttributes.concat(attributes);
 }
 
+const createRegex = (key: string) =>
+    new RegExp(`(\\s${key}\\s|{${key}\\s|\\s${key}}|{${key}}|(${key}))`, "gm");
+
 const hasDependencies = (updatedStateKeys: string[], expression: string) => {
-    const shouldUpdate = updatedStateKeys.some((key) => {
-        const regex = new RegExp(
-            `(\\s${key}\\s|{${key}\\s|\\s${key}}|{${key}}|(${key}))`,
-            "gm"
-        );
-        return regex.test(expression);
-    });
+    const regexes = updatedStateKeys.map(createRegex);
+    const shouldUpdate = regexes.some((regex) => regex.test(expression));
 
     return shouldUpdate;
 };
