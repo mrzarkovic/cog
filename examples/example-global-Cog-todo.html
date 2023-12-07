@@ -62,7 +62,11 @@
         </div>
         <script src="/lib/cog.js"></script>
         <script>
-            const { variable } = Cog;
+            const { variable, render } = Cog;
+
+            document.addEventListener("DOMContentLoaded", function () {
+                render(document.getElementById("app"));
+            });
 
             const todos = variable("todos", [
                 "make website",
@@ -102,10 +106,7 @@
                 editingId.set(-1);
             };
 
-            let todoInput;
-            document.addEventListener("DOMContentLoaded", () => {
-                todoInput = document.querySelector("[data-input=todo]");
-            });
+            const todoInput = document.querySelector("[data-input=todo]");
         </script>
     </body>
 </html>

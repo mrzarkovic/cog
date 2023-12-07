@@ -1,4 +1,8 @@
-import { variable } from "../../src/cog";
+import { variable, render } from "../../src/cog";
+
+document.addEventListener("DOMContentLoaded", function () {
+    render(document.getElementById("app")!);
+});
 
 // Initialize the game's state
 const history = variable("history", [Array(9).fill("")]); // The history of the game's moves

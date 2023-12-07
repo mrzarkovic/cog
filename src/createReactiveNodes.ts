@@ -19,8 +19,8 @@ export function createReactiveNodes(): ReactiveNodesList {
             }
             this.list[index][property] = value as never;
         },
-        clean(list: ReactiveNode[]) {
-            this.list = cleanReactiveNodesList(list);
+        clean() {
+            this.list = cleanReactiveNodesList(this.list);
             this.index = this.list.reduce((index, item, i) => {
                 index[item.id] = i;
                 return index;

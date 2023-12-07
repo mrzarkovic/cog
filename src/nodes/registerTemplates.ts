@@ -1,16 +1,13 @@
 import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
-import {
-    evaluateTemplate,
-    extractTemplateExpressions,
-} from "../html/evaluateTemplate";
+import { extractTemplateExpressions } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
 import { ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 import { findNodes } from "./findNodes";
 import { registerReactiveNode } from "./registerReactiveNode";
 
-export function loadTemplates(
+export function registerTemplates(
     rootElement: Node,
     state: State,
     reactiveNodes: ReactiveNodesList
@@ -59,6 +56,40 @@ function defineCustomElement(
     customElements.define(name, CustomElement as never);
 }
 
+function addParentIdToChildren(template: string, parentId: number) {
+    const newElement = elementFromString(template);
+
+    if (newElement.nodeType !== Node.TEXT_NODE) {
+        const childElements = newElement.querySelectorAll("*");
+        for (let i = 0; i < childElements.length; i++) {
+            const child = childElements[i];
+            if (child.tagName.includes("-")) {
+                child.setAttribute("data-parent-id", String(parentId));
+            }
+        }
+    }
+
+    let refinedTemplate = newElement.outerHTML;
+    if (!refinedTemplate) {
+        refinedTemplate = newElement.textContent || "";
+    }
+
+    return refinedTemplate;
+}
+
+function getCustomElementAttributes(element: HTMLElement) {
+    const attributes = getAttributes(element);
+    const childrenExpressions = extractTemplateExpressions(element.innerHTML);
+    attributes.push({
+        name: "children",
+        value: element.innerHTML,
+        expressions: childrenExpressions,
+        reactive: !!childrenExpressions.length,
+    });
+
+    return attributes;
+}
+
 function registerCustomElement(
     template: HTMLTemplateElement,
     state: State,
@@ -67,68 +98,34 @@ function registerCustomElement(
     return function (this: HTMLElement) {
         const elementId = reactiveNodes.id();
 
-        const attributes = getAttributes(this);
-        const childrenExpressions = extractTemplateExpressions(this.innerHTML);
-        attributes.push({
-            name: "children",
-            value: this.innerHTML,
-            expressions: childrenExpressions,
-            reactive: !!childrenExpressions.length,
-        });
+        const attributes = getCustomElementAttributes(this);
 
-        const newElement = elementFromString(template.innerHTML);
-        if (newElement.nodeType !== Node.TEXT_NODE) {
-            const childElements = newElement.querySelectorAll("*");
-            for (let i = 0; i < childElements.length; i++) {
-                const child = childElements[i];
-                if (child.tagName.includes("-")) {
-                    child.setAttribute("data-parent-id", String(elementId));
-                }
-            }
-        }
-
-        let refinedTemplate = newElement.outerHTML;
-        if (!refinedTemplate) {
-            refinedTemplate = newElement.textContent || "";
-        }
+        const refinedTemplate = addParentIdToChildren(
+            template.innerHTML,
+            elementId
+        );
 
         const parentId = this.dataset.parentId
             ? Number(this.dataset.parentId)
             : null;
 
-        let evaluatedElement = elementFromString(refinedTemplate);
+        const localState = getLocalState(
+            parentId,
+            attributes,
+            state,
+            reactiveNodes.list
+        );
 
-        const expressions = extractTemplateExpressions(refinedTemplate);
-
-        try {
-            const localState = getLocalState(
-                parentId,
-                attributes,
-                state,
-                reactiveNodes.list
-            );
-            const updatedContent = evaluateTemplate(
-                refinedTemplate,
-                expressions,
-                localState
-            );
-            evaluatedElement = elementFromString(updatedContent);
-
-            // eslint-disable-next-line no-empty
-        } catch (e) {}
-
-        evaluatedElement.cogAnchorId = elementId;
-        this.parentElement?.replaceChild(evaluatedElement, this);
-
-        registerReactiveNode(
+        const newElement = registerReactiveNode(
             elementId,
             reactiveNodes,
-            evaluatedElement,
+            this,
             refinedTemplate,
-            null,
+            localState,
             attributes,
-            parentId,
-            expressions
+            parentId
         );
+
+        newElement.cogAnchorId = elementId;
     };
 }

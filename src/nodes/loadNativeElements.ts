@@ -1,12 +1,13 @@
-import { extractTemplateExpressions } from "../html/evaluateTemplate";
-
-import { ReactiveNodesList } from "../types";
+import { getChangedAttributes } from "../attributes/getChangedAttributes";
+import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
+import { ReactiveNodesList, State } from "../types";
 import { findNodes } from "./findNodes";
 import { isCustomElement } from "./isCustomElement";
 import { registerReactiveNode } from "./registerReactiveNode";
 
 export const registerNativeElements = (
     rootElement: Node,
+    state: State,
     reactiveNodes: ReactiveNodesList
 ) => {
     const elements = findNodes<HTMLElement>(
@@ -18,32 +19,20 @@ export const registerNativeElements = (
     for (let i = 0; i < elements.length; i++) {
         const elementId = reactiveNodes.id();
         const element = elements[i];
-
-        // element.innerHTML = sanitizeHtml(element.innerHTML);
         element.innerHTML = element.innerHTML.trim();
         const template = element.outerHTML;
-        const expressions = extractTemplateExpressions(template);
 
-        registerReactiveNode(
+        const newElement = registerReactiveNode(
             elementId,
             reactiveNodes,
             element,
             template,
-            template.indexOf("data-attribute") !== -1 ? template : null,
-            [],
-            null,
-            expressions
+            state
         );
+
+        const attributes = getChangedAttributes(element, newElement);
+        for (let i = 0; i < attributes.length; i++) {
+            handleBooleanAttribute(newElement, attributes[i]);
+        }
     }
 };
-
-// function generateUUID() {
-//     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-//         /[xy]/g,
-//         function (c) {
-//             const r = (Math.random() * 16) | 0,
-//                 v = c === "x" ? r : (r & 0x3) | 0x8;
-//             return v.toString(16);
-//         }
-//     );
-// }

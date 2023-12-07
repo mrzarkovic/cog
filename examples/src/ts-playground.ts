@@ -1,14 +1,18 @@
-import { variable } from "../../src/cog";
+import { variable, render } from "../../src/cog";
+
+document.addEventListener("DOMContentLoaded", function () {
+    render(document.getElementById("app")!);
+});
 
 const names = variable("names", ["Alice", "Bob", "Carol"]);
 const count = variable("count", 3);
 const checked = variable("checked", true);
 
-window.toggleChecked = () => {
-    checked.value = !checked.value;
-};
+variable("isOk", () => {
+    return count.value % 2 === 0;
+});
 
-window.handleCheckbox = () => {
+window.toggleChecked = () => {
     checked.value = !checked.value;
 };
 

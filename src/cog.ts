@@ -1,22 +1,19 @@
 import { type Cog } from "./types";
-import { createRootElement } from "./rootElement";
-import { loadTemplates } from "./nodes/loadCustomElements";
+import { registerTemplates } from "./nodes/registerTemplates";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { registerNativeElements } from "./nodes/loadNativeElements";
 import { reconcile } from "./nodes/reconcile";
 import { createState } from "./state";
 import { createReactiveNodes } from "./createReactiveNodes";
 
-export const init = (document: Document): Cog => {
+export const init = (): Cog => {
     const reactiveNodes = createReactiveNodes();
-    const rootElement = createRootElement(document);
     let updateStateTimeout: number | null = null;
     const state = createState();
 
     function reRender() {
-        // console.time("reRender");
         reconcile(reactiveNodes, state.value, state.updatedKeys);
-        // console.timeEnd("reRender");
+        reactiveNodes.clean();
         state.clearUpdates();
     }
 
@@ -30,24 +27,16 @@ export const init = (document: Document): Cog => {
         });
     }
 
-    const onLoad = () => {
-        registerNativeElements(rootElement.value, reactiveNodes);
-        loadTemplates(rootElement.value, state.value, reactiveNodes);
-        addAllEventListeners(rootElement.value, state.value);
+    const render = (rootElement: HTMLElement) => {
+        registerNativeElements(rootElement, state.value, reactiveNodes);
+        registerTemplates(rootElement, state.value, reactiveNodes);
+        addAllEventListeners(rootElement, state.value);
     };
 
-    onLoad();
-
-    // const onLoadHandler = (document as DocumentWithHandler)["onLoadHandler"];
-    // if (onLoadHandler) {
-    //     document.removeEventListener("DOMContentLoaded", onLoadHandler);
-    // }
-    // document.addEventListener("DOMContentLoaded", onLoad);
-    // (document as DocumentWithHandler)["onLoadHandler"] = onLoad;
-
     return {
+        render,
         variable: <T>(name: string, value: T) => {
-            updateState(name, value);
+            state.set(name, value);
 
             return {
                 set value(newVal: T) {
@@ -64,4 +53,4 @@ export const init = (document: Document): Cog => {
     };
 };
 
-export const { variable } = init(document);
+export const { variable, render } = init();

@@ -1,4 +1,8 @@
-import { variable } from "../../src/cog";
+import { variable, render } from "../../src/cog";
+
+document.addEventListener("DOMContentLoaded", function () {
+    render(document.getElementById("app")!);
+});
 
 const todos = variable("todos", [{ text: "hello", done: false }]);
 

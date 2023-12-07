@@ -1,6 +1,7 @@
 import {
     Attribute,
     ChangedAttribute,
+    ChangedNode,
     CogHTMLElement,
     ReactiveNode,
     ReactiveNodesList,
@@ -28,6 +29,79 @@ function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
     return Object.values(attributes);
 }
 
+function handleCustomElement(
+    originalNode: CogHTMLElement,
+    content: string | undefined,
+    attributes: ChangedAttribute[] | undefined,
+    reactiveNodes: ReactiveNodesList
+) {
+    const changedAttributes = attributes?.slice() ?? [];
+    if (content !== undefined) {
+        changedAttributes.push({
+            name: "children",
+            newValue: content,
+        });
+    }
+    if (changedAttributes.length) {
+        const newAttributes = changedAttributesToAttributes(changedAttributes);
+        const nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
+        const reactiveNode = reactiveNodes.list[nodeIndex];
+
+        reactiveNodes.update(
+            nodeIndex,
+            "attributes",
+            mergeAttributes(reactiveNode.attributes, newAttributes)
+        );
+    }
+}
+
+function handleContentChange(
+    originalNode: CogHTMLElement,
+    content: string,
+    localState: State
+) {
+    if (originalNode.nodeType === Node.TEXT_NODE) {
+        originalNode.textContent = content;
+    } else {
+        removeAllEventListeners(originalNode);
+        originalNode.innerHTML = content;
+        addAllEventListeners(originalNode, localState);
+    }
+}
+
+function handleAttributeChange(
+    originalNode: CogHTMLElement,
+    attributes: ChangedAttribute[]
+) {
+    for (let i = 0; i < attributes.length; i++) {
+        handleBooleanAttribute(originalNode, attributes[i]);
+        originalNode.setAttribute(
+            attributes[i].name,
+            attributes[i].newValue as string
+        );
+    }
+}
+
+function handleChildrenAddition(
+    originalNode: CogHTMLElement,
+    addChildren: HTMLElement[]
+) {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < addChildren.length; i++) {
+        fragment.appendChild(addChildren[i]);
+    }
+    originalNode.appendChild(fragment);
+}
+
+function handleChildrenRemoval(
+    originalNode: CogHTMLElement,
+    removeChildren: HTMLElement[]
+) {
+    for (let i = 0; i < removeChildren.length; i++) {
+        originalNode.removeChild(removeChildren[i]);
+    }
+}
+
 const updateElement = (
     originalNode: CogHTMLElement,
     changedNode: HTMLElement,
@@ -39,57 +113,18 @@ const updateElement = (
     reactiveNodes: ReactiveNodesList
 ) => {
     if (isCustomElement(changedNode)) {
-        const changedAttributes = attributes?.slice() ?? [];
-        if (content !== undefined) {
-            changedAttributes.push({
-                name: "children",
-                newValue: content,
-            });
-        }
-        if (changedAttributes.length) {
-            const newAttributes =
-                changedAttributesToAttributes(changedAttributes);
-            const nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
-            const reactiveNode = reactiveNodes.list[nodeIndex];
-
-            reactiveNodes.update(
-                nodeIndex,
-                "attributes",
-                mergeAttributes(reactiveNode.attributes, newAttributes)
-            );
-        }
-
+        handleCustomElement(originalNode, content, attributes, reactiveNodes);
         return;
     }
 
     if (content !== undefined) {
-        if (originalNode.nodeType === Node.TEXT_NODE) {
-            originalNode.textContent = content;
-        } else {
-            removeAllEventListeners(originalNode);
-
-            originalNode.innerHTML = content;
-
-            addAllEventListeners(originalNode, localState);
-        }
+        handleContentChange(originalNode, content, localState);
     } else if (attributes !== undefined) {
-        for (let i = 0; i < attributes.length; i++) {
-            handleBooleanAttribute(originalNode, attributes[i]);
-            originalNode.setAttribute(
-                attributes[i].name,
-                attributes[i].newValue as string
-            );
-        }
+        handleAttributeChange(originalNode, attributes);
     } else if (addChildren.length) {
-        const fragment = document.createDocumentFragment();
-        for (let i = 0; i < addChildren.length; i++) {
-            fragment.appendChild(addChildren[i]);
-        }
-        originalNode.appendChild(fragment);
+        handleChildrenAddition(originalNode, addChildren);
     } else if (removeChildren.length) {
-        for (let i = 0; i < removeChildren.length; i++) {
-            originalNode.removeChild(removeChildren[i]);
-        }
+        handleChildrenRemoval(originalNode, removeChildren);
     }
 };
 
@@ -112,15 +147,116 @@ function getAttributesRecursive(
     return parentAttributes.concat(attributes);
 }
 
-const createRegex = (key: string) =>
+const stateUsageRegex = (key: string) =>
     new RegExp(`(\\s${key}\\s|{${key}\\s|\\s${key}}|{${key}}|(${key}))`, "gm");
 
-const hasDependencies = (updatedStateKeys: string[], expression: string) => {
-    const regexes = updatedStateKeys.map(createRegex);
-    const shouldUpdate = regexes.some((regex) => regex.test(expression));
+const functionStateUsageRegex = (key: string) =>
+    new RegExp(`(${key}.value)`, "gm");
 
-    return shouldUpdate;
+const stateFunctionRegex = (key: string) =>
+    new RegExp(`(${key})\\((.*?)\\)`, "gm");
+
+const hasDependencies = (
+    updatedStateKeys: string[],
+    state: State,
+    expression: string
+) => {
+    const usageRegexes = updatedStateKeys.map(stateUsageRegex);
+    const shouldUpdateFromUsage = usageRegexes.some((regex) =>
+        regex.test(expression)
+    );
+
+    if (shouldUpdateFromUsage) {
+        return true;
+    }
+
+    const functionRegexes = Object.keys(state).map(stateFunctionRegex);
+
+    const usesFunctions = functionRegexes.flatMap((regex) => {
+        const matches = [];
+        let match;
+        while ((match = regex.exec(expression)) !== null) {
+            matches.push(match[1]);
+        }
+        return matches;
+    });
+
+    for (let i = 0; i < usesFunctions.length; i++) {
+        const functionBody = (state[usesFunctions[i]] as object).toString();
+        const functionBodyUsageRegexes = updatedStateKeys.map(
+            functionStateUsageRegex
+        );
+        const usesFunctionBody = functionBodyUsageRegexes.some((regex) =>
+            regex.test(functionBody)
+        );
+        if (usesFunctionBody) {
+            return true;
+        }
+    }
+
+    return false;
 };
+
+function handleNodeChanges(
+    changedNodes: ChangedNode[],
+    oldElement: CogHTMLElement,
+    element: HTMLElement,
+    localState: State,
+    reactiveNodes: ReactiveNodesList
+) {
+    for (let i = 0; i < changedNodes.length; i++) {
+        const originalNode = findCorrespondingNode(
+            changedNodes[i].node,
+            oldElement,
+            element
+        ) as CogHTMLElement;
+
+        const { addChildren, removeChildren } = handleChildrenChanges(
+            changedNodes[i],
+            oldElement,
+            element
+        );
+
+        updateElement(
+            originalNode,
+            changedNodes[i].node,
+            changedNodes[i].content,
+            changedNodes[i].attributes,
+            addChildren,
+            removeChildren,
+            localState,
+            reactiveNodes
+        );
+    }
+}
+
+function handleChildrenChanges(
+    changedNode: ChangedNode,
+    oldElement: CogHTMLElement,
+    element: HTMLElement
+) {
+    const removeChildren = [];
+    let addChildren: HTMLElement[] = [];
+
+    if (changedNode.toBeAdded !== undefined) {
+        addChildren = changedNode.toBeAdded!;
+    }
+
+    if (changedNode.toBeRemoved !== undefined) {
+        for (let i = 0; i < changedNode.toBeRemoved!.length; i++) {
+            const child = findCorrespondingNode(
+                changedNode.toBeRemoved![i],
+                oldElement,
+                element
+            ) as HTMLElement;
+            if (child) {
+                removeChildren.push(child);
+            }
+        }
+    }
+
+    return { addChildren, removeChildren };
+}
 
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
@@ -133,7 +269,6 @@ export const reconcile = (
         treeNodeIndex++
     ) {
         const {
-            id,
             parentId,
             attributes,
             element,
@@ -151,18 +286,15 @@ export const reconcile = (
 
         const stateUpdateAffects = hasDependencies(
             updatedStateKeys,
+            state,
             template + " " + attributesRecursive.map((a) => a.value).join(" ")
         );
 
         if (!stateUpdateAffects && !shouldUpdate) {
             continue;
-        }
-
-        if (shouldUpdate) {
+        } else {
             reactiveNodes.update(treeNodeIndex, "shouldUpdate", false);
         }
-
-        let updatedContent = null;
 
         const localState = getLocalState(
             parentId,
@@ -170,85 +302,30 @@ export const reconcile = (
             state,
             reactiveNodes.list
         );
-
-        try {
-            updatedContent = evaluateTemplate(
-                template,
-                expressions,
-                localState
-            );
-        } catch (e) {
-            console.error(e);
-            continue;
-        }
+        const updatedContent = evaluateTemplate(
+            template,
+            expressions,
+            localState
+        );
 
         const newElement = elementFromString(updatedContent);
+        const oldElement = elementFromString(lastTemplateEvaluation);
+        const changedNodes = compareNodes(oldElement, newElement);
 
-        if (lastTemplateEvaluation === null) {
+        if (changedNodes.length > 0) {
             reactiveNodes.update(
                 treeNodeIndex,
                 "lastTemplateEvaluation",
                 updatedContent
             );
-            reactiveNodes.update(treeNodeIndex, "element", newElement);
-            newElement.cogAnchorId = id;
-            element.parentNode?.replaceChild(newElement, element);
-        } else {
-            const oldElement = elementFromString(lastTemplateEvaluation);
-            const changedNodes = compareNodes(oldElement, newElement);
 
-            if (changedNodes.length > 0) {
-                reactiveNodes.update(
-                    treeNodeIndex,
-                    "lastTemplateEvaluation",
-                    updatedContent
-                );
-
-                for (let i = 0; i < changedNodes.length; i++) {
-                    const originalNode = findCorrespondingNode(
-                        changedNodes[i].node,
-                        oldElement,
-                        element
-                    ) as CogHTMLElement;
-
-                    const removeChildren = [];
-                    let addChildren: HTMLElement[] = [];
-
-                    if (changedNodes[i].toBeAdded !== undefined) {
-                        addChildren = changedNodes[i].toBeAdded!;
-                    }
-
-                    if (changedNodes[i].toBeRemoved !== undefined) {
-                        for (
-                            let j = 0;
-                            j < changedNodes[i].toBeRemoved!.length;
-                            j++
-                        ) {
-                            const child = findCorrespondingNode(
-                                changedNodes[i].toBeRemoved![j],
-                                oldElement,
-                                element
-                            ) as HTMLElement;
-                            if (child) {
-                                removeChildren.push(child);
-                            }
-                        }
-                    }
-
-                    updateElement(
-                        originalNode,
-                        changedNodes[i].node,
-                        changedNodes[i].content,
-                        changedNodes[i].attributes,
-                        addChildren,
-                        removeChildren,
-                        localState,
-                        reactiveNodes
-                    );
-                }
-            }
+            handleNodeChanges(
+                changedNodes,
+                oldElement,
+                element,
+                localState,
+                reactiveNodes
+            );
         }
     }
-
-    reactiveNodes.clean(reactiveNodes.list);
 };

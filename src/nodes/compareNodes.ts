@@ -1,6 +1,5 @@
 import { ChangedNode } from "../types";
 import { getChangedAttributes } from "../attributes/getChangedAttributes";
-import { sanitizeHtml } from "../html/sanitizeHtml";
 
 export function compareTextNodes(
     oldNode: HTMLElement,
@@ -96,9 +95,6 @@ export function compareNodes(
     if (oldNode.nodeType === Node.TEXT_NODE) {
         return compareTextNodes(oldNode, newNode);
     }
-
-    oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
-    newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
 
     const changedAttributes = getChangedAttributes(oldNode, newNode);
     const changedChildren: ChangedNode[] =
