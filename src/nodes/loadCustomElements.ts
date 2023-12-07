@@ -114,12 +114,15 @@ function registerCustomElement(
         const elementId = reactiveNodes.id();
 
         const attributes = getAttributes(this);
-        const templateWithChildren = template.innerHTML.replace(
-            /\{\{\s*children\s*\}\}/g,
-            this.innerHTML
-        );
+        const childrenExpressions = extractTemplateExpressions(this.innerHTML);
+        attributes.push({
+            name: "children",
+            value: this.innerHTML,
+            expressions: childrenExpressions,
+            reactive: !!childrenExpressions.length,
+        });
 
-        const newElement = elementFromString(templateWithChildren);
+        const newElement = elementFromString(template.innerHTML);
         if (newElement.nodeType !== Node.TEXT_NODE) {
             const childElements = newElement.querySelectorAll("*");
             for (let i = 0; i < childElements.length; i++) {

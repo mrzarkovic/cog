@@ -1,7 +1,7 @@
 import { variable } from "../../src/cog";
 
 const names = variable("names", ["Alice", "Bob", "Carol"]);
-const count = variable("count", 10);
+const count = variable("count", 3);
 const checked = variable("checked", true);
 
 window.toggleChecked = () => {
@@ -51,4 +51,4 @@ function refreshLoop() {
     });
 }
 
-// refreshLoop();
+refreshLoop();

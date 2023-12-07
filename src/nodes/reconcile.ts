@@ -39,7 +39,12 @@ const updateElement = (
 ) => {
     if (isCustomElement(changedNode)) {
         const changedAttributes = attributes?.slice() ?? [];
-
+        if (content !== undefined) {
+            changedAttributes.push({
+                name: "children",
+                newValue: content,
+            });
+        }
         if (changedAttributes.length) {
             const newAttributes =
                 changedAttributesToAttributes(changedAttributes);

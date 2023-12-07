@@ -14,9 +14,9 @@ export const init = (document: Document): Cog => {
     const state = createState();
 
     function reRender() {
-        console.time("reRender");
+        // console.time("reRender");
         reconcile(reactiveNodes, state.value, state.updatedKeys);
-        console.timeEnd("reRender");
+        // console.timeEnd("reRender");
         state.clearUpdates();
     }
 
