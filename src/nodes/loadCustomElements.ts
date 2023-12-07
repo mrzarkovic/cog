@@ -7,35 +7,15 @@ import {
 import { sanitizeHtml } from "../html/sanitizeHtml";
 import { ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
+import { findNodes } from "./findNodes";
 import { registerReactiveNode } from "./registerReactiveNode";
-
-function findTemplates(rootElement: Node) {
-    const xpath = "template";
-    const templates: HTMLTemplateElement[] = [];
-
-    const result = document.evaluate(
-        xpath,
-        rootElement,
-        null,
-        XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-        null
-    );
-    let element = <HTMLTemplateElement>result.iterateNext();
-
-    while (element) {
-        templates.push(element);
-        element = <HTMLTemplateElement>result.iterateNext();
-    }
-
-    return templates;
-}
 
 export function loadTemplates(
     rootElement: Node,
     state: State,
     reactiveNodes: ReactiveNodesList
 ) {
-    const templates = findTemplates(rootElement);
+    const templates = findNodes<HTMLTemplateElement>(rootElement, "template");
     const fragment = document.createDocumentFragment();
 
     for (let i = 0; i < templates.length; i++) {
