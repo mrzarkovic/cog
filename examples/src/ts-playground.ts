@@ -8,9 +8,7 @@ const names = variable("names", ["Alice", "Bob", "Carol"]);
 const count = variable("count", 1);
 const checked = variable("checked", true);
 
-variable("isOk", () => {
-    return count.value % 2 === 0;
-});
+variable("isOk", (count: number) => count % 2 === 0);
 
 window.toggleChecked = () => {
     checked.value = !checked.value;

@@ -2,7 +2,6 @@ import {
     evaluateTemplate,
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
-import { sanitizeHtml } from "../html/sanitizeHtml";
 import { Attribute, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 
@@ -15,22 +14,15 @@ export function registerReactiveNode(
     attributes: Attribute[] = [],
     parentId: number | null = null
 ) {
-    const sanitizedTemplate = sanitizeHtml(template);
-    const expressions = extractTemplateExpressions(sanitizedTemplate);
-
-    const updatedContent = evaluateTemplate(
-        sanitizedTemplate,
-        expressions,
-        state
-    );
-
+    const expressions = extractTemplateExpressions(template);
+    const updatedContent = evaluateTemplate(template, expressions, state);
     const element = elementFromString(updatedContent);
 
     reactiveNodes.add({
         id: elementId,
         parentId,
         element,
-        template: sanitizedTemplate,
+        template: template,
         lastTemplateEvaluation: updatedContent,
         attributes,
         expressions,
