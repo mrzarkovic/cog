@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["Cog"] = factory();
+		exports["ts-custom-element-children"] = factory();
 	else
-		root["Cog"] = factory();
+		root["ts-custom-element-children"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -14,23 +14,6 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_require__ = {};
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -46,13 +29,6 @@ return /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  init: () => (/* binding */ init),
-  render: () => (/* binding */ render),
-  variable: () => (/* binding */ variable)
-});
 
 ;// CONCATENATED MODULE: ./src/expressions/evaluateExpression.ts
 function evaluateExpression(expressionWithScope, state) {
@@ -870,6 +846,15 @@ var _init = init(),
   variable = _init.variable,
   render = _init.render;
 
+;// CONCATENATED MODULE: ./examples/src/ts-custom-element-children.ts
+
+document.addEventListener("DOMContentLoaded", function () {
+  render(document.getElementById("app"));
+});
+var count = variable("count", 1);
+window.increment = function () {
+  count.value++;
+};
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

@@ -1,5 +1,6 @@
 import { ChangedNode } from "../types";
 import { getChangedAttributes } from "../attributes/getChangedAttributes";
+import { isCustomElement } from "./isCustomElement";
 
 export function compareTextNodes(
     oldNode: HTMLElement,
@@ -60,6 +61,16 @@ export function compareChildNodes(
     return changedChildren;
 }
 
+function compareCustomElementChildren(
+    oldElement: HTMLElement,
+    newElement: HTMLElement
+): ChangedNode[] {
+    if (oldElement.innerHTML !== newElement.innerHTML) {
+        return [{ node: newElement, content: newElement.innerHTML }];
+    }
+    return [];
+}
+
 export function compareNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
@@ -78,6 +89,12 @@ export function compareNodes(
                   },
               ]
             : [];
+
+    if (isCustomElement(oldNode)) {
+        return changedChildren.concat(
+            compareCustomElementChildren(oldNode, newNode)
+        );
+    }
 
     return changedChildren.concat(compareChildNodes(oldNode, newNode));
 }

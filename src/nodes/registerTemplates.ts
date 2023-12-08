@@ -56,16 +56,21 @@ function defineCustomElement(
     customElements.define(name, CustomElement as never);
 }
 
+function addParentId(element: HTMLElement, parentId: number) {
+    if (element.tagName.includes("-")) {
+        element.setAttribute("data-parent-id", String(parentId));
+    }
+}
+
 function addParentIdToChildren(template: string, parentId: number) {
     const newElement = elementFromString(template);
 
     if (newElement.nodeType !== Node.TEXT_NODE) {
+        addParentId(newElement, parentId);
         const childElements = newElement.querySelectorAll("*");
         for (let i = 0; i < childElements.length; i++) {
             const child = childElements[i];
-            if (child.tagName.includes("-")) {
-                child.setAttribute("data-parent-id", String(parentId));
-            }
+            addParentId(child as HTMLElement, parentId);
         }
     }
 
