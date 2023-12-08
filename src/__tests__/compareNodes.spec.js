@@ -28,7 +28,7 @@ describe("compareNodes", () => {
             {
                 node: node1,
                 newNode: node2,
-                content: node2.innerHTML,
+                toBeAdded: ["<p>World</p>"],
             },
         ]);
     });

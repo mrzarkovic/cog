@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom";
-import { loadNativeElements } from "../nodes/loadNativeElements";
+import { registerNativeElements } from "../nodes/loadNativeElements";
 import { createNativeElements } from "../nativeElements";
 
-describe("loadNativeElements", () => {
+describe("registerNativeElements", () => {
     test("load a list of native elements with templates", () => {
         const element = document.createElement("div");
         element.innerHTML = `<div>
@@ -14,7 +14,11 @@ describe("loadNativeElements", () => {
         </div>`;
 
         const nativeElements = createNativeElements();
-        loadNativeElements(element, { expression: "hello" }, nativeElements);
+        registerNativeElements(
+            element,
+            { expression: "hello" },
+            nativeElements
+        );
 
         expect(nativeElements.value).toEqual([
             {

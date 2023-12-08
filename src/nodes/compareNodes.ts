@@ -37,7 +37,7 @@ export function compareChildNodes(
             newChild?.nodeType === Node.TEXT_NODE
         ) {
             if (oldChild.textContent?.trim() !== newChild.textContent?.trim()) {
-                return [{ node: oldNode, content: newNode.innerHTML }];
+                return [{ node: newNode, content: newNode.innerHTML }];
             }
         } else if (!oldChild) {
             toBeAdded.push(newChild);
@@ -51,10 +51,10 @@ export function compareChildNodes(
     }
 
     if (toBeRemoved.length) {
-        changedChildren.push({ node: oldNode, toBeRemoved });
+        changedChildren.push({ node: newNode, toBeRemoved });
     }
     if (toBeAdded.length) {
-        changedChildren.push({ node: oldNode, toBeAdded });
+        changedChildren.push({ node: newNode, toBeAdded });
     }
 
     return changedChildren;
@@ -73,7 +73,7 @@ export function compareNodes(
         changedAttributes.length > 0
             ? [
                   {
-                      node: oldNode,
+                      node: newNode,
                       attributes: changedAttributes,
                   },
               ]

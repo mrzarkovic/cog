@@ -1,4 +1,4 @@
-import { Attribute, ChangedAttribute } from "../types";
+import { Attribute } from "../types";
 import { extractTemplateExpressions } from "../html/evaluateTemplate";
 
 export const getAttributes = (element: HTMLElement): Attribute[] => {
@@ -13,21 +13,4 @@ export const getAttributes = (element: HTMLElement): Attribute[] => {
     });
 
     return attributes;
-};
-
-export const changedAttributesToAttributes = (
-    changedAttributes: ChangedAttribute[]
-): Attribute[] => {
-    return changedAttributes.map((attribute) => {
-        const expressions = extractTemplateExpressions(
-            attribute.newValue as string
-        );
-
-        return {
-            name: attribute.name,
-            value: attribute.newValue as string,
-            expressions,
-            reactive: !!expressions.length,
-        };
-    });
 };

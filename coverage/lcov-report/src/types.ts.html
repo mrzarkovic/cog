@@ -128,7 +128,57 @@
 <a name='L63'></a><a href='#L63'>63</a>
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -194,6 +244,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export interface Cog {
+    render: (rootElement: HTMLElement) =&gt; void;
     variable: &lt;T&gt;(
         name: string,
         value: T
@@ -214,14 +265,19 @@ export type RootElement = {
 export type Attribute = {
     name: string;
     value: string;
+    expressions: Expression[];
     reactive: boolean;
 };
 &nbsp;
 export type ReactiveNode = {
+    id: number;
+    parentId: number | null;
     element: HTMLElement;
     template: HTMLString;
     lastTemplateEvaluation: HTMLString;
-    parentAttributes: Attribute[];
+    attributes: Attribute[];
+    expressions: Expression[];
+    shouldUpdate: boolean;
 };
 &nbsp;
 export type ChangedAttribute = {
@@ -231,15 +287,18 @@ export type ChangedAttribute = {
 &nbsp;
 export type ChangedNode = {
     node: HTMLElement;
-    newNode: HTMLElement;
     content?: HTMLString;
     attributes?: ChangedAttribute[];
+    toBeAdded?: HTMLElement[];
+    toBeRemoved?: HTMLElement[];
 };
 &nbsp;
 export type StateObject = {
     state: State | null;
+    updatedKeys: string[];
     get value(): State;
     set: &lt;T&gt;(name: string, value: T) =&gt; void;
+    clearUpdates: () =&gt; void;
 };
 export type State = Record&lt;string, unknown&gt;;
 &nbsp;
@@ -248,15 +307,31 @@ export type ElementWithHandler = Element &amp; {
 };
 export type DocumentWithHandler = Document &amp; { onLoadHandler: () =&gt; void };
 &nbsp;
+export type ReactiveNodeIndex = { [id: number]: number };
+&nbsp;
 export type ReactiveNodesList = {
+    index: ReactiveNodeIndex;
     list: ReactiveNode[];
+    lastId: number;
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) =&gt; void;
-    updateLastTemplateEvaluation: (index: number, value: string) =&gt; void;
+    update: (
+        index: number,
+        property: keyof ReactiveNode,
+        value: ReactiveNode[keyof ReactiveNode]
+    ) =&gt; void;
+    clean: () =&gt; void;
+    id: () =&gt; number;
 };
 &nbsp;
-export type CustomElementsList = ReactiveNodesList &amp; {
-    clean: () =&gt; void;
+export type CogHTMLElement = HTMLElement &amp; {
+    cogAnchorId: number;
+};
+&nbsp;
+export type Expression = {
+    start: number;
+    end: number;
+    value: string;
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -265,7 +340,7 @@ export type CustomElementsList = ReactiveNodesList &amp; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-02T18:53:44.279Z
+                at 2023-12-07T21:28:20.090Z
             </div>
         <script src="../prettify.js"></script>
         <script>

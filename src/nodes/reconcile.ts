@@ -16,7 +16,7 @@ import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
-import { changedAttributesToAttributes } from "../attributes/getAttributes";
+import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
 
 function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
@@ -30,20 +30,28 @@ function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
 }
 
 function handleCustomElement(
+    changedNode: HTMLElement,
     originalNode: CogHTMLElement,
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
     reactiveNodes: ReactiveNodesList
 ) {
     const changedAttributes = attributes?.slice() ?? [];
+
+    let newAttributes: Attribute[] = [];
+    if (changedAttributes.length) {
+        newAttributes = getAttributes(changedNode);
+    }
     if (content !== undefined) {
-        changedAttributes.push({
+        newAttributes.push({
             name: "children",
-            newValue: content,
+            value: content,
+            expressions: [],
+            reactive: false,
         });
     }
-    if (changedAttributes.length) {
-        const newAttributes = changedAttributesToAttributes(changedAttributes);
+
+    if (newAttributes.length) {
         const nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
         const reactiveNode = reactiveNodes.list[nodeIndex];
 
@@ -113,7 +121,13 @@ const updateElement = (
     reactiveNodes: ReactiveNodesList
 ) => {
     if (isCustomElement(changedNode)) {
-        handleCustomElement(originalNode, content, attributes, reactiveNodes);
+        handleCustomElement(
+            changedNode,
+            originalNode,
+            content,
+            attributes,
+            reactiveNodes
+        );
         return;
     }
 
@@ -150,8 +164,8 @@ function getAttributesRecursive(
 const stateUsageRegex = (key: string) =>
     new RegExp(`(\\s${key}\\s|{${key}\\s|\\s${key}}|{${key}}|(${key}))`, "gm");
 
-const functionStateUsageRegex = (key: string) =>
-    new RegExp(`(${key}.value)`, "gm");
+// const functionStateUsageRegex = (key: string) =>
+//     new RegExp(`(${key}.value)`, "gm");
 
 const stateFunctionRegex = (key: string) =>
     new RegExp(`(${key})\\((.*?)\\)`, "gm");
@@ -175,7 +189,6 @@ function checkIfChangedStateIsUsedInExpression(
 }
 
 function checkIfChangedStateIsUsedInFunctionUsedInExpression(
-    updatedStateKeys: string[],
     state: State,
     expression: string
 ) {
@@ -189,20 +202,22 @@ function checkIfChangedStateIsUsedInFunctionUsedInExpression(
         return matches;
     });
 
-    for (let i = 0; i < usesFunctions.length; i++) {
-        const functionBody = (state[usesFunctions[i]] as object).toString();
-        const usesInFunctionBody = findInString(
-            updatedStateKeys,
-            functionBody,
-            functionStateUsageRegex
-        );
+    return usesFunctions;
 
-        if (usesInFunctionBody) {
-            return true;
-        }
-    }
+    // for (let i = 0; i < usesFunctions.length; i++) {
+    //     const functionBody = (state[usesFunctions[i]] as object).toString();
+    //     const usesInFunctionBody = findInString(
+    //         updatedStateKeys,
+    //         functionBody,
+    //         functionStateUsageRegex
+    //     );
 
-    return false;
+    //     if (usesInFunctionBody) {
+    //         return true;
+    //     }
+    // }
+
+    // return false;
 }
 
 const hasDependencies = (
@@ -219,11 +234,8 @@ const hasDependencies = (
     }
 
     const functionThatUsesStateUsedInExpression =
-        checkIfChangedStateIsUsedInFunctionUsedInExpression(
-            updatedStateKeys,
-            state,
-            expression
-        );
+        checkIfChangedStateIsUsedInFunctionUsedInExpression(state, expression);
+
     if (functionThatUsesStateUsedInExpression) {
         return true;
     }
@@ -234,6 +246,7 @@ const hasDependencies = (
 function handleNodeChanges(
     changedNodes: ChangedNode[],
     oldElement: CogHTMLElement,
+    newElement: CogHTMLElement,
     element: HTMLElement,
     localState: State,
     reactiveNodes: ReactiveNodesList
@@ -241,7 +254,7 @@ function handleNodeChanges(
     for (let i = 0; i < changedNodes.length; i++) {
         const originalNode = findCorrespondingNode(
             changedNodes[i].node,
-            oldElement,
+            newElement,
             element
         ) as CogHTMLElement;
 
@@ -373,6 +386,7 @@ export const reconcile = (
             handleNodeChanges(
                 changedNodes,
                 oldElement,
+                newElement,
                 element,
                 localState,
                 reactiveNodes
