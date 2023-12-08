@@ -61,16 +61,22 @@ export function compareChildNodes(
     return changedChildren;
 }
 
+function compareCustomElementChildren(
+    oldElement: HTMLElement,
+    newElement: HTMLElement
+): ChangedNode[] {
+    if (oldElement.innerHTML !== newElement.innerHTML) {
+        return [{ node: newElement, content: newElement.innerHTML }];
+    }
+    return [];
+}
+
 export function compareNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
     if (oldNode.nodeType === Node.TEXT_NODE) {
         return compareTextNodes(oldNode, newNode);
-    }
-
-    if (isCustomElement(oldNode)) {
-        // console.log(oldNode);
     }
 
     const changedAttributes = getChangedAttributes(oldNode, newNode);
@@ -83,6 +89,12 @@ export function compareNodes(
                   },
               ]
             : [];
+
+    if (isCustomElement(oldNode)) {
+        return changedChildren.concat(
+            compareCustomElementChildren(oldNode, newNode)
+        );
+    }
 
     return changedChildren.concat(compareChildNodes(oldNode, newNode));
 }

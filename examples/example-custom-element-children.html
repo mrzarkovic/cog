@@ -20,7 +20,13 @@
             </template>
 
             <template id="x-parent">
-                <div><x-child>{{dataParent}}</x-child></div>
+                <div>
+                    <x-child
+                        >some text
+                        <div>{{dataParent}}</div>
+                        <span>other</span>
+                    </x-child>
+                </div>
             </template>
 
             <div class="flex items-center">
