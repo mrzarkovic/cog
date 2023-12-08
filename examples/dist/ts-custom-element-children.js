@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["optional-attributes"] = factory();
+		exports["ts-custom-element-children"] = factory();
 	else
-		root["optional-attributes"] = factory();
+		root["ts-custom-element-children"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
@@ -837,14 +837,14 @@ var _init = init(),
   variable = _init.variable,
   render = _init.render;
 
-;// CONCATENATED MODULE: ./examples/src/optional-attributes.ts
+;// CONCATENATED MODULE: ./examples/src/ts-custom-element-children.ts
 
 document.addEventListener("DOMContentLoaded", function () {
   render(document.getElementById("app"));
 });
-var checked = variable("checked", false);
-window.toggleChecked = function () {
-  checked.value = !checked.value;
+var count = variable("count", 1);
+window.increment = function () {
+  count.value++;
 };
 /******/ 	return __webpack_exports__;
 /******/ })()

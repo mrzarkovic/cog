@@ -1,5 +1,6 @@
 import { ChangedNode } from "../types";
 import { getChangedAttributes } from "../attributes/getChangedAttributes";
+import { isCustomElement } from "./isCustomElement";
 
 export function compareTextNodes(
     oldNode: HTMLElement,
@@ -66,6 +67,10 @@ export function compareNodes(
 ): ChangedNode[] {
     if (oldNode.nodeType === Node.TEXT_NODE) {
         return compareTextNodes(oldNode, newNode);
+    }
+
+    if (isCustomElement(oldNode)) {
+        // console.log(oldNode);
     }
 
     const changedAttributes = getChangedAttributes(oldNode, newNode);

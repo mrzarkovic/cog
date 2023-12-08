@@ -54,12 +54,12 @@ function handleCustomElement(
     if (newAttributes.length) {
         const nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
         const reactiveNode = reactiveNodes.list[nodeIndex];
-
-        reactiveNodes.update(
-            nodeIndex,
-            "attributes",
-            mergeAttributes(reactiveNode.attributes, newAttributes)
+        const mergedAttributes = mergeAttributes(
+            reactiveNode.attributes,
+            newAttributes
         );
+
+        reactiveNodes.update(nodeIndex, "attributes", mergedAttributes);
     }
 }
 
