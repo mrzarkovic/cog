@@ -17,8 +17,8 @@ Cog is a simple, beginner-friendly reactive UI library for building web applicat
 <!-- index.html -->
 
 <div id="app">
-    <div>Counter: {{ counter }}</div>
-    <button onclick="increment()">Increment</button>
+  <div>Counter: {{ counter }}</div>
+  <button onclick="increment()">Increment</button>
 </div>
 ```
 
@@ -27,7 +27,7 @@ Cog is a simple, beginner-friendly reactive UI library for building web applicat
 
 const counter = variable("counter", 0);
 function increment() {
-    counter.set(counter.value + 1);
+  counter.set(counter.value + 1);
 }
 ```
 
@@ -57,6 +57,18 @@ Or you can install it via `npm` package manager:
 npm install @mzrk/cog
 ```
 
+## Troubleshooting Installation on Ubuntu 22.04
+
+If you encounter issues installing cog.js on Ubuntu 22.04, follow these steps to troubleshoot:
+
+1. **Update System Software:**
+   Ensure your system software is up-to-date by running the following commands:
+
+   ```bash
+   sudo apt update && sudo apt upgrade
+
+   ```
+
 ## Usage
 
 We'll build a simple counter. In this example, `countVariable` is a reactive variable and `count` is the name of the state variable used in the HTML template.
@@ -68,8 +80,8 @@ We'll add a new `<script>` tag to our `index.html`. We can then get the `variabl
 
 <div id="app">...</div>
 <script>
-    const { variable } = Cog;
-    // ...
+  const { variable } = Cog;
+  // ...
 </script>
 ```
 
@@ -81,8 +93,8 @@ const countVariable = variable("count", 0);
 
 // Your typical callback function, nothing fancy
 function incrementCount(e) {
-    // Get count value and update it using count setter
-    countVariable.set(countVariable.value + 1);
+  // Get count value and update it using count setter
+  countVariable.set(countVariable.value + 1);
 }
 ```
 
@@ -92,11 +104,11 @@ In the HTML, you can use `{{ count }}` to bind a variable to the text content o
 <!-- index.html -->
 
 <div id="app">
-    <div>{{ count }}</div>
-    <button onclick="incrementCount()">Increment</button>
+  <div>{{ count }}</div>
+  <button onclick="incrementCount()">Increment</button>
 </div>
 <script>
-    ...
+  ...
 </script>
 ```
 
@@ -113,7 +125,7 @@ You can explicitly add your functions to the global `window` object, which will 
 ```js
 // In your JavaScript module
 function increment() {
-    counter.set(counter.value + 1);
+  counter.set(counter.value + 1);
 }
 
 // Add the function to the global window object
@@ -138,7 +150,7 @@ import { variable } from "@mzrk/cog";
 const counter = variable("counter", 0);
 
 function increment() {
-    counter.set(counter.value + 1);
+  counter.set(counter.value + 1);
 }
 
 // Get the button element
@@ -162,10 +174,10 @@ In the next example, there are two templates defined: `my-element` and `my-check
 
 ```html
 <template id="my-text">
-    <div class="bold">{{ children }}</div>
+  <div class="bold">{{ children }}</div>
 </template>
 <template id="my-checkbox">
-    <label><input type="checkbox" /> {{ dataLabel }}</label>
+  <label><input type="checkbox" /> {{ dataLabel }}</label>
 </template>
 ```
 
@@ -211,10 +223,10 @@ Here's how you might use these variables in the `my-checkbox` template:
 
 ```html
 <template id="my-checkbox">
-    <label>
-        <input type="checkbox" data-attribute-checked="{{ dataIsChecked }}" />
-        {{ dataLabel }}
-    </label>
+  <label>
+    <input type="checkbox" data-attribute-checked="{{ dataIsChecked }}" />
+    {{ dataLabel }}
+  </label>
 </template>
 ```
 
@@ -317,7 +329,7 @@ When an expression is evaluated, it's done so in the context of the `state` ob
 // Cog under the hood
 
 const state = {
-    meaningOfLife: 41,
+  meaningOfLife: 41,
 };
 const expression = "meaningOfLife + 1";
 evaluateExpression(expression, state); // 42
@@ -350,13 +362,13 @@ So, gear up and let Cog drive your coding journey with less cognitive friction a
 
 Hey there! If you're interested in the Cog project, we'd love to have you on board. Here's how you can help out:
 
--   **Bug Reports**: Found a bug? Let us know! Just create an issue in the GitHub repository with the details and steps to reproduce it.
+- **Bug Reports**: Found a bug? Let us know! Just create an issue in the GitHub repository with the details and steps to reproduce it.
 
--   **Feature Requests**: Got a cool idea for a new feature or improvement? We're all ears. Drop an issue describing your idea.
+- **Feature Requests**: Got a cool idea for a new feature or improvement? We're all ears. Drop an issue describing your idea.
 
--   **Code Contributions**: If you're up for contributing code, go ahead and create a pull request. Just make sure your code follows the existing style and includes tests where needed.
+- **Code Contributions**: If you're up for contributing code, go ahead and create a pull request. Just make sure your code follows the existing style and includes tests where needed.
 
--   **Documentation**: Remember, good documentation is just as crucial as good code. If you can make the docs better, that would be awesome!
+- **Documentation**: Remember, good documentation is just as crucial as good code. If you can make the docs better, that would be awesome!
 
 Thanks for considering contributing to Cog!
 
