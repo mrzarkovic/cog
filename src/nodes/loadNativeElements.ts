@@ -1,65 +1,38 @@
-import { convertAttributeValue } from "../attributes/convertAttributeValue";
-import { getAttributes } from "../attributes/getAttributes";
+import { getChangedAttributes } from "../attributes/getChangedAttributes";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
-import { evaluateExpression } from "../expressions/evaluateExpression";
-import { evaluateTemplate } from "../html/evaluateTemplate";
 import { ReactiveNodesList, State } from "../types";
+import { findNodes } from "./findNodes";
 import { isCustomElement } from "./isCustomElement";
+import { registerReactiveNode } from "./registerReactiveNode";
 
-export const loadNativeElements = (
+export const registerNativeElements = (
     rootElement: Node,
     state: State,
-    nativeElements: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList
 ) => {
-    const elements: HTMLElement[] = [];
-    const xpath =
-        "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]";
-
-    const result = document.evaluate(
-        xpath,
+    const elements = findNodes<HTMLElement>(
         rootElement,
-        null,
-        XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-        null
+        "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",
+        (element) => !isCustomElement(element)
     );
-    let element = <HTMLElement>result.iterateNext();
-
-    while (element) {
-        if (!isCustomElement(element)) {
-            elements.push(element);
-        }
-
-        element = <HTMLElement>result.iterateNext();
-    }
 
     for (let i = 0; i < elements.length; i++) {
-        const originalInvocation = elements[i].outerHTML;
-        const attributes = getAttributes(elements[i]);
+        const elementId = reactiveNodes.id();
+        const element = elements[i];
+        element.innerHTML = element.innerHTML.trim();
+        const template = element.outerHTML;
 
-        const evaluatedTemplate = evaluateTemplate(originalInvocation, state);
-
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = evaluatedTemplate;
-        const newElement = tempDiv.firstChild as HTMLElement;
-
-        attributes.map((attribute) =>
-            handleBooleanAttribute(newElement, {
-                name: attribute.name,
-                newValue: convertAttributeValue(
-                    attribute.reactive
-                        ? evaluateExpression(attribute.value, state)
-                        : attribute.value
-                ),
-            })
+        const newElement = registerReactiveNode(
+            elementId,
+            reactiveNodes,
+            element,
+            template,
+            state
         );
 
-        elements[i].parentNode?.replaceChild(newElement, elements[i]);
-
-        nativeElements.add({
-            element: newElement,
-            template: originalInvocation,
-            lastTemplateEvaluation: evaluatedTemplate,
-            parentAttributes: [],
-        });
+        const attributes = getChangedAttributes(element, newElement);
+        for (let i = 0; i < attributes.length; i++) {
+            handleBooleanAttribute(newElement, attributes[i]);
+        }
     }
 };

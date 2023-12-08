@@ -1,4 +1,8 @@
-import { variable } from "../../src/cog";
+import { variable, render } from "../../src/cog";
+
+document.addEventListener("DOMContentLoaded", function () {
+    render(document.getElementById("app")!);
+});
 
 // Initialize the game's state
 const history = variable("history", [Array(9).fill("")]); // The history of the game's moves
@@ -36,7 +40,7 @@ function calculateWinner(squares: string[]) {
     }
 
     // If all squares are filled and there's no winner, it's a draw
-    if (history.value.length === 9) {
+    if (history.value.length === 10) {
         status.set("Draw");
         return null;
     }

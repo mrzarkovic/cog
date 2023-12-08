@@ -18,7 +18,8 @@ describe("evaluateExpression", () => {
     test("that expression evaluates in the given state", () => {
         const state = { x: 1, y: 2 };
         const expression = "x + y";
-        const result = evaluateExpression(expression, state);
+        const expressionWithScope = createExpressionScope(expression, state);
+        const result = evaluateExpression(expressionWithScope, state);
 
         expect(result).toBe(3);
     });
@@ -26,7 +27,8 @@ describe("evaluateExpression", () => {
     test("expressions that evaluate to arrays", () => {
         const state = { users: [{ name: "John" }, { name: "Jane" }] };
         const expression = "users.map( user => `<div>${user.name}</div>` )";
-        const result = evaluateExpression(expression, state);
+        const expressionWithScope = createExpressionScope(expression, state);
+        const result = evaluateExpression(expressionWithScope, state);
 
         expect(result).toEqual("<div>John</div><div>Jane</div>");
     });
@@ -34,7 +36,8 @@ describe("evaluateExpression", () => {
     test("handle expressions that reference undefined variables", () => {
         const state = { x: 1 };
         const expression = "x + y";
+        const expressionWithScope = createExpressionScope(expression, state);
 
-        expect(() => evaluateExpression(expression, state)).toThrow();
+        expect(() => evaluateExpression(expressionWithScope, state)).toThrow();
     });
 });

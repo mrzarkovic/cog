@@ -1,13 +1,37 @@
-import { State } from "../types";
+import { Expression, State } from "../types";
 import { evaluateExpression } from "../expressions/evaluateExpression";
 import { findNextTemplateExpression } from "./findNextTemplateExpression";
 import { htmlToText } from "./htmlToText";
-// import { sanitizeHtml } from "./sanitizeHtml";
+import { sanitizeExpression } from "../expressions/sanitizeExpression";
+import { createExpressionScope } from "../expressions/createExpressionScope";
 
-export const evaluateTemplate = (template: string, state: State): string => {
+export const evaluateTemplate = (
+    template: string,
+    expressions: Expression[],
+    state: State
+): string => {
     let restOfContent = template;
-    let hasTemplateExpression = true;
     let updatedContent = "";
+
+    for (let i = 0; i < expressions.length; i++) {
+        const { start, end, value } = expressions[i];
+        const before = restOfContent.slice(0, start);
+        const after = restOfContent.slice(end + 1);
+        const expressionWithScope = createExpressionScope(value, state);
+        const evaluated = evaluateExpression(expressionWithScope, state);
+        updatedContent += `${before}${evaluated}`;
+        restOfContent = after;
+    }
+
+    updatedContent += restOfContent;
+
+    return updatedContent;
+};
+
+export const extractTemplateExpressions = (template: string): Expression[] => {
+    const expressions = [];
+    let restOfContent = String(template);
+    let hasTemplateExpression = true;
 
     while (hasTemplateExpression) {
         const { start, end } = findNextTemplateExpression(restOfContent);
@@ -18,17 +42,17 @@ export const evaluateTemplate = (template: string, state: State): string => {
         }
 
         const htmlValue = restOfContent.slice(start + 2, end - 1);
-        const before = restOfContent.slice(0, start);
         const after = restOfContent.slice(end + 1);
-        const value = htmlToText(htmlValue);
+        const value = sanitizeExpression(htmlToText(htmlValue));
 
-        const evaluated = evaluateExpression(value, state);
-        updatedContent += `${before}${evaluated}`;
+        expressions.push({
+            start,
+            end,
+            value,
+        });
 
         restOfContent = after;
     }
 
-    updatedContent += restOfContent;
-
-    return updatedContent;
+    return expressions;
 };

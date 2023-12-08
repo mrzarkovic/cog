@@ -1,0 +1,102 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog Templates</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="py-40 px-8 max-w-md mx-auto">
+            <!-- <div
+                class="{{ fps > 60 ? 'text-green-600' : 'text-yellow-600' }} fixed top-4 right-4"
+            >
+                {{ fps }}
+            </div> -->
+            <template id="my-template">
+                <div>Hello {{ dataName }}! {{ dataCount }}</div>
+            </template>
+            <template id="x-child">
+                <div class="flex">
+                    <div>
+                        {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
+                        Number(dataCount) % (Number(dataChild) + 2) }}
+                    </div>
+                    <div class="pl-2">{{ children }}</div>
+                </div>
+            </template>
+            <template id="x-child2">
+                <div class="flex">
+                    <div class="pr-2">{{ children }}.</div>
+                    <div>
+                        {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
+                        Number(dataCount) % (Number(dataChild) + 2) }}
+                    </div>
+                </div>
+            </template>
+            <template id="x-parent">
+                <div class="p-2">
+                    {{ names.map( (n, i) => `
+                    <x-child data-count="{{ dataParent }}" data-child="${i}"
+                        >${n} ${ dataParent}
+                    </x-child>
+                    `)}}
+                </div>
+            </template>
+            <my-template
+                data-name="World"
+                data-count="{{ count }}"
+            ></my-template>
+            <div>Count: {{ count }}</div>
+            <div class="p-4">
+                <div>1 {{ count % 3 == 0 ? count : '' }}</div>
+                <div>2 {{ count % 3 == 1 ? count : '' }}</div>
+                <div>3 {{ count % 3 == 2 ? count : '' }}</div>
+            </div>
+            <div data-id="{{ count }}">Hello World!</div>
+            <div>
+                <input
+                    class="checkbox"
+                    type="checkbox"
+                    data-attribute-checked="{{ checked }}"
+                    onchange="toggleChecked()"
+                />
+                <button class="btn btn-primary" onclick="toggleChecked()">
+                    Toggle
+                </button>
+            </div>
+            <div class="flex items-center">
+                <button onclick="increment()" class="btn btn-success">
+                    Increment
+                </button>
+                <button onclick="decrement()" class="btn btn-error">
+                    Decrement
+                </button>
+                <div class="p-4">{{ count }}</div>
+            </div>
+            <div>
+                {{ isOk() ? `<span>yes</span><span>maybe</span>` :
+                `<span>no</span>` }}
+            </div>
+            <div class="flex">
+                <div class="flex-1">
+                    <div class="p-2">
+                        {{ new Array(count).fill(0).map( (n, i) => `
+                        <x-child2 data-count="${count}" data-child="${i}"
+                            >${ count }</x-child2
+                        >
+                        `)}}
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <x-parent data-parent="{{ count }}"></x-parent>
+                </div>
+            </div>
+        </div>
+        <script src="/examples/dist/ts-playground.js"></script>
+    </body>
+</html>

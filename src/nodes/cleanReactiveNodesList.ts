@@ -4,6 +4,7 @@ export const cleanReactiveNodesList = (
     reactiveNodes: ReactiveNode[]
 ): ReactiveNode[] => {
     return reactiveNodes.filter(({ element }) => {
-        return document.body.contains(element);
+        const contains = document.body.contains(element);
+        return contains;
     });
 };

@@ -8,10 +8,10 @@ export function findNextTemplateExpression(htmlText: HTMLString): {
     let stack = 0;
 
     for (let i = start; i < htmlText.length; i++) {
-        if (htmlText.slice(i, i + 2) === "{{") {
+        if (htmlText[i] === "{" && htmlText[i + 1] === "{") {
             stack++;
             i++;
-        } else if (htmlText.slice(i, i + 2) === "}}") {
+        } else if (htmlText[i] === "}" && htmlText[i + 1] === "}") {
             stack--;
             i++;
         }

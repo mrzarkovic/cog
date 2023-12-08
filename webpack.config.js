@@ -30,7 +30,17 @@ const common = {
                         eval: true,
                         keep_fnames: false,
                         properties: {
-                            reserved: ["connectedCallback"],
+                            reserved: [
+                                "connectedCallback",
+                                "cogAnchorId",
+                                "shouldUpdate",
+                                "attributes",
+                                "lastTemplateEvaluation",
+                                "parentId",
+                                "Cog",
+                                "render",
+                                "variable",
+                            ],
                         },
                     },
                     keep_fnames: false,

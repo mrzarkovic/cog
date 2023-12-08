@@ -1,11 +1,5 @@
 import { ChangedNode } from "../types";
 import { getChangedAttributes } from "../attributes/getChangedAttributes";
-import { sanitizeHtml } from "../html/sanitizeHtml";
-
-// TODO: changed custom element like <my-element></my-element> will
-// be returned twice if both attributes and content changed.
-// But either way the entire element will be updated, so it's suboptimal
-// because the loop with changed elements will be longer for no reason.
 
 export function compareTextNodes(
     oldNode: HTMLElement,
@@ -15,7 +9,6 @@ export function compareTextNodes(
         return [
             {
                 node: oldNode,
-                newNode: newNode,
                 content: newNode.textContent ?? "",
             },
         ];
@@ -27,34 +20,29 @@ export function compareChildNodes(
     oldNode: HTMLElement,
     newNode: HTMLElement
 ): ChangedNode[] {
-    let changedChildren: ChangedNode[] = [];
-    let differentChildren = false;
-
+    const toBeRemoved: HTMLElement[] = [];
+    const toBeAdded: HTMLElement[] = [];
     const nodesLength = Math.max(
         oldNode.childNodes.length,
         newNode.childNodes.length
     );
+    let changedChildren: ChangedNode[] = [];
 
     for (let i = 0; i < nodesLength; i++) {
         const oldChild = oldNode.childNodes[i] as HTMLElement;
         const newChild = newNode.childNodes[i] as HTMLElement;
 
         if (
-            typeof oldChild !== "undefined" &&
-            oldChild.nodeType === Node.TEXT_NODE &&
-            typeof newChild !== "undefined" &&
-            newChild.nodeType === Node.TEXT_NODE
+            oldChild?.nodeType === Node.TEXT_NODE &&
+            newChild?.nodeType === Node.TEXT_NODE
         ) {
-            if (oldChild.textContent !== newChild.textContent) {
-                differentChildren = true;
-                break;
+            if (oldChild.textContent?.trim() !== newChild.textContent?.trim()) {
+                return [{ node: newNode, content: newNode.innerHTML }];
             }
-        } else if (
-            typeof oldChild === "undefined" ||
-            typeof newChild === "undefined"
-        ) {
-            differentChildren = true;
-            break;
+        } else if (!oldChild) {
+            toBeAdded.push(newChild);
+        } else if (!newChild) {
+            toBeRemoved.push(oldChild);
         } else {
             changedChildren = changedChildren.concat(
                 compareNodes(oldChild, newChild)
@@ -62,14 +50,11 @@ export function compareChildNodes(
         }
     }
 
-    if (differentChildren) {
-        return [
-            {
-                node: oldNode,
-                newNode: newNode,
-                content: newNode.innerHTML,
-            },
-        ];
+    if (toBeRemoved.length) {
+        changedChildren.push({ node: newNode, toBeRemoved });
+    }
+    if (toBeAdded.length) {
+        changedChildren.push({ node: newNode, toBeAdded });
     }
 
     return changedChildren;
@@ -83,16 +68,12 @@ export function compareNodes(
         return compareTextNodes(oldNode, newNode);
     }
 
-    oldNode.innerHTML = sanitizeHtml(oldNode.innerHTML);
-    newNode.innerHTML = sanitizeHtml(newNode.innerHTML);
-
     const changedAttributes = getChangedAttributes(oldNode, newNode);
     const changedChildren: ChangedNode[] =
         changedAttributes.length > 0
             ? [
                   {
-                      node: oldNode,
-                      newNode: newNode,
+                      node: newNode,
                       attributes: changedAttributes,
                   },
               ]

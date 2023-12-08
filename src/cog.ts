@@ -1,46 +1,40 @@
-import { type Cog, type DocumentWithHandler } from "./types";
-import { createRootElement } from "./rootElement";
-import { loadCustomElements } from "./nodes/loadCustomElements";
+import { type Cog } from "./types";
+import { registerTemplates } from "./nodes/registerTemplates";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
-import { loadNativeElements } from "./nodes/loadNativeElements";
+import { registerNativeElements } from "./nodes/loadNativeElements";
 import { reconcile } from "./nodes/reconcile";
 import { createState } from "./state";
-import { createCustomElements } from "./customElements";
-import { createNativeElements } from "./nativeElements";
+import { createReactiveNodes } from "./createReactiveNodes";
 
-export const init = (document: Document): Cog => {
-    const nativeElements = createNativeElements();
-    const customElements = createCustomElements();
-    const rootElement = createRootElement(document);
+export const init = (): Cog => {
+    const reactiveNodes = createReactiveNodes();
+    let updateStateTimeout: number | null = null;
     const state = createState();
 
     function reRender() {
-        reconcile(nativeElements, state.value);
-        reconcile(customElements, state.value);
+        reconcile(reactiveNodes, state.value, state.updatedKeys);
+        reactiveNodes.clean();
+        state.clearUpdates();
     }
 
     function updateState<T>(name: string, value: T) {
-        setTimeout(() => {
-            state.set(name, value);
+        state.set(name, value);
+        if (updateStateTimeout !== null) {
+            cancelAnimationFrame(updateStateTimeout);
+        }
+        updateStateTimeout = requestAnimationFrame(() => {
             reRender();
-        }, 0);
+        });
     }
 
-    const onLoad = () => {
-        loadNativeElements(rootElement.value, state.value, nativeElements);
-        loadCustomElements(rootElement.value, state.value, customElements);
-        addAllEventListeners(rootElement.value, state.value);
-        // reRender();
+    const render = (rootElement: HTMLElement) => {
+        registerNativeElements(rootElement, state.value, reactiveNodes);
+        registerTemplates(rootElement, state.value, reactiveNodes);
+        addAllEventListeners(rootElement, state.value);
     };
 
-    const onLoadHandler = (document as DocumentWithHandler)["onLoadHandler"];
-    if (onLoadHandler) {
-        document.removeEventListener("DOMContentLoaded", onLoadHandler);
-    }
-    document.addEventListener("DOMContentLoaded", onLoad);
-    (document as DocumentWithHandler)["onLoadHandler"] = onLoad;
-
     return {
+        render,
         variable: <T>(name: string, value: T) => {
             state.set(name, value);
 
@@ -59,4 +53,4 @@ export const init = (document: Document): Cog => {
     };
 };
 
-export const { variable } = init(document);
+export const { variable, render } = init();

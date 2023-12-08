@@ -5,6 +5,7 @@ export function findCorrespondingNode(
 ): Node | null {
     const pathInA = [];
     let temp = nodeInA;
+
     while (temp !== rootA) {
         pathInA.unshift(
             Array.prototype.indexOf.call(temp.parentNode!.childNodes, temp)
@@ -13,7 +14,8 @@ export function findCorrespondingNode(
     }
 
     let correspondingNodeInB = rootB;
-    for (const index of pathInA) {
+    for (let i = 0; i < pathInA.length; i++) {
+        const index = pathInA[i];
         if (correspondingNodeInB.childNodes[index]) {
             correspondingNodeInB = correspondingNodeInB.childNodes[index];
         } else {

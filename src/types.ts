@@ -1,4 +1,5 @@
 export interface Cog {
+    render: (rootElement: HTMLElement) => void;
     variable: <T>(
         name: string,
         value: T
@@ -19,14 +20,19 @@ export type RootElement = {
 export type Attribute = {
     name: string;
     value: string;
+    expressions: Expression[];
     reactive: boolean;
 };
 
 export type ReactiveNode = {
+    id: number;
+    parentId: number | null;
     element: HTMLElement;
     template: HTMLString;
     lastTemplateEvaluation: HTMLString;
-    parentAttributes: Attribute[];
+    attributes: Attribute[];
+    expressions: Expression[];
+    shouldUpdate: boolean;
 };
 
 export type ChangedAttribute = {
@@ -36,15 +42,18 @@ export type ChangedAttribute = {
 
 export type ChangedNode = {
     node: HTMLElement;
-    newNode: HTMLElement;
     content?: HTMLString;
     attributes?: ChangedAttribute[];
+    toBeAdded?: HTMLElement[];
+    toBeRemoved?: HTMLElement[];
 };
 
 export type StateObject = {
     state: State | null;
+    updatedKeys: string[];
     get value(): State;
     set: <T>(name: string, value: T) => void;
+    clearUpdates: () => void;
 };
 export type State = Record<string, unknown>;
 
@@ -53,13 +62,29 @@ export type ElementWithHandler = Element & {
 };
 export type DocumentWithHandler = Document & { onLoadHandler: () => void };
 
+export type ReactiveNodeIndex = { [id: number]: number };
+
 export type ReactiveNodesList = {
+    index: ReactiveNodeIndex;
     list: ReactiveNode[];
+    lastId: number;
     get value(): ReactiveNode[];
     add: (item: ReactiveNode) => void;
-    updateLastTemplateEvaluation: (index: number, value: string) => void;
+    update: (
+        index: number,
+        property: keyof ReactiveNode,
+        value: ReactiveNode[keyof ReactiveNode]
+    ) => void;
+    clean: () => void;
+    id: () => number;
 };
 
-export type CustomElementsList = ReactiveNodesList & {
-    clean: () => void;
+export type CogHTMLElement = HTMLElement & {
+    cogAnchorId: number;
+};
+
+export type Expression = {
+    start: number;
+    end: number;
+    value: string;
 };

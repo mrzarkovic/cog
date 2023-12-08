@@ -7,8 +7,6 @@ export function convertAttributeValue(value: string) {
         ? null
         : value === "undefined"
         ? undefined
-        : value === ""
-        ? ""
         : !isNaN(Number(value))
         ? Number(value)
         : value;
