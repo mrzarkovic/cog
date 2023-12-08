@@ -12,7 +12,10 @@ import { removeAllEventListeners } from "../eventListeners/removeAllEventListene
 
 import { compareNodes } from "./compareNodes";
 import { elementFromString } from "./elementFromString";
-import { evaluateTemplate } from "../html/evaluateTemplate";
+import {
+    evaluateTemplate,
+    extractTemplateExpressions,
+} from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
@@ -161,87 +164,17 @@ function getAttributesRecursive(
     return parentAttributes.concat(attributes);
 }
 
-const stateUsageRegex = (key: string) =>
-    new RegExp(`(\\s${key}\\s|{${key}\\s|\\s${key}}|{${key}}|(${key}))`, "gm");
-
-// const functionStateUsageRegex = (key: string) =>
-//     new RegExp(`(${key}.value)`, "gm");
-
-const stateFunctionRegex = (key: string) =>
-    new RegExp(`(${key})\\((.*?)\\)`, "gm");
-
-function findInString(
-    items: string[],
-    string: string,
-    regexFactory: (key: string) => RegExp
-) {
-    const regexes = items.map(regexFactory);
-    const found = regexes.some((re) => re.test(string));
-
-    return found;
-}
+const stateVariableUsageRegex = (key: string) =>
+    new RegExp(`\\b${key}\\b|[^\\w]${key}[^\\w]`, "gm");
 
 function checkIfChangedStateIsUsedInExpression(
     updatedStateKeys: string[],
     expression: string
 ) {
-    return findInString(updatedStateKeys, expression, stateUsageRegex);
+    return updatedStateKeys
+        .map(stateVariableUsageRegex)
+        .some((re) => re.test(expression));
 }
-
-function checkIfChangedStateIsUsedInFunctionUsedInExpression(
-    state: State,
-    expression: string
-) {
-    const functionRegexes = Object.keys(state).map(stateFunctionRegex);
-    const usesFunctions = functionRegexes.flatMap((regex) => {
-        const matches = [];
-        let match;
-        while ((match = regex.exec(expression)) !== null) {
-            matches.push(match[1]);
-        }
-        return matches;
-    });
-
-    return usesFunctions;
-
-    // for (let i = 0; i < usesFunctions.length; i++) {
-    //     const functionBody = (state[usesFunctions[i]] as object).toString();
-    //     const usesInFunctionBody = findInString(
-    //         updatedStateKeys,
-    //         functionBody,
-    //         functionStateUsageRegex
-    //     );
-
-    //     if (usesInFunctionBody) {
-    //         return true;
-    //     }
-    // }
-
-    // return false;
-}
-
-const hasDependencies = (
-    updatedStateKeys: string[],
-    state: State,
-    expression: string
-) => {
-    const stateUsedInExpression = checkIfChangedStateIsUsedInExpression(
-        updatedStateKeys,
-        expression
-    );
-    if (stateUsedInExpression) {
-        return true;
-    }
-
-    const functionThatUsesStateUsedInExpression =
-        checkIfChangedStateIsUsedInFunctionUsedInExpression(state, expression);
-
-    if (functionThatUsesStateUsedInExpression) {
-        return true;
-    }
-
-    return false;
-};
 
 function handleNodeChanges(
     changedNodes: ChangedNode[],
@@ -306,7 +239,6 @@ function handleChildrenChanges(
 }
 
 function nodeNeedsUpdate(
-    state: State,
     updatedStateKeys: string[],
     node: ReactiveNode,
     nodes: ReactiveNode[]
@@ -321,11 +253,13 @@ function nodeNeedsUpdate(
         nodes
     );
 
-    return hasDependencies(
-        updatedStateKeys,
-        state,
-        node.template + " " + attributesRecursive.map((a) => a.value).join(" ")
-    );
+    const template =
+        node.template + " " + attributesRecursive.map((a) => a.value).join(" ");
+    const expression = extractTemplateExpressions(template)
+        .map((e) => e.value)
+        .join(" ");
+
+    return checkIfChangedStateIsUsedInExpression(updatedStateKeys, expression);
 }
 
 export const reconcile = (
@@ -348,7 +282,6 @@ export const reconcile = (
         } = reactiveNodes.value[nodeIndex];
 
         const shouldUpdate = nodeNeedsUpdate(
-            state,
             updatedStateKeys,
             reactiveNodes.value[nodeIndex],
             reactiveNodes.value
