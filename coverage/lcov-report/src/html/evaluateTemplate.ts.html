@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">55.17% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/29</span>
+                <span class='fraction'>0/29</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">57.14% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/28</span>
+                <span class='fraction'>0/28</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -128,7 +128,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,33 +151,33 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Expression, State } from "../types";
 import { evaluateExpression } from "../expressions/evaluateExpression";
@@ -186,7 +186,7 @@ import { htmlToText } from "./htmlToText";
 import { sanitizeExpression } from "../expressions/sanitizeExpression";
 import { createExpressionScope } from "../expressions/createExpressionScope";
 &nbsp;
-export const evaluateTemplate = <span class="fstat-no" title="function not covered" >(</span>
+export const evaluateTemplate = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(</span></span>
     template: string,
     expressions: Expression[],
     state: State
@@ -209,33 +209,33 @@ export const evaluateTemplate = <span class="fstat-no" title="function not cover
 <span class="cstat-no" title="statement not covered" >    return updatedContent;</span>
 };
 &nbsp;
-export const extractTemplateExpressions = (template: string): Expression[] =&gt; {
-    const expressions = [];
-    let restOfContent = String(template);
-    let hasTemplateExpression = true;
+export const extractTemplateExpressions = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(t</span>emplate: string): Expression[] =&gt; {</span>
+    const expressions = <span class="cstat-no" title="statement not covered" >[];</span>
+    let restOfContent = <span class="cstat-no" title="statement not covered" >String(template);</span>
+    let hasTemplateExpression = <span class="cstat-no" title="statement not covered" >true;</span>
 &nbsp;
-    while (hasTemplateExpression) {
-        const { start, end } = findNextTemplateExpression(restOfContent);
+<span class="cstat-no" title="statement not covered" >    while (hasTemplateExpression) {</span>
+        const { start, end } = <span class="cstat-no" title="statement not covered" >findNextTemplateExpression(restOfContent);</span>
 &nbsp;
-        if (end === -1) {
-            hasTemplateExpression = false;
-            break;
+<span class="cstat-no" title="statement not covered" >        if (end === -1) {</span>
+<span class="cstat-no" title="statement not covered" >            hasTemplateExpression = false;</span>
+<span class="cstat-no" title="statement not covered" >            break;</span>
         }
 &nbsp;
-        const htmlValue = restOfContent.slice(start + 2, end - 1);
-        const after = restOfContent.slice(end + 1);
-        const value = sanitizeExpression(htmlToText(htmlValue));
+        const htmlValue = <span class="cstat-no" title="statement not covered" >restOfContent.slice(start + 2, end - 1);</span>
+        const after = <span class="cstat-no" title="statement not covered" >restOfContent.slice(end + 1);</span>
+        const value = <span class="cstat-no" title="statement not covered" >sanitizeExpression(htmlToText(htmlValue));</span>
 &nbsp;
-        expressions.push({
+<span class="cstat-no" title="statement not covered" >        expressions.push({</span>
             start,
             end,
             value,
         });
 &nbsp;
-        restOfContent = after;
+<span class="cstat-no" title="statement not covered" >        restOfContent = after;</span>
     }
 &nbsp;
-    return expressions;
+<span class="cstat-no" title="statement not covered" >    return expressions;</span>
 };
 &nbsp;</pre></td></tr></table></pre>
 
@@ -244,7 +244,7 @@ export const extractTemplateExpressions = (template: string): Expression[] =&gt;
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-07T21:28:20.090Z
+                at 2023-12-09T12:36:43.605Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
