@@ -17,13 +17,19 @@ export const init = (): Cog => {
         state.clearUpdates();
     }
 
+    let lastFrameTime = 0;
+    const frameDelay = 1000 / 60;
+
     function updateState<T>(name: string, value: T) {
         state.set(name, value);
         if (updateStateTimeout !== null) {
             cancelAnimationFrame(updateStateTimeout);
         }
-        updateStateTimeout = requestAnimationFrame(() => {
-            reRender();
+        updateStateTimeout = requestAnimationFrame((currentTime) => {
+            if (currentTime - lastFrameTime > frameDelay) {
+                lastFrameTime = currentTime;
+                reRender();
+            }
         });
     }
 

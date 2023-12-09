@@ -251,7 +251,7 @@ export const reconcile = (
             reactiveNodes.value[nodeIndex]
         );
 
-        if (!shouldUpdate) {
+        if (shouldUpdate) {
             reactiveNodes.update(nodeIndex, "shouldUpdate", false);
 
             const localState = getLocalState(
