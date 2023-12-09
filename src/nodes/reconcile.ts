@@ -12,10 +12,7 @@ import { removeAllEventListeners } from "../eventListeners/removeAllEventListene
 
 import { compareNodes } from "./compareNodes";
 import { elementFromString } from "./elementFromString";
-import {
-    evaluateTemplate,
-    extractTemplateExpressions,
-} from "../html/evaluateTemplate";
+import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
@@ -145,25 +142,6 @@ const updateElement = (
     }
 };
 
-function getAttributesRecursive(
-    parentId: number | null,
-    attributes: Attribute[],
-    reactiveNodes: ReactiveNode[]
-): Attribute[] {
-    if (parentId === null) {
-        return attributes;
-    }
-    const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
-
-    const parentAttributes = getAttributesRecursive(
-        parentNode!.parentId,
-        parentNode!.attributes,
-        reactiveNodes
-    );
-
-    return parentAttributes.concat(attributes);
-}
-
 const stateVariableUsageRegex = (key: string) =>
     new RegExp(`\\b${key}\\b|[^\\w]${key}[^\\w]`, "gm");
 
@@ -238,28 +216,15 @@ function handleChildrenChanges(
     return { addChildren, removeChildren };
 }
 
-function nodeNeedsUpdate(
-    updatedStateKeys: string[],
-    node: ReactiveNode,
-    nodes: ReactiveNode[]
-) {
+function nodeNeedsUpdate(updatedStateKeys: string[], node: ReactiveNode) {
     if (node.shouldUpdate) {
         return true;
     }
 
-    const attributesRecursive = getAttributesRecursive(
-        node.parentId,
-        node.attributes,
-        nodes
+    return checkIfChangedStateIsUsedInExpression(
+        updatedStateKeys,
+        node.updateCheckString
     );
-
-    const template =
-        node.template + " " + attributesRecursive.map((a) => a.value).join(" ");
-    const expression = extractTemplateExpressions(template)
-        .map((e) => e.value)
-        .join(" ");
-
-    return checkIfChangedStateIsUsedInExpression(updatedStateKeys, expression);
 }
 
 export const reconcile = (
@@ -283,47 +248,44 @@ export const reconcile = (
 
         const shouldUpdate = nodeNeedsUpdate(
             updatedStateKeys,
-            reactiveNodes.value[nodeIndex],
-            reactiveNodes.value
+            reactiveNodes.value[nodeIndex]
         );
 
-        if (!shouldUpdate) {
-            continue;
-        } else {
+        if (shouldUpdate) {
             reactiveNodes.update(nodeIndex, "shouldUpdate", false);
-        }
 
-        const localState = getLocalState(
-            parentId,
-            attributes,
-            state,
-            reactiveNodes.list
-        );
-        const updatedContent = evaluateTemplate(
-            template,
-            expressions,
-            localState
-        );
-
-        const newElement = elementFromString(updatedContent);
-        const oldElement = elementFromString(lastTemplateEvaluation);
-        const changedNodes = compareNodes(oldElement, newElement);
-
-        if (changedNodes.length > 0) {
-            reactiveNodes.update(
-                nodeIndex,
-                "lastTemplateEvaluation",
-                updatedContent
+            const localState = getLocalState(
+                parentId,
+                attributes,
+                state,
+                reactiveNodes.list
+            );
+            const updatedContent = evaluateTemplate(
+                template,
+                expressions,
+                localState
             );
 
-            handleNodeChanges(
-                changedNodes,
-                oldElement,
-                newElement,
-                element,
-                localState,
-                reactiveNodes
-            );
+            const newElement = elementFromString(updatedContent);
+            const oldElement = elementFromString(lastTemplateEvaluation);
+            const changedNodes = compareNodes(oldElement, newElement);
+
+            if (changedNodes.length > 0) {
+                reactiveNodes.update(
+                    nodeIndex,
+                    "lastTemplateEvaluation",
+                    updatedContent
+                );
+
+                handleNodeChanges(
+                    changedNodes,
+                    oldElement,
+                    newElement,
+                    element,
+                    localState,
+                    reactiveNodes
+                );
+            }
         }
     }
 };

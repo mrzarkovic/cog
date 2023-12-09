@@ -1,7 +1,9 @@
+import { getAttributesRecursive } from "../attributes/getAttributesRecursive";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
+import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
 import { Attribute, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 
@@ -18,12 +20,26 @@ export function registerReactiveNode(
     const updatedContent = evaluateTemplate(template, expressions, state);
     const element = elementFromString(updatedContent);
 
+    const attributesRecursive = getAttributesRecursive(
+        parentId,
+        attributes,
+        reactiveNodes.list
+    );
+
+    const templateForUpdateCheck =
+        template + " " + attributesRecursive.map((a) => a.value).join(" ");
+    const expression = extractTemplateExpressions(templateForUpdateCheck)
+        .map((e) => e.value)
+        .join(" ");
+    const updateCheckString = removeTagsAndAttributeNames(expression);
+
     reactiveNodes.add({
         id: elementId,
         parentId,
         element,
         template: template,
         lastTemplateEvaluation: updatedContent,
+        updateCheckString,
         attributes,
         expressions,
         shouldUpdate: false,

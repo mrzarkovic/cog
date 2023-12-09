@@ -30,6 +30,7 @@ export type ReactiveNode = {
     element: HTMLElement;
     template: HTMLString;
     lastTemplateEvaluation: HTMLString;
+    updateCheckString: string;
     attributes: Attribute[];
     expressions: Expression[];
     shouldUpdate: boolean;
