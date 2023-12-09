@@ -61,19 +61,19 @@ npm install @mzrk/cog
 
 We'll build a simple counter. In this example, `countVariable` is a reactive variable and `count` is the name of the state variable used in the HTML template.
 
-We'll add a new `<script>` tag to our `index.html`. We can then get the `variable` factory method from the global Cog object.
+We'll add a new `<script>` tag to our `index.html`. We can then get the `variable` and `render` methods from the global Cog object.
 
 ```html
 <!-- index.html -->
 
 <div id="app">...</div>
 <script>
-    const { variable } = Cog;
+    const { variable, render } = Cog;
     // ...
 </script>
 ```
 
-Then we can write our counter logic:
+Then we can write our counter logic and render the app when the DOM is ready:
 
 ```js
 // Initialize reactive variable 'count'
@@ -84,6 +84,13 @@ function incrementCount(e) {
     // Get count value and update it using count setter
     countVariable.set(countVariable.value + 1);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Get the root element
+    const rootElement = document.getElementById("app");
+    // Render the app
+    render(rootElement);
+});
 ```
 
 In the HTML, you can use `{{ count }}` to bind a variable to the text content of an element.
@@ -170,6 +177,8 @@ In the next example, there are two templates defined: `my-element` and `my-check
 ```
 
 Each template has an `id` which is used to reference it in the rest of the HTML. Inside the templates, you can see `{{ children }}` and `{{ dataLabel }}`. These are placeholders for dynamic content.
+
+> _Template must have a single child element!_
 
 When a custom element like `<my-text>` or `<my-checkbox>` is used in the HTML, Cog replaces the custom element with the corresponding template's content. Any placeholders in the template are replaced with the corresponding data from the custom element.
 
