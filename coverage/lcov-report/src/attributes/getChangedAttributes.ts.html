@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>8/8</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -92,42 +92,42 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ChangedAttribute } from "../types";
 import { convertAttributeValue } from "./convertAttributeValue";
 &nbsp;
-export function getChangedAttributes(
+export function <span class="fstat-no" title="function not covered" >getChangedAttributes(</span>
     oldElement: HTMLElement,
     newElement: HTMLElement
 ): ChangedAttribute[] {
-    const changedAttributes: ChangedAttribute[] = [];
+    const changedAttributes: ChangedAttribute[] = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-    for (let i = 0; i &lt; oldElement.attributes.length; i++) {
-        const oldAttr = oldElement.attributes[i];
-        const newAttrValue = newElement.getAttribute(oldAttr.name);
-        <span class="missing-if-branch" title="else path not taken" >E</span>if (newAttrValue !== oldAttr.value) {
-            changedAttributes.push({
+<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; oldElement.attributes.length; i++) {</span>
+        const oldAttr = <span class="cstat-no" title="statement not covered" >oldElement.attributes[i];</span>
+        const newAttrValue = <span class="cstat-no" title="statement not covered" >newElement.getAttribute(oldAttr.name);</span>
+<span class="cstat-no" title="statement not covered" >        if (newAttrValue !== oldAttr.value) {</span>
+<span class="cstat-no" title="statement not covered" >            changedAttributes.push({</span>
                 name: oldAttr.name,
-                newValue: convertAttributeValue(newAttrValue || <span class="branch-1 cbranch-no" title="branch not covered" >"")</span>,
+                newValue: convertAttributeValue(newAttrValue || ""),
             });
         }
     }
 &nbsp;
-    return changedAttributes;
+<span class="cstat-no" title="statement not covered" >    return changedAttributes;</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -136,7 +136,7 @@ export function getChangedAttributes(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-09T12:42:37.642Z
+                at 2023-12-09T12:48:45.549Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

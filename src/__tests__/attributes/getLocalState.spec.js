@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom";
-import { getAttributesRecursive } from "../../attributes/getAttributesRecursive";
+import { getLocalState } from "../../attributes/getLocalState";
 
-describe("getAttributesRecursive", () => {
-    test("add parent attributes to attributes", () => {
+describe("getLocalState", () => {
+    test("get local state from attributes", () => {
         const reactiveNodes = [
             {
                 id: 0,
@@ -26,7 +26,7 @@ describe("getAttributesRecursive", () => {
             },
             {
                 id: 2,
-                parentId: null,
+                parentId: 1,
                 attributes: [
                     {
                         name: "data-parent3",
@@ -35,33 +35,28 @@ describe("getAttributesRecursive", () => {
                 ],
             },
         ];
-
-        const childAttributes = [
+        const elementAttributes = [
             {
                 name: "data-child",
                 value: "child",
             },
         ];
-
-        const attributes = getAttributesRecursive(
-            1,
-            childAttributes,
+        const globalState = {
+            global: 42,
+        };
+        const localState = getLocalState(
+            2,
+            elementAttributes,
+            globalState,
             reactiveNodes
         );
 
-        expect(attributes).toStrictEqual([
-            {
-                name: "data-parent",
-                value: "parent",
-            },
-            {
-                name: "data-parent2",
-                value: "parent2",
-            },
-            {
-                name: "data-child",
-                value: "child",
-            },
-        ]);
+        expect(localState).toStrictEqual({
+            global: 42,
+            dataChild: "child",
+            dataParent: "parent",
+            dataParent2: "parent2",
+            dataParent3: "parent3",
+        });
     });
 });
