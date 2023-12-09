@@ -16,8 +16,14 @@ export function registerReactiveNode(
     attributes: Attribute[] = [],
     parentId: number | null = null
 ) {
-    const expressions = extractTemplateExpressions(template);
-    const updatedContent = evaluateTemplate(template, expressions, state);
+    const refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
+    const expressions = extractTemplateExpressions(refinedTemplate);
+    const updatedContent = evaluateTemplate(
+        refinedTemplate,
+        expressions,
+        state
+    );
+
     const element = elementFromString(updatedContent);
 
     const attributesRecursive = getAttributesRecursive(
@@ -27,7 +33,9 @@ export function registerReactiveNode(
     );
 
     const templateForUpdateCheck =
-        template + " " + attributesRecursive.map((a) => a.value).join(" ");
+        refinedTemplate +
+        " " +
+        attributesRecursive.map((a) => a.value).join(" ");
     const expression = extractTemplateExpressions(templateForUpdateCheck)
         .map((e) => e.value)
         .join(" ");
@@ -37,7 +45,7 @@ export function registerReactiveNode(
         id: elementId,
         parentId,
         element,
-        template: template,
+        template: refinedTemplate,
         lastTemplateEvaluation: updatedContent,
         updateCheckString,
         attributes,

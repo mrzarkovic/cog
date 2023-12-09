@@ -27,7 +27,7 @@
                         class="input input-bordered"
                     />
                     <div class="pl-2">
-                        {{ isEditing() ? `<button
+                        {{ isEditing(editingId) ? `<button
                             class="btn btn-primary"
                             onclick="handleUpdateTodo()"
                         >
@@ -75,7 +75,7 @@
             ]);
             const editingId = variable("editingId", -1);
 
-            variable("isEditing", () => editingId.value > -1);
+            variable("isEditing", (editingId) => editingId > -1);
 
             function handleAddTodo() {
                 if (todoInput.value) {
