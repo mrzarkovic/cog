@@ -232,7 +232,6 @@ export const reconcile = (
     state: State,
     updatedStateKeys: string[]
 ) => {
-    let updates = 0;
     for (
         let nodeIndex = 0;
         nodeIndex < reactiveNodes.value.length;
@@ -253,44 +252,40 @@ export const reconcile = (
         );
 
         if (!shouldUpdate) {
-            continue;
-        } else {
-            updates++;
             reactiveNodes.update(nodeIndex, "shouldUpdate", false);
-        }
 
-        const localState = getLocalState(
-            parentId,
-            attributes,
-            state,
-            reactiveNodes.list
-        );
-        const updatedContent = evaluateTemplate(
-            template,
-            expressions,
-            localState
-        );
-
-        const newElement = elementFromString(updatedContent);
-        const oldElement = elementFromString(lastTemplateEvaluation);
-        const changedNodes = compareNodes(oldElement, newElement);
-
-        if (changedNodes.length > 0) {
-            reactiveNodes.update(
-                nodeIndex,
-                "lastTemplateEvaluation",
-                updatedContent
+            const localState = getLocalState(
+                parentId,
+                attributes,
+                state,
+                reactiveNodes.list
+            );
+            const updatedContent = evaluateTemplate(
+                template,
+                expressions,
+                localState
             );
 
-            handleNodeChanges(
-                changedNodes,
-                oldElement,
-                newElement,
-                element,
-                localState,
-                reactiveNodes
-            );
+            const newElement = elementFromString(updatedContent);
+            const oldElement = elementFromString(lastTemplateEvaluation);
+            const changedNodes = compareNodes(oldElement, newElement);
+
+            if (changedNodes.length > 0) {
+                reactiveNodes.update(
+                    nodeIndex,
+                    "lastTemplateEvaluation",
+                    updatedContent
+                );
+
+                handleNodeChanges(
+                    changedNodes,
+                    oldElement,
+                    newElement,
+                    element,
+                    localState,
+                    reactiveNodes
+                );
+            }
         }
     }
-    console.log("Nodes updated: ", updates);
 };
