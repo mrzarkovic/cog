@@ -271,7 +271,7 @@ In this example, `{{ count * 2 }}` will be replaced with the result of multiplyi
 
 ### `variable()`
 
-The Cog library is designed with simplicity in mind and thus provides a single API, the **variable** method.
+The Cog library is designed with simplicity in mind and thus provides a single API, the **variable** method (if we exclude the _render_ method).
 
 `variable` is a function that creates a new reactive variable. It is used to create a state variable within the `state` object of the Cog library. It takes a name and an initial value as arguments, and adds an entry to the `state` object with the given name and value.
 
