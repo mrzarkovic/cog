@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>7/7</span>
+                <span class='fraction'>0/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -92,43 +92,43 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ChangedAttribute } from "../types";
 &nbsp;
-export function handleBooleanAttribute(
+export function <span class="fstat-no" title="function not covered" >handleBooleanAttribute(</span>
     changedNode: HTMLElement,
     attribute: ChangedAttribute
 ) {
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (attribute.name.startsWith("data-attribute-")) {
-        const optionalAttribute = attribute.name.substring(15); // "data-attribute-".length
+<span class="cstat-no" title="statement not covered" >    if (attribute.name.startsWith("data-attribute-")) {</span>
+        const optionalAttribute = <span class="cstat-no" title="statement not covered" >attribute.name.substring(15);</span> // "data-attribute-".length
 &nbsp;
-        if (attribute.newValue) {
+<span class="cstat-no" title="statement not covered" >        if (attribute.newValue) {</span>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (changedNode as any)[optionalAttribute] = true;
-            changedNode.setAttribute(
+<span class="cstat-no" title="statement not covered" >            (changedNode as any)[optionalAttribute] = true;</span>
+<span class="cstat-no" title="statement not covered" >            changedNode.setAttribute(</span>
                 optionalAttribute,
                 attribute.newValue as string
             );
         } else {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (changedNode as any)[optionalAttribute] = false;
-            changedNode.removeAttribute(optionalAttribute);
+<span class="cstat-no" title="statement not covered" >            (changedNode as any)[optionalAttribute] = false;</span>
+<span class="cstat-no" title="statement not covered" >            changedNode.removeAttribute(optionalAttribute);</span>
         }
     }
 }
@@ -139,7 +139,7 @@ export function handleBooleanAttribute(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-09T12:55:57.026Z
+                at 2023-12-09T13:14:16.708Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
