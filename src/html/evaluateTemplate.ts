@@ -28,6 +28,10 @@ export const evaluateTemplate = (
     return updatedContent;
 };
 
+/**
+ * Extracts all template expressions from a template string.
+ * start and end are relative to the last template expression.
+ */
 export const extractTemplateExpressions = (template: string): Expression[] => {
     const expressions = [];
     let restOfContent = String(template);
