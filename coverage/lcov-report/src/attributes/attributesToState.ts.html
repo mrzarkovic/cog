@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -99,19 +99,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -120,26 +117,29 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { evaluateTemplate } from "../html/evaluateTemplate";
 import { Attribute, State } from "../types";
 import { convertAttribute } from "./convertAttribute";
 import { convertAttributeValue } from "./convertAttributeValue";
 &nbsp;
-const attributesToStates: Record&lt;string, State&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
+const attributesToStates: Record&lt;string, State&gt; = {};
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >attributesToState(</span>attributes: Attribute[], state: State) {
-    const key = <span class="cstat-no" title="statement not covered" >JSON.stringify(attributes) + JSON.stringify(state);</span>
+export function attributesToState(attributes: Attribute[], state: State) {
+    const key = JSON.stringify(attributes) + JSON.stringify(state);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (!attributesToStates[key]) {</span>
-        const localState: State = <span class="cstat-no" title="statement not covered" >Object.assign({}, state);</span>
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (!attributesToStates[key]) {
+        const localState: State = Object.assign({}, state);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; attributes.length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >            localState[convertAttribute(attributes[i].name)] =</span>
+        for (let i = 0; i &lt; attributes.length; i++) {
+            localState[convertAttribute(attributes[i].name)] =
                 convertAttributeValue(
                     attributes[i].reactive
                         ? evaluateTemplate(
@@ -151,10 +151,10 @@ export function <span class="fstat-no" title="function not covered" >attributesT
                 );
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        attributesToStates[key] = localState;</span>
+        attributesToStates[key] = localState;
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return attributesToStates[key];</span>
+    return attributesToStates[key];
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -163,7 +163,7 @@ export function <span class="fstat-no" title="function not covered" >attributesT
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-10T01:16:23.918Z
+                at 2023-12-10T16:23:25.402Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

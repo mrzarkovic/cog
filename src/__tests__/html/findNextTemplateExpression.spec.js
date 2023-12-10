@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 
-import { findNextTemplateExpression } from "../html/findNextTemplateExpression";
+import { findNextTemplateExpression } from "../../html/findNextTemplateExpression";
 
 describe("findNextTemplateExpression", () => {
     test("finds the next template expression start and end index", () => {

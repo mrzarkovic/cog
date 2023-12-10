@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">91.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>11/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>1/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>7/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">91.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>11/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -100,65 +100,65 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ReactiveNodesList, ReactiveNode, ReactiveNodeIndex } from "./types";
 import { cleanReactiveNodesList } from "./nodes/cleanReactiveNodesList";
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >createReactiveNodes(</span>): ReactiveNodesList {
-<span class="cstat-no" title="statement not covered" >    return {</span>
+export function createReactiveNodes(): ReactiveNodesList {
+    return {
         lastId: 0,
         list: [] as ReactiveNode[],
         index: {} as ReactiveNodeIndex,
-<span class="fstat-no" title="function not covered" >        ge</span>t value() {
-<span class="cstat-no" title="statement not covered" >            return this.list;</span>
+        get value() {
+            return this.list;
         },
-<span class="fstat-no" title="function not covered" >        ad</span>d(item: ReactiveNode) {
-<span class="cstat-no" title="statement not covered" >            this.list.push(item);</span>
-<span class="cstat-no" title="statement not covered" >            this.index[item.id] = this.list.length - 1;</span>
+        add(item: ReactiveNode) {
+            this.list.push(item);
+            this.index[item.id] = this.list.length - 1;
         },
-<span class="fstat-no" title="function not covered" >        up</span>date(index: number, property: keyof ReactiveNode, value: unknown) {
-<span class="cstat-no" title="statement not covered" >            if (property === "attributes") {</span>
+        update(index: number, property: keyof ReactiveNode, value: unknown) {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (property === "attributes") {
 <span class="cstat-no" title="statement not covered" >                this.list[index].shouldUpdate = true;</span>
             }
-<span class="cstat-no" title="statement not covered" >            this.list[index][property] = value as never;</span>
+            this.list[index][property] = value as never;
         },
-<span class="fstat-no" title="function not covered" >        cl</span>ean() {
-<span class="cstat-no" title="statement not covered" >            this.list = cleanReactiveNodesList(this.list);</span>
-<span class="cstat-no" title="statement not covered" >            this.index = this.list.reduce(<span class="fstat-no" title="function not covered" >(i</span>ndex, item, i) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >                index[item.id] = i;</span>
-<span class="cstat-no" title="statement not covered" >                return index;</span>
+        clean() {
+            this.list = cleanReactiveNodesList(this.list);
+            this.index = this.list.reduce((index, item, i) =&gt; {
+                index[item.id] = i;
+                return index;
             }, {} as ReactiveNodeIndex);
         },
-<span class="fstat-no" title="function not covered" >        id</span>() {
-<span class="cstat-no" title="statement not covered" >            return this.lastId++;</span>
+        id() {
+            return this.lastId++;
         },
     };
 }
@@ -169,7 +169,7 @@ export function <span class="fstat-no" title="function not covered" >createReact
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-10T01:16:23.918Z
+                at 2023-12-10T16:23:25.402Z
             </div>
         <script src="../prettify.js"></script>
         <script>

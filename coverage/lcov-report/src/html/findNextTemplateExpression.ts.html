@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,49 +94,49 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">52x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">250x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">225x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">250x</span>
+<span class="cline-any cline-yes">51x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { HTMLString } from "../types";
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >findNextTemplateExpression(</span>htmlText: HTMLString): {
+export function findNextTemplateExpression(htmlText: HTMLString): {
     start: number;
     end: number;
 } {
-    const start = <span class="cstat-no" title="statement not covered" >htmlText.indexOf("{{");</span>
-    let stack = <span class="cstat-no" title="statement not covered" >0;</span>
+    const start = htmlText.indexOf("{{");
+    let stack = 0;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    for (let i = <span class="cstat-no" title="statement not covered" >start;</span> i &lt; htmlText.length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >        if (htmlText[i] === "{" &amp;&amp; htmlText[i + 1] === "{") {</span>
-<span class="cstat-no" title="statement not covered" >            stack++;</span>
-<span class="cstat-no" title="statement not covered" >            i++;</span>
-        } else <span class="cstat-no" title="statement not covered" >if (htmlText[i] === "}" &amp;&amp; htmlText[i + 1] === "}") {</span>
-<span class="cstat-no" title="statement not covered" >            stack--;</span>
-<span class="cstat-no" title="statement not covered" >            i++;</span>
+    for (let i = start; i &lt; htmlText.length; i++) {
+        if (htmlText[i] === "{" &amp;&amp; htmlText[i + 1] === "{") {
+            stack++;
+            i++;
+        } else if (htmlText[i] === "}" &amp;&amp; htmlText[i + 1] === "}") {
+            stack--;
+            i++;
         }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        if (stack === 0) {</span>
-<span class="cstat-no" title="statement not covered" >            return { start, end: i };</span>
+        if (stack === 0) {
+            return { start, end: i };
         }
     }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return { start, end: -1 };</span>
+    return { start, end: -1 };
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -145,7 +145,7 @@ export function <span class="fstat-no" title="function not covered" >findNextTem
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-10T01:16:23.918Z
+                at 2023-12-10T16:23:25.402Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

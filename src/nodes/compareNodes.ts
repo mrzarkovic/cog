@@ -9,7 +9,7 @@ export function compareTextNodes(
     if (oldNode.textContent !== newNode.textContent) {
         return [
             {
-                node: oldNode,
+                node: newNode,
                 content: newNode.textContent ?? "",
             },
         ];
@@ -61,7 +61,7 @@ export function compareChildNodes(
     return changedChildren;
 }
 
-function compareCustomElementChildren(
+export function compareCustomElementChildren(
     oldElement: HTMLElement,
     newElement: HTMLElement
 ): ChangedNode[] {

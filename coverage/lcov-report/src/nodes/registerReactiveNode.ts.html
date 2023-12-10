@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>3/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -140,46 +140,46 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { getAttributesRecursive } from "../attributes/getAttributesRecursive";
 import {
@@ -190,41 +190,41 @@ import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames
 import { Attribute, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >registerReactiveNode(</span>
+export function registerReactiveNode(
     elementId: number,
     reactiveNodes: ReactiveNodesList,
     originalElement: HTMLElement,
     template: string,
     state: State,
-    attributes: Attribute[] = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span>
-    parentId: number | null = <span class="branch-0 cbranch-no" title="branch not covered" >null</span>
+    attributes: Attribute[] = [],
+    parentId: number | null = null
 ) {
-    const refinedTemplate = <span class="cstat-no" title="statement not covered" >template.replace(/&gt;\s*([\s\S]*?)\s*&lt;/g, "&gt;$1&lt;");</span>
-    const expressions = <span class="cstat-no" title="statement not covered" >extractTemplateExpressions(refinedTemplate);</span>
-    const updatedContent = <span class="cstat-no" title="statement not covered" >evaluateTemplate(</span>
+    const refinedTemplate = template.replace(/&gt;\s*([\s\S]*?)\s*&lt;/g, "&gt;$1&lt;");
+    const expressions = extractTemplateExpressions(refinedTemplate);
+    const updatedContent = evaluateTemplate(
         refinedTemplate,
         expressions,
         state
     );
 &nbsp;
-    const element = <span class="cstat-no" title="statement not covered" >elementFromString(updatedContent);</span>
+    const element = elementFromString(updatedContent);
 &nbsp;
-    const attributesRecursive = <span class="cstat-no" title="statement not covered" >getAttributesRecursive(</span>
+    const attributesRecursive = getAttributesRecursive(
         parentId,
         attributes,
         reactiveNodes.list
     );
 &nbsp;
     const templateForUpdateCheck =
-<span class="cstat-no" title="statement not covered" >        refinedTemplate +</span>
+        refinedTemplate +
         " " +
-        attributesRecursive.map(<span class="fstat-no" title="function not covered" >(a</span>) =&gt; <span class="cstat-no" title="statement not covered" >a.value)</span>.join(" ");
-    const expression = <span class="cstat-no" title="statement not covered" >extractTemplateExpressions(templateForUpdateCheck)</span>
-        .map(<span class="fstat-no" title="function not covered" >(e</span>) =&gt; <span class="cstat-no" title="statement not covered" >e.value)</span>
+        attributesRecursive.map((a) =&gt; a.value).join(" ");
+    const expression = extractTemplateExpressions(templateForUpdateCheck)
+        .map((e) =&gt; e.value)
         .join(" ");
-    const updateCheckString = <span class="cstat-no" title="statement not covered" >removeTagsAndAttributeNames(expression);</span>
+    const updateCheckString = removeTagsAndAttributeNames(expression);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    reactiveNodes.add({</span>
+    reactiveNodes.add({
         id: elementId,
         parentId,
         element,
@@ -236,9 +236,9 @@ export function <span class="fstat-no" title="function not covered" >registerRea
         shouldUpdate: false,
     });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    originalElement.parentElement?.replaceChild(element, originalElement);</span>
+    originalElement.parentElement?.replaceChild(element, originalElement);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return element;</span>
+    return element;
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -247,7 +247,7 @@ export function <span class="fstat-no" title="function not covered" >registerRea
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-10T01:16:23.918Z
+                at 2023-12-10T16:23:25.402Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
