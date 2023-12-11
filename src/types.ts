@@ -29,7 +29,7 @@ export type ReactiveNode = {
     parentId: number | null;
     element: HTMLElement;
     template: HTMLString;
-    lastTemplateEvaluation: HTMLString;
+    lastTemplateEvaluation: CogHTMLElement;
     updateCheckString: string;
     attributes: Attribute[];
     expressions: Expression[];

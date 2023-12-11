@@ -4,7 +4,7 @@ import {
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
 import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
-import { Attribute, ReactiveNodesList, State } from "../types";
+import { Attribute, CogHTMLElement, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 
 export function registerReactiveNode(
@@ -46,7 +46,7 @@ export function registerReactiveNode(
         parentId,
         element,
         template: refinedTemplate,
-        lastTemplateEvaluation: updatedContent,
+        lastTemplateEvaluation: element.cloneNode(true) as CogHTMLElement,
         updateCheckString,
         attributes,
         expressions,
