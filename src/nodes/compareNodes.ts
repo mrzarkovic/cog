@@ -10,7 +10,7 @@ export function compareTextNodes(
         return [
             {
                 node: newNode,
-                content: newNode.textContent ?? "",
+                content: newNode.textContent!,
             },
         ];
     }

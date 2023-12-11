@@ -11,18 +11,6 @@ const getWindowErrorPromise = () =>
     });
 
 describe("cog", () => {
-    function dispatchDOMContentLoaded() {
-        const event = new Event("DOMContentLoaded", {
-            bubbles: true,
-            cancelable: false,
-        });
-        document.dispatchEvent(event);
-    }
-
-    beforeEach(() => {
-        document.body.innerHTML = "";
-    });
-
     test("pass data to custom element through data attributes", () => {
         const root = document.createElement("div");
         const template = document.createElement("template");
@@ -62,7 +50,7 @@ describe("cog", () => {
         });
     });
 
-    test("update custom element data attribute", async () => {
+    test("update custom element reactive data attribute", async () => {
         const root = document.createElement("div");
         const template = document.createElement("template");
         template.id = "my-template4";
@@ -85,6 +73,150 @@ describe("cog", () => {
 
         await waitFor(() => {
             expect(element.textContent).toBe("Hello Me!");
+        });
+    });
+
+    test("update custom element static data attribute", async () => {
+        const root = document.createElement("div");
+        const template = document.createElement("template");
+        template.id = "my-template5";
+        template.innerHTML = "<div>Hello {{ dataChild }}!</div>";
+        const container = document.createElement("div");
+        container.innerHTML =
+            '{{ new Array(1).fill(0).map( (n, i) => `<my-template5 data-child="${i + count}"></my-template5>`)}}';
+        root.appendChild(template);
+        root.appendChild(container);
+        document.body.appendChild(root);
+        const cog = init();
+        const count = cog.variable("count", 0);
+        cog.render(root);
+
+        const element = getByText(root, "Hello 0!");
+
+        expect(element).toBeInTheDocument();
+
+        count.value = 1;
+
+        await waitFor(() => {
+            expect(element.textContent).toBe("Hello 1!");
+        });
+    });
+
+    test("update custom element children attribute", async () => {
+        const root = document.createElement("div");
+        const template = document.createElement("template");
+        template.id = "my-template6";
+        template.innerHTML = "<div>Hello {{ children }}!</div>";
+        const container = document.createElement("div");
+        container.innerHTML =
+            "{{ new Array(1).fill(0).map( (n, i) => `<my-template6>${i + count}</my-template6>`)}}";
+        root.appendChild(template);
+        root.appendChild(container);
+        document.body.appendChild(root);
+        const cog = init();
+        const count = cog.variable("count", 0);
+        cog.render(root);
+
+        const element = getByText(root, "Hello 0!");
+
+        expect(element).toBeInTheDocument();
+
+        count.value = 1;
+
+        await waitFor(() => {
+            expect(element.textContent).toBe("Hello 1!");
+        });
+    });
+
+    test("add children to custom element", async () => {
+        const root = document.createElement("div");
+        const template = document.createElement("template");
+        template.id = "my-template7";
+        template.innerHTML = "<div>Hello World!</div>";
+        const container = document.createElement("div");
+        container.setAttribute("data-testid", "container");
+        container.innerHTML =
+            "{{ new Array(count).fill(0).map( (n, i) => `<my-template7></my-template7>`)}}";
+        root.appendChild(template);
+        root.appendChild(container);
+        document.body.appendChild(root);
+        const cog = init();
+        const count = cog.variable("count", 1);
+        cog.render(root);
+
+        count.value = 5;
+
+        await waitFor(() => {
+            expect(getByTestId(root, "container").children.length).toBe(5);
+        });
+    });
+
+    test("remove children from custom element", async () => {
+        const root = document.createElement("div");
+        const template = document.createElement("template");
+        template.id = "my-template8";
+        template.innerHTML = "<div>Hello World!</div>";
+        const container = document.createElement("div");
+        container.setAttribute("data-testid", "container");
+        container.innerHTML =
+            "{{ new Array(count).fill(0).map( (n, i) => `<my-template8></my-template8>`)}}";
+        root.appendChild(template);
+        root.appendChild(container);
+        document.body.appendChild(root);
+        const cog = init();
+        const count = cog.variable("count", 3);
+        cog.render(root);
+
+        count.value = 1;
+
+        await waitFor(() => {
+            expect(getByTestId(root, "container").children.length).toBe(1);
+        });
+    });
+
+    test("update text node custom element", async () => {
+        const root = document.createElement("div");
+        const template = document.createElement("template");
+        template.id = "my-template9";
+        template.innerHTML = "{{greeting}}";
+        const myElement = document.createElement("my-template9");
+        root.appendChild(template);
+        root.appendChild(myElement);
+        document.body.appendChild(root);
+
+        const cog = init();
+        const greeting = cog.variable("greeting", "Hello World!");
+        cog.render(root);
+
+        greeting.value = "Hello Me!";
+
+        await waitFor(() => {
+            expect(getByText(root, "Hello Me!")).toBeInTheDocument();
+        });
+    });
+
+    test("update child custom elements of custom element", async () => {
+        const root = document.createElement("div");
+        const template = document.createElement("template");
+        template.id = "my-template10";
+        template.innerHTML = "<div>Hello {{dataChild}}!</div>";
+        const container = document.createElement("template");
+        container.id = "my-template-container";
+        container.innerHTML =
+            "<div>{{ new Array(1).fill(0).map( (n, i) => `<my-template10 data-child={{dataParent}}></my-template8>`)}}</div>";
+        const parent = document.createElement("my-template-container");
+        parent.setAttribute("data-parent", "{{name}}");
+        root.appendChild(template);
+        root.appendChild(container);
+        root.appendChild(parent);
+        document.body.appendChild(root);
+
+        const cog = init();
+        cog.variable("name", "World");
+        cog.render(root);
+
+        await waitFor(() => {
+            expect(getByText(root, "Hello World!")).toBeInTheDocument();
         });
     });
 

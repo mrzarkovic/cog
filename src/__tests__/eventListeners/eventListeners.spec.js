@@ -50,4 +50,24 @@ describe("eventListeners", () => {
         const state = {};
         expect(() => addEventListeners(parent, "click", state)).toThrow();
     });
+
+    test("don't remove event listeners if there aren't any", () => {
+        const parent = document.createElement("div");
+        parent.innerHTML =
+            "<button data-on-click='mock()' data-on-change='mock()'>Click</button>";
+        const button = getByText(parent, "Click");
+
+        const mock = jest.fn();
+        const state = { mock };
+
+        addEventListeners(parent, "click", state);
+        button.click();
+
+        expect(mock).toHaveBeenCalled();
+
+        removeEventListeners(parent, "change");
+        button.click();
+
+        expect(mock).toHaveBeenCalledTimes(2);
+    });
 });
