@@ -7,6 +7,7 @@ import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
 
 export const init = (): Cog => {
+    let calling: string | null = null;
     const reactiveNodes = createReactiveNodes();
     let updateStateTimeout: number | null = null;
     const state = createState();
@@ -42,13 +43,23 @@ export const init = (): Cog => {
     return {
         render,
         variable: <T>(name: string, value: T) => {
-            state.set(name, value);
+            if (value instanceof Function) {
+                console.log("function", name);
+                state.set(name, (...args: unknown[]) => {
+                    console.log("called", name, args);
+                    calling = name;
+                    return value(...args);
+                });
+            } else {
+                state.set(name, value);
+            }
 
             return {
                 set value(newVal: T) {
                     updateState(name, newVal);
                 },
                 get value() {
+                    console.log(calling, "is getting value");
                     return state.value[name] as T;
                 },
                 set: (newVal: T) => {
