@@ -76,7 +76,7 @@ function addParentIdToChildren(template: string, parentId: number) {
 
     let refinedTemplate = newElement.outerHTML;
     if (!refinedTemplate) {
-        refinedTemplate = newElement.textContent || "";
+        refinedTemplate = newElement.textContent!;
     }
 
     return refinedTemplate;

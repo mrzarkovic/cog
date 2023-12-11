@@ -1,9 +1,9 @@
 import { type Cog } from "./types";
 import { registerTemplates } from "./nodes/registerTemplates";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
-import { registerNativeElements } from "./nodes/loadNativeElements";
+import { registerNativeElements } from "./nodes/registerNativeElements";
 import { reconcile } from "./nodes/reconcile";
-import { createState } from "./state";
+import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
 
 export const init = (): Cog => {

@@ -18,7 +18,7 @@
                 {{ fps }}
             </div>
             <template id="my-template">
-                <div>Hello {{ dataName }}! {{ dataCount }}</div>
+                Hello {{ dataName }}! {{ dataCount }}
             </template>
             <template id="x-child">
                 <div class="flex">
@@ -51,7 +51,7 @@
                 data-name="World"
                 data-count="{{ count }}"
             ></my-template>
-            <div>Count: {{ count }}</div>
+            <div>Count: {{ `<span>${count}</span>` }}</div>
             <div class="p-4">
                 <div>1 {{ count % 3 == 0 ? count : '' }}</div>
                 <div>2 {{ count % 3 == 1 ? count : '' }}</div>
