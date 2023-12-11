@@ -1,7 +1,7 @@
 {
     "name": "@mzrk/cog",
-    "version": "0.0.11",
-    "description": "A simple, reactive expression library with zero dependencies.",
+    "version": "0.1.0",
+    "description": "Reactive UI Library for HTML",
     "main": "lib/cog.js",
     "types": "lib/src/cog.d.ts",
     "scripts": {
