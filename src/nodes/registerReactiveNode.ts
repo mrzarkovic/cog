@@ -4,8 +4,38 @@ import {
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
 import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
-import { Attribute, ReactiveNodesList, State } from "../types";
+import { Attribute, ReactiveNode, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
+
+function assignDependents(
+    state: State,
+    parentId: number | null,
+    attributes: Attribute[],
+    reactiveNodes: ReactiveNode[],
+    template: string
+) {
+    const attributesRecursive = getAttributesRecursive(
+        parentId,
+        attributes,
+        reactiveNodes
+    );
+    const templateForUpdateCheck =
+        template + " " + attributesRecursive.map((a) => a.value).join(" ");
+    const expression = extractTemplateExpressions(templateForUpdateCheck)
+        .map((e) => e.value)
+        .join(" ");
+    const updateCheckString = removeTagsAndAttributeNames(expression);
+    const index: Record<string, boolean> = {};
+    const uniqueWords = updateCheckString
+        .split("@")
+        .filter((w) => (index[w] ? false : (index[w] = true)));
+
+    for (let i = 0; i < uniqueWords.length; i++) {
+        if (state[uniqueWords[i]]) {
+            console.log("assignDependents", uniqueWords[i]);
+        }
+    }
+}
 
 export function registerReactiveNode(
     elementId: number,
@@ -31,15 +61,20 @@ export function registerReactiveNode(
         attributes,
         reactiveNodes.list
     );
-
     const templateForUpdateCheck =
-        refinedTemplate +
-        " " +
-        attributesRecursive.map((a) => a.value).join(" ");
+        template + " " + attributesRecursive.map((a) => a.value).join(" ");
     const expression = extractTemplateExpressions(templateForUpdateCheck)
         .map((e) => e.value)
         .join(" ");
     const updateCheckString = removeTagsAndAttributeNames(expression);
+
+    assignDependents(
+        state,
+        parentId,
+        attributes,
+        reactiveNodes.list,
+        refinedTemplate
+    );
 
     reactiveNodes.add({
         id: elementId,
