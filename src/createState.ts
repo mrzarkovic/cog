@@ -27,7 +27,9 @@ export function createState(): StateObject {
             }
         },
         registerUpdate(key: string) {
-            this.updatedKeys.push(key);
+            if (this.updatedKeys.indexOf(key) === -1) {
+                this.updatedKeys.push(key);
+            }
         },
         clearUpdates() {
             this.updatedKeys = [];

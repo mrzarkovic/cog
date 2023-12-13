@@ -13,7 +13,24 @@ export const init = (): Cog => {
     const state = createState();
 
     function reRender() {
-        reconcile(reactiveNodes, state.value, state.updatedKeys);
+        const uniqueDependents = [
+            ...new Set(
+                state.updatedKeys
+                    .map((stateKey) => state.value[stateKey].dependents)
+                    .flat()
+            ),
+        ];
+        console.log("uniqueDependents", uniqueDependents);
+        const nodesToReconcile = uniqueDependents.map((id) =>
+            reactiveNodes.get(id)
+        );
+
+        reconcile(
+            reactiveNodes,
+            nodesToReconcile,
+            state.value,
+            state.updatedKeys
+        );
         reactiveNodes.clean();
         state.clearUpdates();
     }

@@ -79,6 +79,7 @@ export type ReactiveNodesList = {
     list: ReactiveNode[];
     lastId: number;
     get value(): ReactiveNode[];
+    get: (id: number) => ReactiveNode;
     add: (item: ReactiveNode) => void;
     update: (
         index: number,

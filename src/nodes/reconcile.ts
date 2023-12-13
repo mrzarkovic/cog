@@ -30,6 +30,7 @@ function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
 }
 
 function handleCustomElement(
+    id: number,
     changedNode: HTMLElement,
     originalNode: CogHTMLElement,
     content: string | undefined,
@@ -59,7 +60,7 @@ function handleCustomElement(
             newAttributes
         );
 
-        reactiveNodes.update(nodeIndex, "attributes", mergedAttributes);
+        reactiveNodes.update(id, "attributes", mergedAttributes);
     }
 }
 
@@ -111,6 +112,7 @@ function handleChildrenRemoval(
 }
 
 const updateElement = (
+    id: number,
     originalNode: CogHTMLElement,
     changedNode: HTMLElement,
     content: string | undefined,
@@ -122,6 +124,7 @@ const updateElement = (
 ) => {
     if (isCustomElement(changedNode)) {
         handleCustomElement(
+            id,
             changedNode,
             originalNode,
             content,
@@ -155,6 +158,7 @@ function checkIfChangedStateIsUsedInExpression(
 }
 
 function handleNodeChanges(
+    id: number,
     changedNodes: ChangedNode[],
     oldElement: CogHTMLElement,
     newElement: CogHTMLElement,
@@ -176,6 +180,7 @@ function handleNodeChanges(
         );
 
         updateElement(
+            id,
             originalNode,
             changedNodes[i].node,
             changedNodes[i].content,
@@ -229,30 +234,28 @@ function nodeNeedsUpdate(updatedStateKeys: string[], node: ReactiveNode) {
 
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
+    nodesToReconcile: ReactiveNode[],
     state: State,
     updatedStateKeys: string[]
 ) => {
-    for (
-        let nodeIndex = 0;
-        nodeIndex < reactiveNodes.value.length;
-        nodeIndex++
-    ) {
+    for (let nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
         const {
+            id,
             parentId,
             attributes,
             element,
             template,
             lastTemplateEvaluation,
             expressions,
-        } = reactiveNodes.value[nodeIndex];
+        } = nodesToReconcile[nodeIndex];
 
         const shouldUpdate = nodeNeedsUpdate(
             updatedStateKeys,
-            reactiveNodes.value[nodeIndex]
+            nodesToReconcile[nodeIndex]
         );
 
         if (shouldUpdate) {
-            reactiveNodes.update(nodeIndex, "shouldUpdate", false);
+            reactiveNodes.update(id, "shouldUpdate", false);
 
             const localState = getLocalState(
                 parentId,
@@ -272,12 +275,13 @@ export const reconcile = (
 
             if (changedNodes.length > 0) {
                 reactiveNodes.update(
-                    nodeIndex,
+                    id,
                     "lastTemplateEvaluation",
                     updatedContent
                 );
 
                 handleNodeChanges(
+                    id,
                     changedNodes,
                     oldElement,
                     newElement,
