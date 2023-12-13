@@ -1,8 +1,8 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/mrzarkovic/cog/main/logo.png" alt="Cog Logo"/>
 </p>
-<br/>
-<p align="center">
+
+# ⚙️Cog
 
 [![dependencies](https://img.shields.io/badge/dependencies-0-blue)](https://www.npmjs.com/package/@mzrk/cog?activeTab=dependencies)
 [![npm](https://img.shields.io/npm/v/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog)
@@ -10,11 +10,6 @@
 ![Lines](https://img.shields.io/badge/coverage-100%25-brightgreen.svg?style=flat)
 ![license](https://img.shields.io/npm/l/@mzrk/cog)
 [![downloads](https://img.shields.io/npm/dt/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog?activeTab=versions)
-
-</p>
-<br/>
-
-# ⚙️Cog
 
 > Reactive UI Library for HTML
 
