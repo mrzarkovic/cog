@@ -59,7 +59,7 @@ Or you can install it via `npm` package manager:
 npm install @mzrk/cog
 ```
 
-## Usage
+## Getting Started
 
 We'll build a simple counter. In this example, `countVariable` is a reactive variable and `count` is the name of the state variable used in the HTML template.
 
@@ -110,6 +110,39 @@ In the HTML, you can use `{{ count }}` to bind a variable to the text content o
 ```
 
 When the button is clicked, the `incrementCount` function is called, which updates the `count` variable and triggers a re-render of the UI.
+
+## Component System
+
+The Cog library uses Web Components to create reusable HTML templates. This allows you to define a template once and use it multiple times with different data, making your HTML more maintainable.
+
+Templates are defined using the `<template>` HTML element with an `id`. The content inside the template can include any HTML markup and placeholders for dynamic content, enclosed in `{{ }}`.
+
+```html
+<template id="my-text">
+    <div class="bold">{{ children }}</div>
+</template>
+```
+
+Placeholders in the template are replaced with the corresponding data from the custom element. This can include the content of the custom element (replacing `{{ children }}`) and any data attributes on the custom element (replacing `{{ attributeName }}`).
+
+```html
+<my-text>I'm the child</my-text>
+```
+
+Custom data attributes (prefixed with `data-`) can be used to pass additional data to the template. Cog converts these attribute names to camelCase and makes them available as variables inside the template.
+
+```html
+<!-- Definition -->
+<template id="my-checkbox">
+    <label>
+        <input type="checkbox" data-attribute-checked="{{ dataIsChecked }}" />
+        {{ dataLabel }}
+    </label>
+</template>
+
+<!-- Usage -->
+<my-checkbox data-label="Check it" data-is-checked="true"></my-checkbox>
+```
 
 ## Documentation
 
