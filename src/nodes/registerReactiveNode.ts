@@ -8,6 +8,7 @@ import { Attribute, ReactiveNode, ReactiveNodesList, State } from "../types";
 import { elementFromString } from "./elementFromString";
 
 function assignDependents(
+    elementId: number,
     state: State,
     parentId: number | null,
     attributes: Attribute[],
@@ -32,7 +33,9 @@ function assignDependents(
 
     for (let i = 0; i < uniqueWords.length; i++) {
         if (state[uniqueWords[i]]) {
-            console.log("assignDependents", uniqueWords[i]);
+            if (state[uniqueWords[i]].dependents.indexOf(elementId!) === -1) {
+                state[uniqueWords[i]].dependents.push(elementId!);
+            }
         }
     }
 }
@@ -69,6 +72,7 @@ export function registerReactiveNode(
     const updateCheckString = removeTagsAndAttributeNames(expression);
 
     assignDependents(
+        elementId,
         state,
         parentId,
         attributes,

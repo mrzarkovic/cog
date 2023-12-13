@@ -1,1 +1,902 @@
-!function(n,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports["t"]=t():n["t"]=t()}(self,(()=>(()=>{"use strict";var n={};function t(n,t){var r=n(t);return Array.isArray(r)&&(r=r.join("")),r}function r(n){for(var t=n.indexOf("{{"),r=0,e=t;e<n.length;e++)if("{"===n[e]&&"{"===n[e+1]?(r++,e++):"}"===n[e]&&"}"===n[e+1]&&(r--,e++),0===r)return{start:t,end:e};return{start:t,end:-1}}(n=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(n,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(n,"o",{value:!0})})(n);var e={},o=function(n,t){var r=n+JSON.stringify(Object.keys(t).join(""));if(!e[r]){var o="return (state) => {".concat(Object.keys(t).map((function(n){return"const ".concat(n,' = state["').concat(n,'"];')})).join("\n")," return ").concat(n,"}");e[r]=Function(o)()}return e[r]},u=function(n,r,e){for(var u=n,i="",a=0;a<r.length;a++){var c=r[a],f=c.start,v=c.end,l=c.value,d=u.slice(0,f),s=u.slice(v+1),h=t(o(l,e),e);i+="".concat(d).concat(h),u=s}return i+u},i=function(n){for(var t,e,o=[],u=String(n),i=!0;i;){var a=r(u),c=a.start,f=a.end;if(-1===f){i=!1;break}var v=u.slice(c+2,f-1),l=u.slice(f+1),d=(t=v,e=void 0,(e=document.createElement("div")).innerHTML=function(n){return n.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(t),(e.textContent||e.innerText||"").replace(/[\r\n]+/g,""));o.push({start:c,end:f,value:d}),u=l}return o},a=function(n){return Array.from(n.attributes).map((function(n){var t=i(n.value);return{name:n.name,value:n.value,u:t,i:!!t.length}}))},c=function(n){return n.split("-").reduce((function(n,t,r){return n+(r?t[0].toUpperCase()+t.slice(1):t)}),"")};function f(n){return"true"===n||"false"!==n&&("null"===n?null:"undefined"===n?void 0:""===n?"":isNaN(Number(n))?n:Number(n))}var v={};function l(n,t){var r=JSON.stringify(n)+JSON.stringify(t);if(!v[r]){for(var e=Object.assign({},t),o=0;o<n.length;o++)e[c(n[o].name)]=f(n[o].i?u(n[o].value,n[o].u,t):n[o].value);v[r]=e}return v[r]}function d(n,t,r,e){var o=e.find((function(t){return t.id===n}));if(!o)return l(t,r);var u=d(o.parentId,o.attributes,r,e);return Object.assign({},u,l(t,u))}function s(n){return(new DOMParser).parseFromString(n,"text/html").body.firstChild}function h(n,t){for(var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:function(){return!0},e=[],o=document.evaluate(t,n,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),u=o.iterateNext();u;)r(u)&&e.push(u),u=o.iterateNext();return e}function m(n,t,r){if(null===n)return t;var e=r.find((function(t){return t.id===n}));return m(e.parentId,e.attributes,r).concat(t)}var p=/<\/?[\w-]+/g,b=/[\w-]+(\s*=\s*("|')[^"']*("|'))/g,g=/[^\w\s]/g,w=/\s+/g;function x(n){return n.replace(p,"").replace(b,"$1").replace(g," ").trim().replace(w,"@")}function y(n,t,r,e,o){var a,c=arguments.length>5&&void 0!==arguments[5]?arguments[5]:[],f=arguments.length>6&&void 0!==arguments[6]?arguments[6]:null,v=e.replace(/>\s*([\s\S]*?)\s*</g,">$1<"),l=i(v),d=u(v,l,o),h=s(d),p=e+" "+m(f,c,t.list).map((function(n){return n.value})).join(" "),b=x(i(p).map((function(n){return n.value})).join(" "));return function(n,t,r,e,o){for(var u=o+" "+m(t,r,e).map((function(n){return n.value})).join(" "),a=x(i(u).map((function(n){return n.value})).join(" ")),c={},f=a.split("@").filter((function(n){return!c[n]&&(c[n]=!0)})),v=0;v<f.length;v++)n[f[v]]&&console.log("assignDependents",f[v])}(o,f,c,t.list,v),t.add({id:n,parentId:f,element:h,v,lastTemplateEvaluation:d,l:b,attributes:c,u:l,shouldUpdate:!1}),null===(a=r.parentElement)||void 0===a||a.replaceChild(h,r),h}function N(n,t,r,e){function o(){return Reflect.construct(HTMLElement,[],o)}o.prototype=Object.create(HTMLElement.prototype),o.prototype.constructor=o,o.prototype.connectedCallback=function(n,t,r){return function(){var e=r.id(),o=function(n){var t=a(n),r=i(n.innerHTML);return t.push({name:"children",value:n.innerHTML,u:r,i:!!r.length}),t}(this),u=function(n,t){var r=s(n);if(r.nodeType!==Node.TEXT_NODE){O(r,t);for(var e=r.querySelectorAll("*"),o=0;o<e.length;o++)O(e[o],t)}var u=r.outerHTML;return u||(u=r.textContent),u}(n.innerHTML,e),c=this.dataset.parentId?Number(this.dataset.parentId):null,f=d(c,o,t,r.list);y(e,r,this,u,f,o,c).cogAnchorId=e}}(t,r,e),customElements.define(n,o)}function O(n,t){n.tagName.includes("-")&&n.setAttribute("data-parent-id",String(t))}var j=function(n,t,r){var e=t.getAttribute("data-on-".concat(n));if(!e)throw new Error("Missing data-handler attribute");var u=o(e,r);return function(t){try{u(r),t.preventDefault()}catch(t){throw new Error("".concat(t.message,": data-on-").concat(n,"=").concat(e))}}};function S(n,t,r){n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var e=j(t,n,r);n.addEventListener(t,e),n["".concat(t,"Handler")]=e}))}function E(n,t){S(n,"click",t),S(n,"change",t)}function M(n,t){for(var r=[],e=0;e<n.attributes.length;e++){var o=n.attributes[e],u=t.getAttribute(o.name);u!==o.value&&r.push({name:o.name,newValue:f(u||"")})}return r}function A(n,t){if(t.name.startsWith("data-attribute-")){var r=t.name.substring(15);t.newValue?(n[r]=!0,n.setAttribute(r,t.newValue)):(n[r]=!1,n.removeAttribute(r))}}var T=function(n){return n.nodeType!==Node.TEXT_NODE&&-1!==n.tagName.indexOf("-")};function k(n,t){n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var r=n["".concat(t,"Handler")];r&&n.removeEventListener(t,r)}))}function C(n,t){if(n.nodeType===Node.TEXT_NODE)return function(n,t){return n.textContent!==t.textContent?[{node:t,content:t.textContent}]:[]}(n,t);var r,e=M(n,t),o=e.length>0?[{node:t,attributes:e}]:[];return T(n)?o.concat((r=t,n.innerHTML!==r.innerHTML?[{node:r,content:r.innerHTML}]:[])):o.concat(function(n,t){for(var r=[],e=[],o=Math.max(n.childNodes.length,t.childNodes.length),u=[],i=0;i<o;i++){var a,c,f=n.childNodes[i],v=t.childNodes[i];if((null==f?void 0:f.nodeType)===Node.TEXT_NODE&&(null==v?void 0:v.nodeType)===Node.TEXT_NODE){if((null===(a=f.textContent)||void 0===a?void 0:a.trim())!==(null===(c=v.textContent)||void 0===c?void 0:c.trim()))return[{node:t,content:t.innerHTML}]}else f?v?u=u.concat(C(f,v)):r.push(f):e.push(v)}return r.length&&u.push({node:t,h:r}),e.length&&u.push({node:t,m:e}),u}(n,t))}function F(n,t,r){for(var e=[],o=n;o!==t;)e.unshift(Array.prototype.indexOf.call(o.parentNode.childNodes,o)),o=o.parentNode;for(var u=r,i=0;i<e.length;i++){var a=e[i];if(!u.childNodes[a])return null;u=u.childNodes[a]}return u}var H=function(n,t,r,e,o,u,i,c){T(t)?function(n,t,r,e,o){var u,i=[];if((null!==(u=null==e?void 0:e.slice())&&void 0!==u?u:[]).length&&(i=a(n)),void 0!==r&&i.push({name:"children",value:r,u:[],i:!1}),i.length){var c=o.index[t.cogAnchorId],f=function(n,t){for(var r=n.concat(t),e={},o=0;o<r.length;o++)e[r[o].name]=r[o];return Object.values(e)}(o.list[c].attributes,i);o.update(c,"attributes",f)}}(t,n,r,e,c):void 0!==r?function(n,t,r){var e;n.nodeType===Node.TEXT_NODE?n.textContent=t:(k(e=n,"click"),k(e,"change"),n.innerHTML=t,E(n,r))}(n,r,i):void 0!==e?function(n,t){for(var r=0;r<t.length;r++)A(n,t[r]),n.setAttribute(t[r].name,t[r].newValue)}(n,e):o.length?function(n,t){for(var r=document.createDocumentFragment(),e=0;e<t.length;e++)r.appendChild(t[e]);n.appendChild(r)}(n,o):u.length&&function(n,t){for(var r=0;r<t.length;r++)n.removeChild(t[r])}(n,u)},R=function(n){return new RegExp("\\b".concat(n,"\\b|[^\\w]").concat(n,"[^\\w]"),"gm")};function D(n,t,r,e,o,u){for(var i=0;i<n.length;i++){var a=F(n[i].node,r,e),c=J(n[i],t,e),f=c.p,v=c.N;H(a,n[i].node,n[i].content,n[i].attributes,f,v,o,u)}}function J(n,t,r){var e=[],o=[];if(void 0!==n.m&&(o=n.m),void 0!==n.h)for(var u=0;u<n.h.length;u++){var i=F(n.h[u],t,r);i&&e.push(i)}return{p:o,N:e}}function L(n,t){return!!t.shouldUpdate||function(n,t){return n.map(R).some((function(n){return n.test(t)}))}(n,t.l)}var U=function(){var n=null,t={O:0,list:[],index:{},get value(){return this.list},add:function(n){this.list.push(n),this.index[n.id]=this.list.length-1},update:function(n,t,r){"attributes"===t&&(this.list[n].shouldUpdate=!0),this.list[n][t]=r},j:function(){this.list=this.list.filter((function(n){var t=n.element;return document.body.contains(t)})),this.index=this.list.reduce((function(n,t,r){return n[t.id]=r,n}),{})},id:function(){return this.O++}},r=null,e={state:null,S:[],get value(){return this.state||(this.state={}),this.state},set:function(n,t){this.state||(this.state={}),this.state[n]=t,this.S.push(n)},M:function(){this.S=[]}};var o=0;function i(n,i){e.set(n,i),null!==r&&cancelAnimationFrame(r),r=requestAnimationFrame((function(n){n-o>16.666666666666668&&(o=n,function(n,t,r){for(var e=0;e<n.value.length;e++){var o=n.value[e],i=o.parentId,a=o.attributes,c=o.element,f=o.v,v=o.lastTemplateEvaluation,l=o.u;if(L(r,n.value[e])){n.update(e,"shouldUpdate",!1);var h=d(i,a,t,n.list),m=u(f,l,h),p=s(m),b=s(v),g=C(b,p);g.length>0&&(n.update(e,"lastTemplateEvaluation",m),D(g,b,p,c,h,n))}}}(t,e.value,e.S),t.j(),e.M())}))}return{render:function(n){!function(n,t,r){for(var e=h(n,"self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",(function(n){return!T(n)})),o=0;o<e.length;o++){var u=r.id(),i=e[o];i.innerHTML=i.innerHTML.trim();for(var a=y(u,r,i,i.outerHTML,t),c=M(i,a),f=0;f<c.length;f++)A(a,c[f])}}(n,e.value,t),function(n,t,r){for(var e=h(n,"template"),o=document.createDocumentFragment(),u=0;u<e.length;u++){var i=e[u].getAttribute("id");if(i){if(e[u].innerHTML=e[u].innerHTML.replace(/[\r\n]+\s*/g,""),1!==e[u].content.childNodes.length)throw new Error("Template ".concat(i," should have a single child"));N(i,e[u],t,r),o.appendChild(e[u])}}o.textContent=""}(n,e.value,t),E(n,e.value)},variable:function(t,r){return r instanceof Function?(console.log("function",t),e.set(t,(function(){for(var e=arguments.length,o=new Array(e),u=0;u<e;u++)o[u]=arguments[u];return console.log("called",t,o),n=t,r.apply(void 0,o)}))):e.set(t,r),{set value(n){i(t,n)},get value(){return console.log(n,"is getting value"),e.value[t]},set:function(n){i(t,n)}}}}}(),B=U.variable,I=U.render;document.addEventListener("DOMContentLoaded",(function(){I(document.getElementById("app"))}));var P=B("count",1);return window.increment=function(){P.value++},n})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-custom-element-children"] = factory();
+	else
+		root["ts-custom-element-children"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/expressions/evaluateExpression.ts
+function evaluateExpression(expressionWithScope, state) {
+  var evaluated = expressionWithScope(state);
+  if (Array.isArray(evaluated)) {
+    evaluated = evaluated.join("");
+  }
+  return evaluated;
+}
+;// CONCATENATED MODULE: ./src/html/findNextTemplateExpression.ts
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText[i] === "{" && htmlText[i + 1] === "{") {
+      stack++;
+      i++;
+    } else if (htmlText[i] === "}" && htmlText[i + 1] === "}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+;// CONCATENATED MODULE: ./src/html/htmlToText.ts
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+;// CONCATENATED MODULE: ./src/expressions/sanitizeExpression.ts
+function sanitizeExpression(expression) {
+  return expression.replace(/[\r\n]+/g, "");
+}
+;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
+var functionCache = {};
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var index = expression + JSON.stringify(Object.keys(state).join(""));
+  if (!functionCache[index]) {
+    var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+      return "const ".concat(variable, " = state[\"").concat(variable, "\"].value;");
+    }).join("\n"), " return ").concat(expression, "}");
+    functionCache[index] = Function(functionBody)();
+  }
+  return functionCache[index];
+};
+;// CONCATENATED MODULE: ./src/html/evaluateTemplate.ts
+
+
+
+
+
+var evaluateTemplate = function evaluateTemplate(template, expressions, state) {
+  var restOfContent = template;
+  var updatedContent = "";
+  for (var i = 0; i < expressions.length; i++) {
+    var _expressions$i = expressions[i],
+      start = _expressions$i.start,
+      end = _expressions$i.end,
+      value = _expressions$i.value;
+    var before = restOfContent.slice(0, start);
+    var after = restOfContent.slice(end + 1);
+    var expressionWithScope = createExpressionScope(value, state);
+    var evaluated = evaluateExpression(expressionWithScope, state);
+    updatedContent += "".concat(before).concat(evaluated);
+    restOfContent = after;
+  }
+  updatedContent += restOfContent;
+  return updatedContent;
+};
+
+/**
+ * Extracts all template expressions from a template string.
+ * start and end are relative to the last template expression.
+ */
+var extractTemplateExpressions = function extractTemplateExpressions(template) {
+  var expressions = [];
+  var restOfContent = String(template);
+  var hasTemplateExpression = true;
+  while (hasTemplateExpression) {
+    var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+      start = _findNextTemplateExpr.start,
+      end = _findNextTemplateExpr.end;
+    if (end === -1) {
+      hasTemplateExpression = false;
+      break;
+    }
+    var htmlValue = restOfContent.slice(start + 2, end - 1);
+    var after = restOfContent.slice(end + 1);
+    var value = sanitizeExpression(htmlToText(htmlValue));
+    expressions.push({
+      start: start,
+      end: end,
+      value: value
+    });
+    restOfContent = after;
+  }
+  return expressions;
+};
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var expressions = extractTemplateExpressions(attribute.value);
+    return {
+      name: attribute.name,
+      value: attribute.value,
+      expressions: expressions,
+      reactive: !!expressions.length
+    };
+  });
+  return attributes;
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttribute.ts
+var convertAttribute = function convertAttribute(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeValue.ts
+function convertAttributeValue(value) {
+  return value === "true" ? true : value === "false" ? false : value === "null" ? null : value === "undefined" ? undefined : value === "" ? "" : !isNaN(Number(value)) ? Number(value) : value;
+}
+;// CONCATENATED MODULE: ./src/attributes/attributesToState.ts
+
+
+
+var attributesToStates = {};
+function attributesToState(attributes, state) {
+  var key = JSON.stringify(attributes) + JSON.stringify(state);
+  if (!attributesToStates[key]) {
+    var localState = Object.assign({}, state);
+    for (var i = 0; i < attributes.length; i++) {
+      localState[convertAttribute(attributes[i].name)] = {
+        value: convertAttributeValue(evaluateTemplate(attributes[i].value, attributes[i].expressions, state)),
+        dependents: []
+      };
+    }
+    attributesToStates[key] = localState;
+  }
+  return attributesToStates[key];
+}
+;// CONCATENATED MODULE: ./src/attributes/getLocalState.ts
+
+function getLocalState(parentId, attributes, globalState, reactiveNodes) {
+  var parentNode = reactiveNodes.find(function (rn) {
+    return rn.id === parentId;
+  });
+  if (!parentNode) {
+    return attributesToState(attributes, globalState);
+  }
+  var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, reactiveNodes);
+  return Object.assign({}, parentState, attributesToState(attributes, parentState));
+}
+;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
+function elementFromString(htmlString) {
+  var parser = new DOMParser();
+  var newElementDoc = parser.parseFromString(htmlString, "text/html");
+  return newElementDoc.body.firstChild;
+}
+;// CONCATENATED MODULE: ./src/nodes/findNodes.ts
+function findNodes(rootElement, xpath) {
+  var check = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {
+    return true;
+  };
+  var elements = [];
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (check(element)) {
+      elements.push(element);
+    }
+    element = result.iterateNext();
+  }
+  return elements;
+}
+;// CONCATENATED MODULE: ./src/attributes/getAttributesRecursive.ts
+function getAttributesRecursive(parentId, attributes, reactiveNodes) {
+  if (parentId === null) {
+    return attributes;
+  }
+  var parentNode = reactiveNodes.find(function (rn) {
+    return rn.id === parentId;
+  });
+  var parentAttributes = getAttributesRecursive(parentNode.parentId, parentNode.attributes, reactiveNodes);
+  return parentAttributes.concat(attributes);
+}
+;// CONCATENATED MODULE: ./src/html/removeTagsAndAttributeNames.ts
+var tagRegex = /<\/?[\w-]+/g;
+var attrRegex = /[\w-]+(\s*=\s*("|')[^"']*("|'))/g;
+var specialCharRegex = /[^\w\s]/g;
+var spaceRegex = /\s+/g;
+function removeTagsAndAttributeNames(htmlString) {
+  return htmlString.replace(tagRegex, "").replace(attrRegex, "$1").replace(specialCharRegex, " ").trim().replace(spaceRegex, "@");
+}
+;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
+
+
+
+
+function assignDependents(elementId, state, parentId, attributes, reactiveNodes, template) {
+  var attributesRecursive = getAttributesRecursive(parentId, attributes, reactiveNodes);
+  var templateForUpdateCheck = template + " " + attributesRecursive.map(function (a) {
+    return a.value;
+  }).join(" ");
+  var expression = extractTemplateExpressions(templateForUpdateCheck).map(function (e) {
+    return e.value;
+  }).join(" ");
+  var updateCheckString = removeTagsAndAttributeNames(expression);
+  var index = {};
+  var uniqueWords = updateCheckString.split("@").filter(function (w) {
+    return index[w] ? false : index[w] = true;
+  });
+  for (var i = 0; i < uniqueWords.length; i++) {
+    if (state[uniqueWords[i]]) {
+      if (state[uniqueWords[i]].dependents.indexOf(elementId) === -1) {
+        state[uniqueWords[i]].dependents.push(elementId);
+      }
+    }
+  }
+}
+function registerReactiveNode(elementId, reactiveNodes, originalElement, template, state) {
+  var _originalElement$pare;
+  var attributes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
+  var parentId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+  var refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
+  var expressions = extractTemplateExpressions(refinedTemplate);
+  var updatedContent = evaluateTemplate(refinedTemplate, expressions, state);
+  var element = elementFromString(updatedContent);
+  var attributesRecursive = getAttributesRecursive(parentId, attributes, reactiveNodes.list);
+  var templateForUpdateCheck = template + " " + attributesRecursive.map(function (a) {
+    return a.value;
+  }).join(" ");
+  var expression = extractTemplateExpressions(templateForUpdateCheck).map(function (e) {
+    return e.value;
+  }).join(" ");
+  var updateCheckString = removeTagsAndAttributeNames(expression);
+  assignDependents(elementId, state, parentId, attributes, reactiveNodes.list, refinedTemplate);
+  reactiveNodes.add({
+    id: elementId,
+    parentId: parentId,
+    element: element,
+    template: refinedTemplate,
+    lastTemplateEvaluation: updatedContent,
+    updateCheckString: updateCheckString,
+    attributes: attributes,
+    expressions: expressions,
+    shouldUpdate: false
+  });
+  (_originalElement$pare = originalElement.parentElement) === null || _originalElement$pare === void 0 || _originalElement$pare.replaceChild(element, originalElement);
+  return element;
+}
+;// CONCATENATED MODULE: ./src/nodes/registerTemplates.ts
+
+
+
+
+
+
+
+function registerTemplates(rootElement, state, reactiveNodes) {
+  var templates = findNodes(rootElement, "template");
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < templates.length; i++) {
+    var name = templates[i].getAttribute("id");
+    if (name) {
+      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+      if (templates[i].content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name, templates[i], state, reactiveNodes);
+      fragment.appendChild(templates[i]);
+    }
+  }
+  fragment.textContent = "";
+}
+function defineCustomElement(name, template, state, reactiveNodes) {
+  function CustomElement() {
+    return Reflect.construct(HTMLElement, [], CustomElement);
+  }
+  CustomElement.prototype = Object.create(HTMLElement.prototype);
+  CustomElement.prototype.constructor = CustomElement;
+  CustomElement.prototype.connectedCallback = registerCustomElement(template, state, reactiveNodes);
+  customElements.define(name, CustomElement);
+}
+function addParentId(element, parentId) {
+  if (element.tagName.includes("-")) {
+    element.setAttribute("data-parent-id", String(parentId));
+  }
+}
+function addParentIdToChildren(template, parentId) {
+  var newElement = elementFromString(template);
+  if (newElement.nodeType !== Node.TEXT_NODE) {
+    addParentId(newElement, parentId);
+    var childElements = newElement.querySelectorAll("*");
+    for (var i = 0; i < childElements.length; i++) {
+      var child = childElements[i];
+      addParentId(child, parentId);
+    }
+  }
+  var refinedTemplate = newElement.outerHTML;
+  if (!refinedTemplate) {
+    refinedTemplate = newElement.textContent;
+  }
+  return refinedTemplate;
+}
+function getCustomElementAttributes(element) {
+  var attributes = getAttributes(element);
+  var childrenExpressions = extractTemplateExpressions(element.innerHTML);
+  attributes.push({
+    name: "children",
+    value: element.innerHTML,
+    expressions: childrenExpressions,
+    reactive: !!childrenExpressions.length
+  });
+  return attributes;
+}
+function registerCustomElement(template, state, reactiveNodes) {
+  return function () {
+    var elementId = reactiveNodes.id();
+    var attributes = getCustomElementAttributes(this);
+    var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
+    var parentId = this.dataset.parentId ? Number(this.dataset.parentId) : null;
+    var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
+    var newElement = registerReactiveNode(elementId, reactiveNodes, this, refinedTemplate, localState, attributes, parentId);
+    newElement.cogAnchorId = elementId;
+  };
+}
+;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
+
+var makeEventHandler = function makeEventHandler(eventName, element, state) {
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
+
+function addEventListeners(parent, eventName, state) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
+
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+;// CONCATENATED MODULE: ./src/attributes/getChangedAttributes.ts
+
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: convertAttributeValue(newAttrValue || "")
+      });
+    }
+  }
+  return changedAttributes;
+}
+;// CONCATENATED MODULE: ./src/attributes/handleBooleanAttribute.ts
+function handleBooleanAttribute(changedNode, attribute) {
+  if (attribute.name.startsWith("data-attribute-")) {
+    var optionalAttribute = attribute.name.substring(15); // "data-attribute-".length
+
+    if (attribute.newValue) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      changedNode[optionalAttribute] = true;
+      changedNode.setAttribute(optionalAttribute, attribute.newValue);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      changedNode[optionalAttribute] = false;
+      changedNode.removeAttribute(optionalAttribute);
+    }
+  }
+}
+;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
+var isCustomElement = function isCustomElement(element) {
+  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
+};
+;// CONCATENATED MODULE: ./src/nodes/registerNativeElements.ts
+
+
+
+
+
+var registerNativeElements = function registerNativeElements(rootElement, state, reactiveNodes) {
+  var elements = findNodes(rootElement, "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]", function (element) {
+    return !isCustomElement(element);
+  });
+  for (var i = 0; i < elements.length; i++) {
+    var elementId = reactiveNodes.id();
+    var element = elements[i];
+    element.innerHTML = element.innerHTML.trim();
+    var template = element.outerHTML;
+    var newElement = registerReactiveNode(elementId, reactiveNodes, element, template, state);
+    var attributes = getChangedAttributes(element, newElement);
+    for (var _i = 0; _i < attributes.length; _i++) {
+      handleBooleanAttribute(newElement, attributes[_i]);
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
+function removeEventListeners(parent, eventName) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
+
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+;// CONCATENATED MODULE: ./src/nodes/compareNodes.ts
+
+
+function compareTextNodes(oldNode, newNode) {
+  if (oldNode.textContent !== newNode.textContent) {
+    return [{
+      node: newNode,
+      content: newNode.textContent
+    }];
+  }
+  return [];
+}
+function compareChildNodes(oldNode, newNode) {
+  var toBeRemoved = [];
+  var toBeAdded = [];
+  var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
+  var changedChildren = [];
+  for (var i = 0; i < nodesLength; i++) {
+    var oldChild = oldNode.childNodes[i];
+    var newChild = newNode.childNodes[i];
+    if ((oldChild === null || oldChild === void 0 ? void 0 : oldChild.nodeType) === Node.TEXT_NODE && (newChild === null || newChild === void 0 ? void 0 : newChild.nodeType) === Node.TEXT_NODE) {
+      var _oldChild$textContent, _newChild$textContent;
+      if (((_oldChild$textContent = oldChild.textContent) === null || _oldChild$textContent === void 0 ? void 0 : _oldChild$textContent.trim()) !== ((_newChild$textContent = newChild.textContent) === null || _newChild$textContent === void 0 ? void 0 : _newChild$textContent.trim())) {
+        return [{
+          node: newNode,
+          content: newNode.innerHTML
+        }];
+      }
+    } else if (!oldChild) {
+      toBeAdded.push(newChild);
+    } else if (!newChild) {
+      toBeRemoved.push(oldChild);
+    } else {
+      changedChildren = changedChildren.concat(compareNodes(oldChild, newChild));
+    }
+  }
+  if (toBeRemoved.length) {
+    changedChildren.push({
+      node: newNode,
+      toBeRemoved: toBeRemoved
+    });
+  }
+  if (toBeAdded.length) {
+    changedChildren.push({
+      node: newNode,
+      toBeAdded: toBeAdded
+    });
+  }
+  return changedChildren;
+}
+function compareCustomElementChildren(oldElement, newElement) {
+  if (oldElement.innerHTML !== newElement.innerHTML) {
+    return [{
+      node: newElement,
+      content: newElement.innerHTML
+    }];
+  }
+  return [];
+}
+function compareNodes(oldNode, newNode) {
+  if (oldNode.nodeType === Node.TEXT_NODE) {
+    return compareTextNodes(oldNode, newNode);
+  }
+  var changedAttributes = getChangedAttributes(oldNode, newNode);
+  var changedChildren = changedAttributes.length > 0 ? [{
+    node: newNode,
+    attributes: changedAttributes
+  }] : [];
+  if (isCustomElement(oldNode)) {
+    return changedChildren.concat(compareCustomElementChildren(oldNode, newNode));
+  }
+  return changedChildren.concat(compareChildNodes(oldNode, newNode));
+}
+;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
+function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var pathInA = [];
+  var temp = nodeInA;
+  while (temp !== rootA) {
+    pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
+    temp = temp.parentNode;
+  }
+  var correspondingNodeInB = rootB;
+  for (var i = 0; i < pathInA.length; i++) {
+    var index = pathInA[i];
+    if (correspondingNodeInB.childNodes[index]) {
+      correspondingNodeInB = correspondingNodeInB.childNodes[index];
+    } else {
+      return null;
+    }
+  }
+  return correspondingNodeInB;
+}
+;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
+
+
+
+
+
+
+
+
+
+
+function mergeAttributes(oldArray, newArray) {
+  var merged = oldArray.concat(newArray);
+  var attributes = {};
+  for (var i = 0; i < merged.length; i++) {
+    attributes[merged[i].name] = merged[i];
+  }
+  return Object.values(attributes);
+}
+function handleCustomElement(changedNode, originalNode, content, attributes, reactiveNodes) {
+  var _attributes$slice;
+  var changedAttributes = (_attributes$slice = attributes === null || attributes === void 0 ? void 0 : attributes.slice()) !== null && _attributes$slice !== void 0 ? _attributes$slice : [];
+  var newAttributes = [];
+  if (changedAttributes.length) {
+    newAttributes = getAttributes(changedNode);
+  }
+  if (content !== undefined) {
+    newAttributes.push({
+      name: "children",
+      value: content,
+      expressions: [],
+      reactive: false
+    });
+  }
+  if (newAttributes.length) {
+    var nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
+    var reactiveNode = reactiveNodes.list[nodeIndex];
+    var mergedAttributes = mergeAttributes(reactiveNode.attributes, newAttributes);
+    reactiveNodes.update(nodeIndex, "attributes", mergedAttributes);
+  }
+}
+function handleContentChange(originalNode, content, localState) {
+  if (originalNode.nodeType === Node.TEXT_NODE) {
+    originalNode.textContent = content;
+  } else {
+    removeAllEventListeners(originalNode);
+    originalNode.innerHTML = content;
+    addAllEventListeners(originalNode, localState);
+  }
+}
+function handleAttributeChange(originalNode, attributes) {
+  for (var i = 0; i < attributes.length; i++) {
+    handleBooleanAttribute(originalNode, attributes[i]);
+    originalNode.setAttribute(attributes[i].name, attributes[i].newValue);
+  }
+}
+function handleChildrenAddition(originalNode, addChildren) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < addChildren.length; i++) {
+    fragment.appendChild(addChildren[i]);
+  }
+  originalNode.appendChild(fragment);
+}
+function handleChildrenRemoval(originalNode, removeChildren) {
+  for (var i = 0; i < removeChildren.length; i++) {
+    originalNode.removeChild(removeChildren[i]);
+  }
+}
+var updateElement = function updateElement(originalNode, changedNode, content, attributes, addChildren, removeChildren, localState, reactiveNodes) {
+  if (isCustomElement(changedNode)) {
+    handleCustomElement(changedNode, originalNode, content, attributes, reactiveNodes);
+    return;
+  }
+  if (content !== undefined) {
+    handleContentChange(originalNode, content, localState);
+  } else if (attributes !== undefined) {
+    handleAttributeChange(originalNode, attributes);
+  } else if (addChildren.length) {
+    handleChildrenAddition(originalNode, addChildren);
+  } else if (removeChildren.length) {
+    handleChildrenRemoval(originalNode, removeChildren);
+  }
+};
+var stateVariableUsageRegex = function stateVariableUsageRegex(key) {
+  return new RegExp("\\b".concat(key, "\\b|[^\\w]").concat(key, "[^\\w]"), "gm");
+};
+function checkIfChangedStateIsUsedInExpression(updatedStateKeys, expression) {
+  return updatedStateKeys.map(stateVariableUsageRegex).some(function (re) {
+    return re.test(expression);
+  });
+}
+function handleNodeChanges(changedNodes, oldElement, newElement, element, localState, reactiveNodes) {
+  for (var i = 0; i < changedNodes.length; i++) {
+    var originalNode = findCorrespondingNode(changedNodes[i].node, newElement, element);
+    var _handleChildrenChange = handleChildrenChanges(changedNodes[i], oldElement, element),
+      addChildren = _handleChildrenChange.addChildren,
+      removeChildren = _handleChildrenChange.removeChildren;
+    updateElement(originalNode, changedNodes[i].node, changedNodes[i].content, changedNodes[i].attributes, addChildren, removeChildren, localState, reactiveNodes);
+  }
+}
+function handleChildrenChanges(changedNode, oldElement, element) {
+  var removeChildren = [];
+  var addChildren = [];
+  if (changedNode.toBeAdded !== undefined) {
+    addChildren = changedNode.toBeAdded;
+  }
+  if (changedNode.toBeRemoved !== undefined) {
+    for (var i = 0; i < changedNode.toBeRemoved.length; i++) {
+      var child = findCorrespondingNode(changedNode.toBeRemoved[i], oldElement, element);
+      if (child) {
+        removeChildren.push(child);
+      }
+    }
+  }
+  return {
+    addChildren: addChildren,
+    removeChildren: removeChildren
+  };
+}
+function nodeNeedsUpdate(updatedStateKeys, node) {
+  if (node.shouldUpdate) {
+    return true;
+  }
+  return checkIfChangedStateIsUsedInExpression(updatedStateKeys, node.updateCheckString);
+}
+var reconcile = function reconcile(reactiveNodes, state, updatedStateKeys) {
+  for (var nodeIndex = 0; nodeIndex < reactiveNodes.value.length; nodeIndex++) {
+    var _reactiveNodes$value$ = reactiveNodes.value[nodeIndex],
+      parentId = _reactiveNodes$value$.parentId,
+      attributes = _reactiveNodes$value$.attributes,
+      element = _reactiveNodes$value$.element,
+      template = _reactiveNodes$value$.template,
+      lastTemplateEvaluation = _reactiveNodes$value$.lastTemplateEvaluation,
+      expressions = _reactiveNodes$value$.expressions;
+    var shouldUpdate = nodeNeedsUpdate(updatedStateKeys, reactiveNodes.value[nodeIndex]);
+    if (shouldUpdate) {
+      reactiveNodes.update(nodeIndex, "shouldUpdate", false);
+      var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
+      var updatedContent = evaluateTemplate(template, expressions, localState);
+      var newElement = elementFromString(updatedContent);
+      var oldElement = elementFromString(lastTemplateEvaluation);
+      var changedNodes = compareNodes(oldElement, newElement);
+      if (changedNodes.length > 0) {
+        reactiveNodes.update(nodeIndex, "lastTemplateEvaluation", updatedContent);
+        handleNodeChanges(changedNodes, oldElement, newElement, element, localState, reactiveNodes);
+      }
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/createState.ts
+function createState() {
+  return {
+    state: null,
+    updatedKeys: [],
+    get value() {
+      if (!this.state) {
+        this.state = {};
+      }
+      return this.state;
+    },
+    set: function set(key, value) {
+      if (!this.state) {
+        this.state = {};
+      }
+      if (!this.state[key]) {
+        this.state[key] = {
+          value: value,
+          dependents: [],
+          computants: []
+        };
+      } else {
+        this.state[key].value = value;
+      }
+    },
+    registerUpdate: function registerUpdate(key) {
+      this.updatedKeys.push(key);
+    },
+    clearUpdates: function clearUpdates() {
+      this.updatedKeys = [];
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nodes/cleanReactiveNodesList.ts
+var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
+  return reactiveNodes.filter(function (_ref) {
+    var element = _ref.element;
+    var contains = document.body.contains(element);
+    return contains;
+  });
+};
+;// CONCATENATED MODULE: ./src/createReactiveNodes.ts
+
+function createReactiveNodes() {
+  return {
+    lastId: 0,
+    list: [],
+    index: {},
+    get value() {
+      return this.list;
+    },
+    add: function add(item) {
+      this.list.push(item);
+      this.index[item.id] = this.list.length - 1;
+    },
+    update: function update(index, property, value) {
+      if (property === "attributes") {
+        this.list[index].shouldUpdate = true;
+      }
+      this.list[index][property] = value;
+    },
+    clean: function clean() {
+      this.list = cleanReactiveNodesList(this.list);
+      this.index = this.list.reduce(function (index, item, i) {
+        index[item.id] = i;
+        return index;
+      }, {});
+    },
+    id: function id() {
+      return this.lastId++;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/cog.ts
+
+
+
+
+
+
+var init = function init() {
+  var stateFunctionExecuting = null;
+  var reactiveNodes = createReactiveNodes();
+  var updateStateTimeout = null;
+  var state = createState();
+  function reRender() {
+    reconcile(reactiveNodes, state.value, state.updatedKeys);
+    reactiveNodes.clean();
+    state.clearUpdates();
+  }
+  var lastFrameTime = 0;
+  var frameDelay = 1000 / 60;
+  function scheduleReRender(stateKey) {
+    state.registerUpdate(stateKey);
+    if (updateStateTimeout !== null) {
+      cancelAnimationFrame(updateStateTimeout);
+    }
+    updateStateTimeout = requestAnimationFrame(function (currentTime) {
+      if (currentTime - lastFrameTime > frameDelay) {
+        lastFrameTime = currentTime;
+        reRender();
+      }
+    });
+  }
+  var render = function render(rootElement) {
+    registerNativeElements(rootElement, state.value, reactiveNodes);
+    registerTemplates(rootElement, state.value, reactiveNodes);
+    addAllEventListeners(rootElement, state.value);
+  };
+  return {
+    render: render,
+    variable: function variable(name, value) {
+      if (value instanceof Function) {
+        console.log("function", name);
+        state.set(name, function () {
+          for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+          console.log("called", name, args);
+          stateFunctionExecuting = name;
+          return value.apply(void 0, args);
+        });
+      } else if (Array.isArray(value)) {
+        var valueProxy = new Proxy(value, {
+          get: function get(target, propKey) {
+            var originalMethod = target[propKey];
+            if (typeof originalMethod === "function" && propKey === "push") {
+              return function () {
+                scheduleReRender(name);
+                for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                  args[_key2] = arguments[_key2];
+                }
+                return originalMethod.apply(target, args);
+              };
+            }
+            return originalMethod;
+          }
+        });
+        state.set(name, valueProxy);
+      } else {
+        state.set(name, value);
+      }
+      return {
+        set value(newVal) {
+          state.set(name, newVal);
+          scheduleReRender(name);
+        },
+        get value() {
+          console.log(stateFunctionExecuting, "is getting value");
+          if (stateFunctionExecuting !== null && state.value[name].computants.indexOf(stateFunctionExecuting) === -1) {
+            state.value[name].computants.push(stateFunctionExecuting);
+          } else {
+            console.log("no one calling");
+          }
+          return state.value[name].value;
+        },
+        set: function set(newVal) {
+          state.set(name, newVal);
+          scheduleReRender(name);
+        }
+      };
+    }
+  };
+};
+var _init = init(),
+  variable = _init.variable,
+  render = _init.render;
+
+;// CONCATENATED MODULE: ./examples/src/ts-custom-element-children.ts
+
+document.addEventListener("DOMContentLoaded", function () {
+  render(document.getElementById("app"));
+});
+var count = variable("count", 1);
+window.increment = function () {
+  count.value++;
+};
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});

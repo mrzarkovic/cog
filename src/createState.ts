@@ -16,7 +16,17 @@ export function createState(): StateObject {
                 this.state = {};
             }
 
-            this.state[key] = value;
+            if (!this.state[key]) {
+                this.state[key] = {
+                    value,
+                    dependents: [],
+                    computants: [],
+                };
+            } else {
+                this.state[key].value = value;
+            }
+        },
+        registerUpdate(key: string) {
             this.updatedKeys.push(key);
         },
         clearUpdates() {

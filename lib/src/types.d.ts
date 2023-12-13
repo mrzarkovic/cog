@@ -17,9 +17,10 @@ export type Attribute = {
     expressions: Expression[];
     reactive: boolean;
 };
+type ReactiveNodeId = number;
 export type ReactiveNode = {
-    id: number;
-    parentId: number | null;
+    id: ReactiveNodeId;
+    parentId: ReactiveNodeId | null;
     element: HTMLElement;
     template: HTMLString;
     lastTemplateEvaluation: HTMLString;
@@ -47,6 +48,10 @@ export type StateObject = {
     clearUpdates: () => void;
 };
 export type State = Record<string, unknown>;
+export type StateValue = {
+    value: unknown;
+    dependents: ReactiveNodeId[];
+};
 export type ElementWithHandler = Element & {
     [key: string]: (e: Event) => void;
 };
@@ -74,3 +79,4 @@ export type Expression = {
     end: number;
     value: string;
 };
+export {};

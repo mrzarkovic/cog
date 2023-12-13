@@ -24,9 +24,11 @@ export type Attribute = {
     reactive: boolean;
 };
 
+type ReactiveNodeId = number;
+
 export type ReactiveNode = {
-    id: number;
-    parentId: number | null;
+    id: ReactiveNodeId;
+    parentId: ReactiveNodeId | null;
     element: HTMLElement;
     template: HTMLString;
     lastTemplateEvaluation: HTMLString;
@@ -54,9 +56,16 @@ export type StateObject = {
     updatedKeys: string[];
     get value(): State;
     set: <T>(name: string, value: T) => void;
+    registerUpdate: (key: string) => void;
     clearUpdates: () => void;
 };
-export type State = Record<string, unknown>;
+type StateKey = string;
+export type State = Record<StateKey, StateValue>;
+export type StateValue = {
+    value: unknown;
+    dependents: ReactiveNodeId[];
+    computants: StateKey[];
+};
 
 export type ElementWithHandler = Element & {
     [key: string]: (e: Event) => void;

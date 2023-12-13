@@ -7,7 +7,7 @@ import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
 
 export const init = (): Cog => {
-    let calling: string | null = null;
+    let stateFunctionExecuting: string | null = null;
     const reactiveNodes = createReactiveNodes();
     let updateStateTimeout: number | null = null;
     const state = createState();
@@ -21,8 +21,8 @@ export const init = (): Cog => {
     let lastFrameTime = 0;
     const frameDelay = 1000 / 60;
 
-    function updateState<T>(name: string, value: T) {
-        state.set(name, value);
+    function scheduleReRender(stateKey: string) {
+        state.registerUpdate(stateKey);
         if (updateStateTimeout !== null) {
             cancelAnimationFrame(updateStateTimeout);
         }
@@ -47,23 +47,56 @@ export const init = (): Cog => {
                 console.log("function", name);
                 state.set(name, (...args: unknown[]) => {
                     console.log("called", name, args);
-                    calling = name;
+                    stateFunctionExecuting = name;
                     return value(...args);
                 });
+            } else if (Array.isArray(value)) {
+                const valueProxy = new Proxy(value, {
+                    get(target, propKey) {
+                        const originalMethod = target[
+                            propKey as keyof T
+                        ] as unknown;
+                        if (
+                            typeof originalMethod === "function" &&
+                            propKey === "push"
+                        ) {
+                            return (...args: unknown[]) => {
+                                scheduleReRender(name);
+                                return originalMethod.apply(target, args);
+                            };
+                        }
+                        return originalMethod;
+                    },
+                });
+                state.set(name, valueProxy);
             } else {
                 state.set(name, value);
             }
 
             return {
                 set value(newVal: T) {
-                    updateState(name, newVal);
+                    state.set(name, newVal);
+                    scheduleReRender(name);
                 },
                 get value() {
-                    console.log(calling, "is getting value");
-                    return state.value[name] as T;
+                    console.log(stateFunctionExecuting, "is getting value");
+                    if (
+                        stateFunctionExecuting !== null &&
+                        state.value[name].computants.indexOf(
+                            stateFunctionExecuting
+                        ) === -1
+                    ) {
+                        state.value[name].computants.push(
+                            stateFunctionExecuting
+                        );
+                    } else {
+                        console.log("no one calling");
+                    }
+                    return state.value[name].value as T;
                 },
                 set: (newVal: T) => {
-                    updateState(name, newVal);
+                    state.set(name, newVal);
+                    scheduleReRender(name);
                 },
             };
         },

@@ -12,16 +12,16 @@ export function attributesToState(attributes: Attribute[], state: State) {
         const localState: State = Object.assign({}, state);
 
         for (let i = 0; i < attributes.length; i++) {
-            localState[convertAttribute(attributes[i].name)] =
-                convertAttributeValue(
-                    attributes[i].reactive
-                        ? evaluateTemplate(
-                              attributes[i].value,
-                              attributes[i].expressions,
-                              state
-                          )
-                        : attributes[i].value
-                );
+            localState[convertAttribute(attributes[i].name)] = {
+                value: convertAttributeValue(
+                    evaluateTemplate(
+                        attributes[i].value,
+                        attributes[i].expressions,
+                        state
+                    )
+                ),
+                dependents: [],
+            };
         }
 
         attributesToStates[key] = localState;

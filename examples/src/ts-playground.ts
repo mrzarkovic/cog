@@ -37,20 +37,20 @@ function generateRandomString() {
     return result;
 }
 
-const times: number[] = [];
+// const times: number[] = [];
 
-const fps = variable("fps", 0);
+variable("fps", 0);
 
-function refreshLoop() {
-    window.requestAnimationFrame(() => {
-        const now = performance.now();
-        while (times.length > 0 && times[0] <= now - 1000) {
-            times.shift();
-        }
-        times.push(now);
-        fps.value = times.length;
-        refreshLoop();
-    });
-}
+// function refreshLoop() {
+//     window.requestAnimationFrame(() => {
+//         const now = performance.now();
+//         while (times.length > 0 && times[0] <= now - 1000) {
+//             times.shift();
+//         }
+//         times.push(now);
+//         fps.value = times.length;
+//         refreshLoop();
+//     });
+// }
 
-refreshLoop();
+// refreshLoop();
