@@ -37,6 +37,8 @@ export type ReactiveNode = {
     shouldUpdate: boolean;
 };
 
+export type UnknownFunction = (...args: unknown[]) => unknown;
+
 export type ChangedAttribute = {
     name: string;
     newValue: string | number | boolean | null | undefined;

@@ -1,4 +1,4 @@
-export const convertAttribute = (attribute: string): string => {
+export const convertAttributeName = (attribute: string): string => {
     return attribute
         .split("-")
         .reduce(

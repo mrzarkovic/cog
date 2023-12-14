@@ -1,4 +1,4 @@
-import { type Cog } from "./types";
+import { type Cog, UnknownFunction } from "./types";
 import { registerTemplates } from "./nodes/registerTemplates";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { registerNativeElements } from "./nodes/registerNativeElements";
@@ -54,64 +54,69 @@ export const init = (): Cog => {
         addAllEventListeners(rootElement, state.value);
     };
 
+    const setFunctionValue = (name: string, value: UnknownFunction) => {
+        state.set(name, (...args: unknown[]) => {
+            stateFunctionExecuting = name;
+            const result = value(...args);
+            stateFunctionExecuting = null;
+            return result;
+        });
+    };
+
+    const setArrayValue = (name: string, value: unknown[]) => {
+        const valueProxy = new Proxy(value, {
+            get(target, propKey) {
+                const originalMethod = target[
+                    propKey as keyof typeof target
+                ] as UnknownFunction;
+                if (propKey === "push") {
+                    return (...args: unknown[]) => {
+                        scheduleReRender(name);
+                        return originalMethod.apply(target, args);
+                    };
+                }
+                return originalMethod;
+            },
+        });
+        state.set(name, valueProxy);
+    };
+
+    const variable = <T>(name: string, value: T) => {
+        if (value instanceof Function) {
+            setFunctionValue(name, value as UnknownFunction);
+        } else if (Array.isArray(value)) {
+            setArrayValue(name, value);
+        } else {
+            state.set(name, value);
+        }
+
+        return {
+            get value() {
+                if (
+                    stateFunctionExecuting !== null &&
+                    state.value[name].computants.indexOf(
+                        stateFunctionExecuting
+                    ) === -1
+                ) {
+                    state.value[name].computants.push(stateFunctionExecuting);
+                }
+
+                return state.value[name].value as T;
+            },
+            set value(newVal: T) {
+                state.set(name, newVal);
+                scheduleReRender(name);
+            },
+            set: (newVal: T) => {
+                state.set(name, newVal);
+                scheduleReRender(name);
+            },
+        };
+    };
+
     return {
         render,
-        variable: <T>(name: string, value: T) => {
-            if (value instanceof Function) {
-                state.set(name, (...args: unknown[]) => {
-                    stateFunctionExecuting = name;
-                    const result = value(...args);
-                    stateFunctionExecuting = null;
-                    return result;
-                });
-            } else if (Array.isArray(value)) {
-                const valueProxy = new Proxy(value, {
-                    get(target, propKey) {
-                        const originalMethod = target[
-                            propKey as keyof T
-                        ] as unknown;
-                        if (
-                            typeof originalMethod === "function" &&
-                            propKey === "push"
-                        ) {
-                            return (...args: unknown[]) => {
-                                scheduleReRender(name);
-                                return originalMethod.apply(target, args);
-                            };
-                        }
-                        return originalMethod;
-                    },
-                });
-                state.set(name, valueProxy);
-            } else {
-                state.set(name, value);
-            }
-
-            return {
-                set value(newVal: T) {
-                    state.set(name, newVal);
-                    scheduleReRender(name);
-                },
-                get value() {
-                    if (
-                        stateFunctionExecuting !== null &&
-                        state.value[name].computants.indexOf(
-                            stateFunctionExecuting
-                        ) === -1
-                    ) {
-                        state.value[name].computants.push(
-                            stateFunctionExecuting
-                        );
-                    }
-
-                    return state.value[name].value as T;
-                },
-                set: (newVal: T) => {
-                    state.set(name, newVal);
-                    scheduleReRender(name);
-                },
-            };
-        },
+        variable,
     };
 };
 
