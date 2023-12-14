@@ -38,8 +38,12 @@ describe("evaluateTemplate", () => {
             },
         ];
         const evaluatedTemplate = evaluateTemplate(template, expressions, {
-            name: "John",
-            count: 2,
+            name: {
+                value: "John",
+            },
+            count: {
+                value: 2,
+            },
         });
 
         expect(evaluatedTemplate).toEqual("Hello John! 2");

@@ -11,9 +11,26 @@ describe("attributesToState", () => {
                 reactive: false,
             },
         ];
-        const state = { global: 1 };
+        const state = {
+            global: {
+                value: 1,
+                dependents: [],
+                computants: [],
+            },
+        };
         const localState = attributesToState(attributes, state);
 
-        expect(localState).toEqual({ global: 1, dataTest: "test" });
+        expect(localState).toStrictEqual({
+            global: {
+                value: 1,
+                dependents: [],
+                computants: [],
+            },
+            dataTest: {
+                value: "test",
+                dependents: [],
+                computants: [],
+            },
+        });
     });
 });

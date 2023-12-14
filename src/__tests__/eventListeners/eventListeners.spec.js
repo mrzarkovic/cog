@@ -18,7 +18,11 @@ describe("eventListeners", () => {
         const button = getByText(parent, "Click");
 
         const mock = jest.fn();
-        const state = { mock };
+        const state = {
+            mock: {
+                value: mock,
+            },
+        };
 
         addEventListeners(parent, "click", state);
         button.click();
@@ -58,7 +62,7 @@ describe("eventListeners", () => {
         const button = getByText(parent, "Click");
 
         const mock = jest.fn();
-        const state = { mock };
+        const state = { mock: { value: mock } };
 
         addEventListeners(parent, "click", state);
         button.click();

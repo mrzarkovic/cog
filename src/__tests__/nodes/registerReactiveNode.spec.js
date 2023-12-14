@@ -20,7 +20,9 @@ describe("registerReactiveNode", () => {
             element1,
             element1.outerHTML,
             {
-                name: "John",
+                name: {
+                    value: "John",
+                },
             },
             [],
             null

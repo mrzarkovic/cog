@@ -11,6 +11,7 @@ describe("getLocalState", () => {
                     {
                         name: "data-parent",
                         value: "parent",
+                        expressions: [],
                     },
                 ],
             },
@@ -21,6 +22,7 @@ describe("getLocalState", () => {
                     {
                         name: "data-parent2",
                         value: "parent2",
+                        expressions: [],
                     },
                 ],
             },
@@ -31,6 +33,7 @@ describe("getLocalState", () => {
                     {
                         name: "data-parent3",
                         value: "parent3",
+                        expressions: [],
                     },
                 ],
             },
@@ -39,10 +42,15 @@ describe("getLocalState", () => {
             {
                 name: "data-child",
                 value: "child",
+                expressions: [],
             },
         ];
         const globalState = {
-            global: 42,
+            global: {
+                value: 42,
+                dependents: [],
+                computants: [],
+            },
         };
         const localState = getLocalState(
             2,
@@ -52,11 +60,31 @@ describe("getLocalState", () => {
         );
 
         expect(localState).toStrictEqual({
-            global: 42,
-            dataChild: "child",
-            dataParent: "parent",
-            dataParent2: "parent2",
-            dataParent3: "parent3",
+            global: {
+                value: 42,
+                dependents: [],
+                computants: [],
+            },
+            dataChild: {
+                value: "child",
+                dependents: [],
+                computants: [],
+            },
+            dataParent: {
+                value: "parent",
+                dependents: [],
+                computants: [],
+            },
+            dataParent2: {
+                value: "parent2",
+                dependents: [],
+                computants: [],
+            },
+            dataParent3: {
+                value: "parent3",
+                dependents: [],
+                computants: [],
+            },
         });
     });
 });

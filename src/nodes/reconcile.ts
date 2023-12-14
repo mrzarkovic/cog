@@ -207,11 +207,11 @@ export const reconcile = (
             localState
         );
 
+        const oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(
+            true
+        ) as CogHTMLElement;
         const newElement = elementFromString(updatedContent);
-        const changedNodes = compareNodes(
-            reactiveNode.lastTemplateEvaluation,
-            newElement
-        );
+        const changedNodes = compareNodes(oldElement, newElement);
 
         if (changedNodes.length > 0) {
             nodesToReconcile[nodeIndex].lastTemplateEvaluation =
@@ -219,7 +219,7 @@ export const reconcile = (
 
             handleNodeChanges(
                 changedNodes,
-                reactiveNode.lastTemplateEvaluation,
+                oldElement,
                 newElement,
                 reactiveNode.element,
                 localState,

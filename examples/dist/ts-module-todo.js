@@ -1,1 +1,913 @@
-!function(n,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports["t"]=t():n["t"]=t()}(self,(()=>(()=>{"use strict";var n={};function t(n,t){var r=n(t);return Array.isArray(r)&&(r=r.join("")),r}function r(n){for(var t=n.indexOf("{{"),r=0,e=t;e<n.length;e++)if("{"===n[e]&&"{"===n[e+1]?(r++,e++):"}"===n[e]&&"}"===n[e+1]&&(r--,e++),0===r)return{start:t,end:e};return{start:t,end:-1}}(n=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(n,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(n,"o",{value:!0})})(n);var e={},o=function(n,t){var r=n+JSON.stringify(Object.keys(t).join(""));if(!e[r]){var o="return (state) => {".concat(Object.keys(t).map((function(n){return"const ".concat(n,' = state["').concat(n,'"].value;')})).join("\n")," return ").concat(n,"}");e[r]=Function(o)()}return e[r]},u=function(n,r,e){for(var u=n,i="",a=0;a<r.length;a++){var c=r[a],f=c.start,v=c.end,d=c.value,l=u.slice(0,f),s=u.slice(v+1),h=t(o(d,e),e);i+="".concat(l).concat(h),u=s}return i+u},i=function(n){for(var t,e,o=[],u=String(n),i=!0;i;){var a=r(u),c=a.start,f=a.end;if(-1===f){i=!1;break}var v=u.slice(c+2,f-1),d=u.slice(f+1),l=(t=v,e=void 0,(e=document.createElement("div")).innerHTML=function(n){return n.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(t),(e.textContent||e.innerText||"").replace(/[\r\n]+/g,""));o.push({start:c,end:f,value:l}),u=d}return o},a=function(n){return Array.from(n.attributes).map((function(n){var t=i(n.value);return{name:n.name,value:n.value,u:t,i:!!t.length}}))},c=function(n){return n.split("-").reduce((function(n,t,r){return n+(r?t[0].toUpperCase()+t.slice(1):t)}),"")};function f(n){return"true"===n||"false"!==n&&("null"===n?null:"undefined"===n?void 0:""===n?"":isNaN(Number(n))?n:Number(n))}var v={};function d(n,t){var r=JSON.stringify(n)+JSON.stringify(t);if(!v[r]){for(var e=Object.assign({},t),o=0;o<n.length;o++)e[c(n[o].name)]={value:f(u(n[o].value,n[o].u,t)),v:[],l:[]};v[r]=e}return v[r]}function l(n,t,r,e){var o=e.find((function(t){return t.id===n}));if(!o)return d(t,r);var u=l(o.parentId,o.attributes,r,e);return Object.assign({},u,d(t,u))}function s(n){return(new DOMParser).parseFromString(n,"text/html").body.firstChild}function h(n,t){for(var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:function(){return!0},e=[],o=document.evaluate(t,n,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),u=o.iterateNext();u;)r(u)&&e.push(u),u=o.iterateNext();return e}function m(n,t,r){if(null===n)return t;var e=r.find((function(t){return t.id===n}));return m(e.parentId,e.attributes,r).concat(t)}var p=/<\/?[\w-]+/g,b=/[\w-]+(\s*=\s*("|')[^"']*("|'))/g,y=/[^\w\s]/g,g=/\s+/g;function x(n,t,r,e,o,u){var a=u+" "+m(r,e,o).map((function(n){return n.value})).join(" "),c={};i(a).map((function(r){return(e=r.value,e.replace(p,"").replace(b,"$1").replace(y," ").trim().replace(g,"@")).split("@").filter((function(n){return!c[n]&&(c[n]=!0)})).filter((function(r){return t[r]&&-1===t[r].v.indexOf(n)})).forEach((function(r){t[r].v.push(n)}));var e}))}function w(n,t,r,e,o){var a,c=arguments.length>5&&void 0!==arguments[5]?arguments[5]:[],f=arguments.length>6&&void 0!==arguments[6]?arguments[6]:null,v=e.replace(/>\s*([\s\S]*?)\s*</g,">$1<"),d=i(v),l=s(u(v,d,o));return x(n,o,f,c,t.list,v),t.add({id:n,parentId:f,element:l,h:v,lastTemplateEvaluation:l.cloneNode(!0),attributes:c,u:d,shouldUpdate:!1}),null===(a=r.parentElement)||void 0===a||a.replaceChild(l,r),l}function O(n,t,r,e){function o(){return Reflect.construct(HTMLElement,[],o)}o.prototype=Object.create(HTMLElement.prototype),o.prototype.constructor=o,o.prototype.connectedCallback=function(n,t,r){return function(){var e=r.id(),o=function(n){var t=a(n),r=i(n.innerHTML);return t.push({name:"children",value:n.innerHTML,u:r,i:!!r.length}),t}(this),u=function(n,t){var r=s(n);if(r.nodeType!==Node.TEXT_NODE){j(r,t);for(var e=r.querySelectorAll("*"),o=0;o<e.length;o++)j(e[o],t)}var u=r.outerHTML;return u||(u=r.textContent),u}(n.innerHTML,e),c=this.dataset.parentId?Number(this.dataset.parentId):null,f=l(c,o,t,r.list);w(e,r,this,u,f,o,c).cogAnchorId=e}}(t,r,e),customElements.define(n,o)}function j(n,t){n.tagName.includes("-")&&n.setAttribute("data-parent-id",String(t))}var N=function(n,t,r){var e=t.getAttribute("data-on-".concat(n));if(!e)throw new Error("Missing data-handler attribute");var u=o(e,r);return function(t){try{u(r),t.preventDefault()}catch(t){throw new Error("".concat(t.message,": data-on-").concat(n,"=").concat(e))}}};function A(n,t,r){n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var e=N(t,n,r);n.addEventListener(t,e),n["".concat(t,"Handler")]=e}))}function S(n,t){A(n,"click",t),A(n,"change",t)}function M(n,t){for(var r=[],e=0;e<n.attributes.length;e++){var o=n.attributes[e],u=t.getAttribute(o.name);u!==o.value&&r.push({name:o.name,newValue:f(u||"")})}return r}function E(n,t){if(t.name.startsWith("data-attribute-")){var r=t.name.substring(15);t.newValue?(n[r]=!0,n.setAttribute(r,t.newValue)):(n[r]=!1,n.removeAttribute(r))}}var T=function(n){return n.nodeType!==Node.TEXT_NODE&&-1!==n.tagName.indexOf("-")};function k(n,t){n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var r=n["".concat(t,"Handler")];r&&n.removeEventListener(t,r)}))}function C(n,t){if(n.nodeType===Node.TEXT_NODE)return function(n,t){return n.textContent!==t.textContent?[{node:t,content:t.textContent}]:[]}(n,t);var r,e=M(n,t),o=e.length>0?[{node:t,attributes:e}]:[];return T(n)?o.concat((r=t,n.innerHTML!==r.innerHTML?[{node:r,content:r.innerHTML}]:[])):o.concat(function(n,t){for(var r=[],e=[],o=Math.max(n.childNodes.length,t.childNodes.length),u=[],i=0;i<o;i++){var a,c,f=n.childNodes[i],v=t.childNodes[i];if((null==f?void 0:f.nodeType)===Node.TEXT_NODE&&(null==v?void 0:v.nodeType)===Node.TEXT_NODE){if((null===(a=f.textContent)||void 0===a?void 0:a.trim())!==(null===(c=v.textContent)||void 0===c?void 0:c.trim()))return[{node:t,content:t.innerHTML}]}else f?v?u=u.concat(C(f,v)):r.push(f):e.push(v)}return r.length&&u.push({node:t,m:r}),e.length&&u.push({node:t,p:e}),u}(n,t))}function I(n,t,r){for(var e=[],o=n;o!==t;)e.unshift(Array.prototype.indexOf.call(o.parentNode.childNodes,o)),o=o.parentNode;for(var u=r,i=0;i<e.length;i++){var a=e[i];if(!u.childNodes[a])return null;u=u.childNodes[a]}return u}function F(n,t,r,e,o,u){var i,c=[];if((null!==(i=null==e?void 0:e.slice())&&void 0!==i?i:[]).length&&(c=a(n)),void 0!==r&&c.push({name:"children",value:r,u:[],i:!1}),c.length){var f=o.get(t.cogAnchorId),v=function(n,t){for(var r=n.concat(t),e={},o=0;o<r.length;o++)e[r[o].name]=r[o];return Object.values(e)}(f.attributes,c);f.attributes=v,0==u.filter((function(n){return n.id===f.id})).length&&u.push(f)}}function H(n,t,r){var e;n.nodeType===Node.TEXT_NODE?n.textContent=t:(k(e=n,"click"),k(e,"change"),n.innerHTML=t,S(n,r))}function U(n,t){for(var r=0;r<t.length;r++)E(n,t[r]),n.setAttribute(t[r].name,t[r].newValue)}function J(n,t){for(var r=0;r<t.length;r++)n.appendChild(t[r])}function L(n,t){for(var r=0;r<t.length;r++)n.removeChild(t[r])}function P(n,t,r,e,o,u,i){for(var a=0;a<n.length;a++){var c=n[a],f=I(c.node,r,e);if(T(c.node))F(c.node,f,c.content,c.attributes,u,i);else{var v=R(c,t,e),d=v.O,l=v.j;void 0!==c.content?H(f,c.content,o):void 0!==c.attributes?U(f,c.attributes):d.length?J(f,d):l.length&&L(f,l)}}}function R(n,t,r){var e=[],o=[];if(void 0!==n.p&&(o=n.p),void 0!==n.m)for(var u=0;u<n.m.length;u++){var i=I(n.m[u],t,r);i&&e.push(i)}return{O:o,j:e}}var $=function(){var n=null,t={N:0,list:[],index:{},get value(){return this.list},get:function(n){return this.list[this.index[n]]},add:function(n){this.list.push(n),this.index[n.id]=this.list.length-1},update:function(n,t,r){this.list[this.index[n]][t]=r},A:function(){this.list=this.list.filter((function(n){var t=n.element;return document.body.contains(t)})),this.index=this.list.reduce((function(n,t,r){return n[t.id]=r,n}),{})},id:function(){return this.N++}},r=null,e={state:null,S:[],get value(){return this.state||(this.state={}),this.state},set:function(n,t){this.state||(this.state={}),this.state[n]?this.state[n].value=t:this.state[n]={value:t,v:[],l:[]}},M:function(n){-1===this.S.indexOf(n)&&this.S.push(n)},T:function(){this.S=[]}};var o=0;function i(n){e.value[n].l.forEach((function(n){e.M(n)})),e.M(n),null!==r&&cancelAnimationFrame(r),r=requestAnimationFrame((function(n){n-o>16.666666666666668&&(o=n,function(){var n={};e.S.map((function(n){return e.value[n].v})).flat().forEach((function(t){return n[t]=!0}));var r=Object.keys(n).map((function(n){return t.get(Number(n))}));!function(n,t,r){for(var e=0;e<t.length;e++){var o=t[e],i=l(o.parentId,o.attributes,r,t),a=s(u(o.h,o.u,i)),c=C(o.lastTemplateEvaluation,a);c.length>0&&(t[e].lastTemplateEvaluation=a.cloneNode(!0),P(c,o.lastTemplateEvaluation,a,o.element,i,n,t))}}(t,r,e.value),t.A(),e.T()}())}))}return{render:function(n){!function(n,t,r){for(var e=h(n,"self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",(function(n){return!T(n)})),o=0;o<e.length;o++){var u=r.id(),i=e[o];i.innerHTML=i.innerHTML.trim();for(var a=w(u,r,i,i.outerHTML,t),c=M(i,a),f=0;f<c.length;f++)E(a,c[f])}}(n,e.value,t),function(n,t,r){for(var e=h(n,"template"),o=document.createDocumentFragment(),u=0;u<e.length;u++){var i=e[u].getAttribute("id");if(i){if(e[u].innerHTML=e[u].innerHTML.replace(/[\r\n]+\s*/g,""),1!==e[u].content.childNodes.length)throw new Error("Template ".concat(i," should have a single child"));O(i,e[u],t,r),o.appendChild(e[u])}}o.textContent=""}(n,e.value,t),S(n,e.value)},variable:function(t,r){if(r instanceof Function)e.set(t,(function(){n=t;var e=r.apply(void 0,arguments);return n=null,e}));else if(Array.isArray(r)){var o=new Proxy(r,{get:function(n,r){var e=n[r];return"function"==typeof e&&"push"===r?function(){i(t);for(var r=arguments.length,o=new Array(r),u=0;u<r;u++)o[u]=arguments[u];return e.apply(n,o)}:e}});e.set(t,o)}else e.set(t,r);return{set value(n){e.set(t,n),i(t)},get value(){return null!==n&&-1===e.value[t].l.indexOf(n)&&e.value[t].l.push(n),e.value[t].value},set:function(n){e.set(t,n),i(t)}}}}}(),B=$.variable,D=$.render;function _(n){return function(n){if(Array.isArray(n))return q(n)}(n)||function(n){if("undefined"!=typeof Symbol&&null!=n[Symbol.iterator]||null!=n["@@iterator"])return Array.from(n)}(n)||function(n,t){if(n){if("string"==typeof n)return q(n,t);var r=Object.prototype.toString.call(n).slice(8,-1);return"Object"===r&&n.constructor&&(r=n.constructor.name),"Map"===r||"Set"===r?Array.from(n):"Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)?q(n,t):void 0}}(n)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function q(n,t){(null==t||t>n.length)&&(t=n.length);for(var r=0,e=new Array(t);r<t;r++)e[r]=n[r];return e}document.addEventListener("DOMContentLoaded",(function(){D(document.getElementById("app"))}));var K=B("todos",[{text:"hello",done:!1}]);B("save",(function(){var n=document.querySelector("[data-input=todo");null!=n&&n.value&&(K.set([].concat(_(K.value),[{text:n.value,done:!1}])),n.value="")})),B("toggleTodo",(function(n){var t=_(K.value);t[n].done=!t[n].done,K.set(t)})),B("Checkbox",(function(n){var t=n.index,r=void 0===t?-1:t,e=n.checked,o=void 0!==e&&e;return'<input type="checkbox" id="todo'.concat(r,'" data-on-change="toggleTodo(').concat(r,')" ').concat(o?"checked":""," />")}));var V=B("counter",0);return B("increment",(function(){V.set(V.value+1)})),n})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-module-todo"] = factory();
+	else
+		root["ts-module-todo"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/expressions/evaluateExpression.ts
+function evaluateExpression(expressionWithScope, state) {
+  var evaluated = expressionWithScope(state);
+  if (Array.isArray(evaluated)) {
+    evaluated = evaluated.join("");
+  }
+  return evaluated;
+}
+;// CONCATENATED MODULE: ./src/html/findNextTemplateExpression.ts
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText[i] === "{" && htmlText[i + 1] === "{") {
+      stack++;
+      i++;
+    } else if (htmlText[i] === "}" && htmlText[i + 1] === "}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+;// CONCATENATED MODULE: ./src/html/htmlToText.ts
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+;// CONCATENATED MODULE: ./src/expressions/sanitizeExpression.ts
+function sanitizeExpression(expression) {
+  return expression.replace(/[\r\n]+/g, "");
+}
+;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
+var functionCache = {};
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var index = expression + JSON.stringify(Object.keys(state).join(""));
+  if (!functionCache[index]) {
+    var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+      return "const ".concat(variable, " = state[\"").concat(variable, "\"].value;");
+    }).join("\n"), " return ").concat(expression, "}");
+    functionCache[index] = Function(functionBody)();
+  }
+  return functionCache[index];
+};
+;// CONCATENATED MODULE: ./src/html/evaluateTemplate.ts
+
+
+
+
+
+var evaluateTemplate = function evaluateTemplate(template, expressions, state) {
+  var restOfContent = template;
+  var updatedContent = "";
+  for (var i = 0; i < expressions.length; i++) {
+    var _expressions$i = expressions[i],
+      start = _expressions$i.start,
+      end = _expressions$i.end,
+      value = _expressions$i.value;
+    var before = restOfContent.slice(0, start);
+    var after = restOfContent.slice(end + 1);
+    var expressionWithScope = createExpressionScope(value, state);
+    var evaluated = evaluateExpression(expressionWithScope, state);
+    updatedContent += "".concat(before).concat(evaluated);
+    restOfContent = after;
+  }
+  updatedContent += restOfContent;
+  return updatedContent;
+};
+
+/**
+ * Extracts all template expressions from a template string.
+ * start and end are relative to the last template expression.
+ */
+var extractTemplateExpressions = function extractTemplateExpressions(template) {
+  var expressions = [];
+  var restOfContent = String(template);
+  var hasTemplateExpression = true;
+  while (hasTemplateExpression) {
+    var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+      start = _findNextTemplateExpr.start,
+      end = _findNextTemplateExpr.end;
+    if (end === -1) {
+      hasTemplateExpression = false;
+      break;
+    }
+    var htmlValue = restOfContent.slice(start + 2, end - 1);
+    var after = restOfContent.slice(end + 1);
+    var value = sanitizeExpression(htmlToText(htmlValue));
+    expressions.push({
+      start: start,
+      end: end,
+      value: value
+    });
+    restOfContent = after;
+  }
+  return expressions;
+};
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var expressions = extractTemplateExpressions(attribute.value);
+    return {
+      name: attribute.name,
+      value: attribute.value,
+      expressions: expressions,
+      reactive: !!expressions.length
+    };
+  });
+  return attributes;
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeName.ts
+var convertAttributeName = function convertAttributeName(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeValue.ts
+function convertAttributeValue(value) {
+  return value === "true" ? true : value === "false" ? false : value === "null" ? null : value === "undefined" ? undefined : value === "" ? "" : !isNaN(Number(value)) ? Number(value) : value;
+}
+;// CONCATENATED MODULE: ./src/attributes/attributesToState.ts
+
+
+
+var attributesToStates = {};
+function attributesToState(attributes, state) {
+  var key = JSON.stringify(attributes) + JSON.stringify(state);
+  if (!attributesToStates[key]) {
+    var localState = Object.assign({}, state);
+    for (var i = 0; i < attributes.length; i++) {
+      localState[convertAttributeName(attributes[i].name)] = {
+        value: convertAttributeValue(evaluateTemplate(attributes[i].value, attributes[i].expressions, state)),
+        dependents: [],
+        computants: []
+      };
+    }
+    attributesToStates[key] = localState;
+  }
+  return attributesToStates[key];
+}
+;// CONCATENATED MODULE: ./src/attributes/getLocalState.ts
+
+function getLocalState(parentId, attributes, globalState, reactiveNodes) {
+  var parentNode = reactiveNodes.find(function (rn) {
+    return rn.id === parentId;
+  });
+  if (!parentNode) {
+    return attributesToState(attributes, globalState);
+  }
+  var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, reactiveNodes);
+  return Object.assign({}, parentState, attributesToState(attributes, parentState));
+}
+;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
+function elementFromString(htmlString) {
+  var parser = new DOMParser();
+  var newElementDoc = parser.parseFromString(htmlString, "text/html");
+  return newElementDoc.body.firstChild;
+}
+;// CONCATENATED MODULE: ./src/nodes/findNodes.ts
+function findNodes(rootElement, xpath) {
+  var check = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {
+    return true;
+  };
+  var elements = [];
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (check(element)) {
+      elements.push(element);
+    }
+    element = result.iterateNext();
+  }
+  return elements;
+}
+;// CONCATENATED MODULE: ./src/attributes/getAttributesRecursive.ts
+function getAttributesRecursive(parentId, attributes, reactiveNodes) {
+  if (parentId === null) {
+    return attributes;
+  }
+  var parentNode = reactiveNodes.find(function (rn) {
+    return rn.id === parentId;
+  });
+  var parentAttributes = getAttributesRecursive(parentNode.parentId, parentNode.attributes, reactiveNodes);
+  return parentAttributes.concat(attributes);
+}
+;// CONCATENATED MODULE: ./src/html/removeTagsAndAttributeNames.ts
+var tagRegex = /<\/?[\w-]+/g;
+var attrRegex = /[\w-]+(\s*=\s*("|')[^"']*("|'))/g;
+var specialCharRegex = /[^\w\s]/g;
+var spaceRegex = /\s+/g;
+function removeTagsAndAttributeNames(htmlString) {
+  return htmlString.replace(tagRegex, "").replace(attrRegex, "$1").replace(specialCharRegex, " ").trim().replace(spaceRegex, "@");
+}
+;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
+
+
+
+
+function assignDependents(elementId, state, parentId, attributes, reactiveNodes, template) {
+  var attributesRecursive = getAttributesRecursive(parentId, attributes, reactiveNodes);
+  var templateAndAttributesString = template + " " + attributesRecursive.map(function (a) {
+    return a.value;
+  }).join(" ");
+  var uniqueIndex = {};
+  extractTemplateExpressions(templateAndAttributesString).map(function (expression) {
+    return removeTagsAndAttributeNames(expression.value).split("@").filter(function (wordFromExpression) {
+      return uniqueIndex[wordFromExpression] ? false : uniqueIndex[wordFromExpression] = true;
+    }).filter(function (wordFromExpression) {
+      return state[wordFromExpression] && state[wordFromExpression].dependents.indexOf(elementId) === -1;
+    }).forEach(function (wordFromExpression) {
+      state[wordFromExpression].dependents.push(elementId);
+    });
+  });
+}
+function registerReactiveNode(elementId, reactiveNodes, originalElement, template, state) {
+  var _originalElement$pare;
+  var attributes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
+  var parentId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+  var refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
+  var expressions = extractTemplateExpressions(refinedTemplate);
+  var updatedContent = evaluateTemplate(refinedTemplate, expressions, state);
+  var element = elementFromString(updatedContent);
+  assignDependents(elementId, state, parentId, attributes, reactiveNodes.list, refinedTemplate);
+  reactiveNodes.add({
+    id: elementId,
+    parentId: parentId,
+    element: element,
+    template: refinedTemplate,
+    lastTemplateEvaluation: element.cloneNode(true),
+    attributes: attributes,
+    expressions: expressions,
+    shouldUpdate: false
+  });
+  (_originalElement$pare = originalElement.parentElement) === null || _originalElement$pare === void 0 || _originalElement$pare.replaceChild(element, originalElement);
+  return element;
+}
+;// CONCATENATED MODULE: ./src/nodes/registerTemplates.ts
+
+
+
+
+
+
+
+function registerTemplates(rootElement, state, reactiveNodes) {
+  var templates = findNodes(rootElement, "template");
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < templates.length; i++) {
+    var name = templates[i].getAttribute("id");
+    if (name) {
+      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+      if (templates[i].content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name, templates[i], state, reactiveNodes);
+      fragment.appendChild(templates[i]);
+    }
+  }
+  fragment.textContent = "";
+}
+function defineCustomElement(name, template, state, reactiveNodes) {
+  function CustomElement() {
+    return Reflect.construct(HTMLElement, [], CustomElement);
+  }
+  CustomElement.prototype = Object.create(HTMLElement.prototype);
+  CustomElement.prototype.constructor = CustomElement;
+  CustomElement.prototype.connectedCallback = registerCustomElement(template, state, reactiveNodes);
+  customElements.define(name, CustomElement);
+}
+function addParentId(element, parentId) {
+  if (element.tagName.includes("-")) {
+    element.setAttribute("data-parent-id", String(parentId));
+  }
+}
+function addParentIdToChildren(template, parentId) {
+  var newElement = elementFromString(template);
+  if (newElement.nodeType !== Node.TEXT_NODE) {
+    addParentId(newElement, parentId);
+    var childElements = newElement.querySelectorAll("*");
+    for (var i = 0; i < childElements.length; i++) {
+      var child = childElements[i];
+      addParentId(child, parentId);
+    }
+  }
+  var refinedTemplate = newElement.outerHTML;
+  if (!refinedTemplate) {
+    refinedTemplate = newElement.textContent;
+  }
+  return refinedTemplate;
+}
+function getCustomElementAttributes(element) {
+  var attributes = getAttributes(element);
+  var childrenExpressions = extractTemplateExpressions(element.innerHTML);
+  attributes.push({
+    name: "children",
+    value: element.innerHTML,
+    expressions: childrenExpressions,
+    reactive: !!childrenExpressions.length
+  });
+  return attributes;
+}
+function registerCustomElement(template, state, reactiveNodes) {
+  return function () {
+    var elementId = reactiveNodes.id();
+    var attributes = getCustomElementAttributes(this);
+    var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
+    var parentId = this.dataset.parentId ? Number(this.dataset.parentId) : null;
+    var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
+    var newElement = registerReactiveNode(elementId, reactiveNodes, this, refinedTemplate, localState, attributes, parentId);
+    newElement.cogAnchorId = elementId;
+  };
+}
+;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
+
+var makeEventHandler = function makeEventHandler(eventName, element, state) {
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
+
+function addEventListeners(parent, eventName, state) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
+
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+;// CONCATENATED MODULE: ./src/attributes/getChangedAttributes.ts
+
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: convertAttributeValue(newAttrValue || "")
+      });
+    }
+  }
+  return changedAttributes;
+}
+;// CONCATENATED MODULE: ./src/attributes/handleBooleanAttribute.ts
+function handleBooleanAttribute(changedNode, attribute) {
+  if (attribute.name.startsWith("data-attribute-")) {
+    var optionalAttribute = attribute.name.substring(15); // "data-attribute-".length
+
+    if (attribute.newValue) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      changedNode[optionalAttribute] = true;
+      changedNode.setAttribute(optionalAttribute, attribute.newValue);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      changedNode[optionalAttribute] = false;
+      changedNode.removeAttribute(optionalAttribute);
+    }
+  }
+}
+;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
+var isCustomElement = function isCustomElement(element) {
+  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
+};
+;// CONCATENATED MODULE: ./src/nodes/registerNativeElements.ts
+
+
+
+
+
+var registerNativeElements = function registerNativeElements(rootElement, state, reactiveNodes) {
+  var elements = findNodes(rootElement, "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]", function (element) {
+    return !isCustomElement(element);
+  });
+  for (var i = 0; i < elements.length; i++) {
+    var elementId = reactiveNodes.id();
+    var element = elements[i];
+    element.innerHTML = element.innerHTML.trim();
+    var template = element.outerHTML;
+    var newElement = registerReactiveNode(elementId, reactiveNodes, element, template, state);
+    var attributes = getChangedAttributes(element, newElement);
+    for (var _i = 0; _i < attributes.length; _i++) {
+      handleBooleanAttribute(newElement, attributes[_i]);
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
+function removeEventListeners(parent, eventName) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
+
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+;// CONCATENATED MODULE: ./src/nodes/compareNodes.ts
+
+
+function compareTextNodes(oldNode, newNode) {
+  if (oldNode.textContent !== newNode.textContent) {
+    return [{
+      node: newNode,
+      content: newNode.textContent
+    }];
+  }
+  return [];
+}
+function compareChildNodes(oldNode, newNode) {
+  var toBeRemoved = [];
+  var toBeAdded = [];
+  var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
+  var changedChildren = [];
+  for (var i = 0; i < nodesLength; i++) {
+    var oldChild = oldNode.childNodes[i];
+    var newChild = newNode.childNodes[i];
+    if ((oldChild === null || oldChild === void 0 ? void 0 : oldChild.nodeType) === Node.TEXT_NODE && (newChild === null || newChild === void 0 ? void 0 : newChild.nodeType) === Node.TEXT_NODE) {
+      var _oldChild$textContent, _newChild$textContent;
+      if (((_oldChild$textContent = oldChild.textContent) === null || _oldChild$textContent === void 0 ? void 0 : _oldChild$textContent.trim()) !== ((_newChild$textContent = newChild.textContent) === null || _newChild$textContent === void 0 ? void 0 : _newChild$textContent.trim())) {
+        return [{
+          node: newNode,
+          content: newNode.innerHTML
+        }];
+      }
+    } else if (!oldChild) {
+      toBeAdded.push(newChild);
+    } else if (!newChild) {
+      toBeRemoved.push(oldChild);
+    } else {
+      changedChildren = changedChildren.concat(compareNodes(oldChild, newChild));
+    }
+  }
+  if (toBeRemoved.length) {
+    changedChildren.push({
+      node: newNode,
+      toBeRemoved: toBeRemoved
+    });
+  }
+  if (toBeAdded.length) {
+    changedChildren.push({
+      node: newNode,
+      toBeAdded: toBeAdded
+    });
+  }
+  return changedChildren;
+}
+function compareCustomElementChildren(oldElement, newElement) {
+  if (oldElement.innerHTML !== newElement.innerHTML) {
+    return [{
+      node: newElement,
+      content: newElement.innerHTML
+    }];
+  }
+  return [];
+}
+function compareNodes(oldNode, newNode) {
+  if (oldNode.nodeType === Node.TEXT_NODE) {
+    return compareTextNodes(oldNode, newNode);
+  }
+  var changedAttributes = getChangedAttributes(oldNode, newNode);
+  var changedChildren = changedAttributes.length > 0 ? [{
+    node: newNode,
+    attributes: changedAttributes
+  }] : [];
+  if (isCustomElement(oldNode)) {
+    return changedChildren.concat(compareCustomElementChildren(oldNode, newNode));
+  }
+  return changedChildren.concat(compareChildNodes(oldNode, newNode));
+}
+;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
+function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var pathInA = [];
+  var temp = nodeInA;
+  while (temp !== rootA) {
+    pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
+    temp = temp.parentNode;
+  }
+  var correspondingNodeInB = rootB;
+  for (var i = 0; i < pathInA.length; i++) {
+    var index = pathInA[i];
+    if (correspondingNodeInB.childNodes[index]) {
+      correspondingNodeInB = correspondingNodeInB.childNodes[index];
+    } else {
+      return null;
+    }
+  }
+  return correspondingNodeInB;
+}
+;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
+
+
+
+
+
+
+
+
+
+
+function mergeAttributes(oldArray, newArray) {
+  var merged = oldArray.concat(newArray);
+  var attributes = {};
+  for (var i = 0; i < merged.length; i++) {
+    attributes[merged[i].name] = merged[i];
+  }
+  return Object.values(attributes);
+}
+function updateCustomElement(changedNode, originalNode, content, attributes, reactiveNodes, nodesToReconcile) {
+  var _attributes$slice;
+  var changedAttributes = (_attributes$slice = attributes === null || attributes === void 0 ? void 0 : attributes.slice()) !== null && _attributes$slice !== void 0 ? _attributes$slice : [];
+  var newAttributes = [];
+  if (changedAttributes.length) {
+    newAttributes = getAttributes(changedNode);
+  }
+  if (content !== undefined) {
+    newAttributes.push({
+      name: "children",
+      value: content,
+      expressions: [],
+      reactive: false
+    });
+  }
+  if (newAttributes.length) {
+    var reactiveNode = reactiveNodes.get(originalNode.cogAnchorId);
+    var mergedAttributes = mergeAttributes(reactiveNode.attributes, newAttributes);
+    reactiveNode.attributes = mergedAttributes;
+    if (nodesToReconcile.filter(function (n) {
+      return n.id === reactiveNode.id;
+    }).length == 0) {
+      nodesToReconcile.push(reactiveNode);
+    }
+  }
+}
+function handleContentChange(originalNode, content, localState) {
+  if (originalNode.nodeType === Node.TEXT_NODE) {
+    originalNode.textContent = content;
+  } else {
+    removeAllEventListeners(originalNode);
+    originalNode.innerHTML = content;
+    addAllEventListeners(originalNode, localState);
+  }
+}
+function handleAttributeChange(originalNode, attributes) {
+  for (var i = 0; i < attributes.length; i++) {
+    handleBooleanAttribute(originalNode, attributes[i]);
+    originalNode.setAttribute(attributes[i].name, attributes[i].newValue);
+  }
+}
+function handleChildrenAddition(originalNode, addChildren) {
+  for (var i = 0; i < addChildren.length; i++) {
+    originalNode.appendChild(addChildren[i]);
+  }
+}
+function handleChildrenRemoval(originalNode, removeChildren) {
+  for (var i = 0; i < removeChildren.length; i++) {
+    originalNode.removeChild(removeChildren[i]);
+  }
+}
+function handleNodeChanges(changedNodes, oldElement, newElement, element, localState, reactiveNodes, nodesToReconcile) {
+  for (var i = 0; i < changedNodes.length; i++) {
+    var change = changedNodes[i];
+    var originalNode = findCorrespondingNode(change.node, newElement, element);
+    if (isCustomElement(change.node)) {
+      updateCustomElement(change.node, originalNode, change.content, change.attributes, reactiveNodes, nodesToReconcile);
+    } else {
+      var _handleChildrenChange = handleChildrenChanges(change, oldElement, element),
+        addChildren = _handleChildrenChange.addChildren,
+        removeChildren = _handleChildrenChange.removeChildren;
+      if (change.content !== undefined) {
+        handleContentChange(originalNode, change.content, localState);
+      } else if (change.attributes !== undefined) {
+        handleAttributeChange(originalNode, change.attributes);
+      } else if (addChildren.length) {
+        handleChildrenAddition(originalNode, addChildren);
+      } else if (removeChildren.length) {
+        handleChildrenRemoval(originalNode, removeChildren);
+      }
+    }
+  }
+}
+function handleChildrenChanges(changedNode, oldElement, element) {
+  var removeChildren = [];
+  var addChildren = [];
+  if (changedNode.toBeAdded !== undefined) {
+    addChildren = changedNode.toBeAdded;
+  }
+  if (changedNode.toBeRemoved !== undefined) {
+    for (var i = 0; i < changedNode.toBeRemoved.length; i++) {
+      var child = findCorrespondingNode(changedNode.toBeRemoved[i], oldElement, element);
+      if (child) {
+        removeChildren.push(child);
+      }
+    }
+  }
+  return {
+    addChildren: addChildren,
+    removeChildren: removeChildren
+  };
+}
+var reconcile = function reconcile(reactiveNodes, nodesToReconcile, state) {
+  for (var nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
+    var reactiveNode = nodesToReconcile[nodeIndex];
+    var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, state, nodesToReconcile);
+    var updatedContent = evaluateTemplate(reactiveNode.template, reactiveNode.expressions, localState);
+    var oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(true);
+    var newElement = elementFromString(updatedContent);
+    var changedNodes = compareNodes(oldElement, newElement);
+    if (changedNodes.length > 0) {
+      nodesToReconcile[nodeIndex].lastTemplateEvaluation = newElement.cloneNode(true);
+      handleNodeChanges(changedNodes, oldElement, newElement, reactiveNode.element, localState, reactiveNodes, nodesToReconcile);
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/createState.ts
+function createState() {
+  return {
+    state: null,
+    updatedKeys: [],
+    get value() {
+      if (!this.state) {
+        this.state = {};
+      }
+      return this.state;
+    },
+    set: function set(key, value) {
+      if (!this.state) {
+        this.state = {};
+      }
+      if (!this.state[key]) {
+        this.state[key] = {
+          value: value,
+          dependents: [],
+          computants: []
+        };
+      } else {
+        this.state[key].value = value;
+      }
+    },
+    registerUpdate: function registerUpdate(key) {
+      if (this.updatedKeys.indexOf(key) === -1) {
+        this.updatedKeys.push(key);
+      }
+    },
+    clearUpdates: function clearUpdates() {
+      this.updatedKeys = [];
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nodes/cleanReactiveNodesList.ts
+var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
+  return reactiveNodes.filter(function (_ref) {
+    var element = _ref.element;
+    var contains = document.body.contains(element);
+    return contains;
+  });
+};
+;// CONCATENATED MODULE: ./src/createReactiveNodes.ts
+
+function createReactiveNodes() {
+  return {
+    lastId: 0,
+    list: [],
+    index: {},
+    get value() {
+      return this.list;
+    },
+    get: function get(id) {
+      return this.list[this.index[id]];
+    },
+    add: function add(item) {
+      this.list.push(item);
+      this.index[item.id] = this.list.length - 1;
+    },
+    update: function update(id, property, value) {
+      this.list[this.index[id]][property] = value;
+    },
+    clean: function clean() {
+      this.list = cleanReactiveNodesList(this.list);
+      this.index = this.list.reduce(function (index, item, i) {
+        index[item.id] = i;
+        return index;
+      }, {});
+    },
+    id: function id() {
+      return this.lastId++;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/cog.ts
+
+
+
+
+
+
+var init = function init() {
+  var stateFunctionExecuting = null;
+  var reactiveNodes = createReactiveNodes();
+  var updateStateTimeout = null;
+  var state = createState();
+  function reRender() {
+    var uniqueKeys = {};
+    state.updatedKeys.map(function (stateKey) {
+      return state.value[stateKey].dependents;
+    }).flat().forEach(function (id) {
+      return uniqueKeys[id] = true;
+    });
+    var uniqueDependents = Object.keys(uniqueKeys);
+    var nodesToReconcile = uniqueDependents.map(function (id) {
+      return reactiveNodes.get(Number(id));
+    });
+    reconcile(reactiveNodes, nodesToReconcile, state.value);
+    reactiveNodes.clean();
+    state.clearUpdates();
+  }
+  var lastFrameTime = 0;
+  var frameDelay = 1000 / 60;
+  function scheduleReRender(stateKey) {
+    state.value[stateKey].computants.forEach(function (computant) {
+      state.registerUpdate(computant);
+    });
+    state.registerUpdate(stateKey);
+    if (updateStateTimeout !== null) {
+      cancelAnimationFrame(updateStateTimeout);
+    }
+    updateStateTimeout = requestAnimationFrame(function (currentTime) {
+      if (currentTime - lastFrameTime > frameDelay) {
+        lastFrameTime = currentTime;
+        reRender();
+      }
+    });
+  }
+  var render = function render(rootElement) {
+    registerNativeElements(rootElement, state.value, reactiveNodes);
+    registerTemplates(rootElement, state.value, reactiveNodes);
+    addAllEventListeners(rootElement, state.value);
+  };
+  var setFunctionValue = function setFunctionValue(name, value) {
+    state.set(name, function () {
+      stateFunctionExecuting = name;
+      var result = value.apply(void 0, arguments);
+      stateFunctionExecuting = null;
+      return result;
+    });
+  };
+  var setArrayValue = function setArrayValue(name, value) {
+    var valueProxy = new Proxy(value, {
+      get: function get(target, propKey) {
+        var originalMethod = target[propKey];
+        if (propKey === "push") {
+          return function () {
+            scheduleReRender(name);
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+            return originalMethod.apply(target, args);
+          };
+        }
+        return originalMethod;
+      }
+    });
+    state.set(name, valueProxy);
+  };
+  var variable = function variable(name, value) {
+    if (value instanceof Function) {
+      setFunctionValue(name, value);
+    } else if (Array.isArray(value)) {
+      setArrayValue(name, value);
+    } else {
+      state.set(name, value);
+    }
+    return {
+      get value() {
+        if (stateFunctionExecuting !== null && state.value[name].computants.indexOf(stateFunctionExecuting) === -1) {
+          state.value[name].computants.push(stateFunctionExecuting);
+        }
+        return state.value[name].value;
+      },
+      set value(newVal) {
+        state.set(name, newVal);
+        scheduleReRender(name);
+      },
+      set: function set(newVal) {
+        state.set(name, newVal);
+        scheduleReRender(name);
+      }
+    };
+  };
+  return {
+    render: render,
+    variable: variable
+  };
+};
+var _init = init(),
+  variable = _init.variable,
+  render = _init.render;
+
+;// CONCATENATED MODULE: ./examples/src/ts-module-todo.ts
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+document.addEventListener("DOMContentLoaded", function () {
+  render(document.getElementById("app"));
+});
+var todos = variable("todos", [{
+  text: "hello",
+  done: false
+}]);
+variable("save", function () {
+  var todo = document.querySelector("[data-input=todo");
+  if (todo !== null && todo !== void 0 && todo.value) {
+    todos.set([].concat(_toConsumableArray(todos.value), [{
+      text: todo.value,
+      done: false
+    }]));
+    todo.value = "";
+  }
+});
+variable("toggleTodo", function (index) {
+  var newTodos = _toConsumableArray(todos.value);
+  newTodos[index].done = !newTodos[index].done;
+  todos.set(newTodos);
+});
+variable("Checkbox", function (_ref) {
+  var _ref$index = _ref.index,
+    index = _ref$index === void 0 ? -1 : _ref$index,
+    _ref$checked = _ref.checked,
+    checked = _ref$checked === void 0 ? false : _ref$checked;
+  return "<input type=\"checkbox\" id=\"todo".concat(index, "\" data-on-change=\"toggleTodo(").concat(index, ")\" ").concat(checked ? "checked" : "", " />");
+});
+var counter = variable("counter", 0);
+variable("increment", function () {
+  counter.set(counter.value + 1);
+});
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});

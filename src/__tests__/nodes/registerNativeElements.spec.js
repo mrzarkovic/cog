@@ -14,7 +14,11 @@ describe("registerNativeElements", () => {
         root.appendChild(element2);
         const reactiveNodes = createReactiveNodes();
 
-        registerNativeElements(root, { name: "John" }, reactiveNodes);
+        registerNativeElements(
+            root,
+            { name: { value: "John" } },
+            reactiveNodes
+        );
 
         expect(reactiveNodes.list.length).toBe(1);
     });
