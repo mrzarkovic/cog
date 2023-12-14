@@ -13,24 +13,18 @@ export const init = (): Cog => {
     const state = createState();
 
     function reRender() {
-        const uniqueDependents = [
-            ...new Set(
-                state.updatedKeys
-                    .map((stateKey) => state.value[stateKey].dependents)
-                    .flat()
-            ),
-        ];
-        console.log("uniqueDependents", uniqueDependents);
+        const uniqueKeys: Record<number, boolean> = {};
+        state.updatedKeys
+            .map((stateKey) => state.value[stateKey].dependents)
+            .flat()
+            .forEach((id) => (uniqueKeys[id] = true));
+        const uniqueDependents = Object.keys(uniqueKeys);
+
         const nodesToReconcile = uniqueDependents.map((id) =>
-            reactiveNodes.get(id)
+            reactiveNodes.get(Number(id))
         );
 
-        reconcile(
-            reactiveNodes,
-            nodesToReconcile,
-            state.value,
-            state.updatedKeys
-        );
+        reconcile(reactiveNodes, nodesToReconcile, state.value);
         reactiveNodes.clean();
         state.clearUpdates();
     }
@@ -39,6 +33,9 @@ export const init = (): Cog => {
     const frameDelay = 1000 / 60;
 
     function scheduleReRender(stateKey: string) {
+        state.value[stateKey].computants.forEach((computant) => {
+            state.registerUpdate(computant);
+        });
         state.registerUpdate(stateKey);
         if (updateStateTimeout !== null) {
             cancelAnimationFrame(updateStateTimeout);
@@ -61,11 +58,11 @@ export const init = (): Cog => {
         render,
         variable: <T>(name: string, value: T) => {
             if (value instanceof Function) {
-                console.log("function", name);
                 state.set(name, (...args: unknown[]) => {
-                    console.log("called", name, args);
                     stateFunctionExecuting = name;
-                    return value(...args);
+                    const result = value(...args);
+                    stateFunctionExecuting = null;
+                    return result;
                 });
             } else if (Array.isArray(value)) {
                 const valueProxy = new Proxy(value, {
@@ -96,7 +93,6 @@ export const init = (): Cog => {
                     scheduleReRender(name);
                 },
                 get value() {
-                    console.log(stateFunctionExecuting, "is getting value");
                     if (
                         stateFunctionExecuting !== null &&
                         state.value[name].computants.indexOf(
@@ -106,9 +102,8 @@ export const init = (): Cog => {
                         state.value[name].computants.push(
                             stateFunctionExecuting
                         );
-                    } else {
-                        console.log("no one calling");
                     }
+
                     return state.value[name].value as T;
                 },
                 set: (newVal: T) => {

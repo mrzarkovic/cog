@@ -31,8 +31,7 @@ export type ReactiveNode = {
     parentId: ReactiveNodeId | null;
     element: HTMLElement;
     template: HTMLString;
-    lastTemplateEvaluation: HTMLString;
-    updateCheckString: string;
+    lastTemplateEvaluation: CogHTMLElement;
     attributes: Attribute[];
     expressions: Expression[];
     shouldUpdate: boolean;

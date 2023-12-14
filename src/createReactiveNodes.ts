@@ -17,9 +17,6 @@ export function createReactiveNodes(): ReactiveNodesList {
             this.index[item.id] = this.list.length - 1;
         },
         update(id: number, property: keyof ReactiveNode, value: unknown) {
-            if (property === "attributes") {
-                this.list[this.index[id]].shouldUpdate = true;
-            }
             this.list[this.index[id]][property] = value as never;
         },
         clean() {

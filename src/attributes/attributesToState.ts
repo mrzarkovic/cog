@@ -21,6 +21,7 @@ export function attributesToState(attributes: Attribute[], state: State) {
                     )
                 ),
                 dependents: [],
+                computants: [],
             };
         }
 

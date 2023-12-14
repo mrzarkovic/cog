@@ -4,7 +4,13 @@ import {
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
 import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
-import { Attribute, ReactiveNode, ReactiveNodesList, State } from "../types";
+import {
+    Attribute,
+    CogHTMLElement,
+    ReactiveNode,
+    ReactiveNodesList,
+    State,
+} from "../types";
 import { elementFromString } from "./elementFromString";
 
 function assignDependents(
@@ -20,24 +26,28 @@ function assignDependents(
         attributes,
         reactiveNodes
     );
-    const templateForUpdateCheck =
+    const templateAndAttributesString =
         template + " " + attributesRecursive.map((a) => a.value).join(" ");
-    const expression = extractTemplateExpressions(templateForUpdateCheck)
-        .map((e) => e.value)
-        .join(" ");
-    const updateCheckString = removeTagsAndAttributeNames(expression);
-    const index: Record<string, boolean> = {};
-    const uniqueWords = updateCheckString
-        .split("@")
-        .filter((w) => (index[w] ? false : (index[w] = true)));
+    const uniqueIndex: Record<string, boolean> = {};
 
-    for (let i = 0; i < uniqueWords.length; i++) {
-        if (state[uniqueWords[i]]) {
-            if (state[uniqueWords[i]].dependents.indexOf(elementId!) === -1) {
-                state[uniqueWords[i]].dependents.push(elementId!);
-            }
-        }
-    }
+    extractTemplateExpressions(templateAndAttributesString).map((expression) =>
+        removeTagsAndAttributeNames(expression.value)
+            .split("@")
+            .filter((wordFromExpression) =>
+                uniqueIndex[wordFromExpression]
+                    ? false
+                    : (uniqueIndex[wordFromExpression] = true)
+            )
+            .filter(
+                (wordFromExpression) =>
+                    state[wordFromExpression] &&
+                    state[wordFromExpression].dependents.indexOf(elementId) ===
+                        -1
+            )
+            .forEach((wordFromExpression) => {
+                state[wordFromExpression].dependents.push(elementId);
+            })
+    );
 }
 
 export function registerReactiveNode(
@@ -59,18 +69,6 @@ export function registerReactiveNode(
 
     const element = elementFromString(updatedContent);
 
-    const attributesRecursive = getAttributesRecursive(
-        parentId,
-        attributes,
-        reactiveNodes.list
-    );
-    const templateForUpdateCheck =
-        template + " " + attributesRecursive.map((a) => a.value).join(" ");
-    const expression = extractTemplateExpressions(templateForUpdateCheck)
-        .map((e) => e.value)
-        .join(" ");
-    const updateCheckString = removeTagsAndAttributeNames(expression);
-
     assignDependents(
         elementId,
         state,
@@ -85,8 +83,7 @@ export function registerReactiveNode(
         parentId,
         element,
         template: refinedTemplate,
-        lastTemplateEvaluation: updatedContent,
-        updateCheckString,
+        lastTemplateEvaluation: element.cloneNode(true) as CogHTMLElement,
         attributes,
         expressions,
         shouldUpdate: false,
