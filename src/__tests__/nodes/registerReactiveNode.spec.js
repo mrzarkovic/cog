@@ -22,6 +22,7 @@ describe("registerReactiveNode", () => {
             {
                 name: {
                     value: "John",
+                    dependents: [],
                 },
             },
             [],

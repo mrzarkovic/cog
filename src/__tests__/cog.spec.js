@@ -169,7 +169,7 @@ describe("cog", () => {
         const count = cog.variable("count", 3);
         cog.render(root);
 
-        count.value--;
+        count.value = 1;
 
         await waitFor(() => {
             expect(
