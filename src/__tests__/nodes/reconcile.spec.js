@@ -23,17 +23,24 @@ describe("reconcile", () => {
                 name: {
                     value: "John",
                     dependents: [],
+                    dependencies: [],
                 },
             },
             reactiveNodes
         );
 
-        reconcile(reactiveNodes, reactiveNodes.list, {
-            name: {
-                value: "Mike",
-                dependents: [],
+        reconcile(
+            reactiveNodes,
+            reactiveNodes.list,
+            {
+                name: {
+                    value: "Mike",
+                    dependents: [],
+                    dependencies: [],
+                },
             },
-        });
+            ["name"]
+        );
 
         expect(getByText(root, "Mike")).toBeInTheDocument();
     });
@@ -51,16 +58,22 @@ describe("reconcile", () => {
 
         registerNativeElements(
             root,
-            { checked: { value: "false", dependents: [] } },
+            { checked: { value: "false", dependents: [], dependencies: [] } },
             reactiveNodes
         );
 
-        reconcile(reactiveNodes, reactiveNodes.list, {
-            checked: {
-                value: true,
-                dependents: [],
+        reconcile(
+            reactiveNodes,
+            reactiveNodes.list,
+            {
+                checked: {
+                    value: true,
+                    dependents: [],
+                    dependencies: [],
+                },
             },
-        });
+            ["checked"]
+        );
 
         expect(
             getByTestId(root, "checkbox").getAttribute("data-attribute-checked")

@@ -16,7 +16,7 @@ describe("registerNativeElements", () => {
 
         registerNativeElements(
             root,
-            { name: { value: "John", dependents: [] } },
+            { name: { value: "John", dependents: [], dependencies: [] } },
             reactiveNodes
         );
 

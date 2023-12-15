@@ -16,20 +16,23 @@ describe("attributesToState", () => {
                 value: 1,
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
         };
-        const localState = attributesToState(attributes, state);
+        const localState = attributesToState(attributes, state, []);
 
         expect(localState).toStrictEqual({
             global: {
                 value: 1,
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
             dataTest: {
                 value: "test",
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
         });
     });

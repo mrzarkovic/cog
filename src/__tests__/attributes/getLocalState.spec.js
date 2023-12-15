@@ -50,12 +50,14 @@ describe("getLocalState", () => {
                 value: 42,
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
         };
         const localState = getLocalState(
             2,
             elementAttributes,
             globalState,
+            [],
             reactiveNodes
         );
 
@@ -64,26 +66,31 @@ describe("getLocalState", () => {
                 value: 42,
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
             dataChild: {
                 value: "child",
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
             dataParent: {
                 value: "parent",
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
             dataParent2: {
                 value: "parent2",
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
             dataParent3: {
                 value: "parent3",
                 dependents: [],
                 computants: [],
+                dependencies: [],
             },
         });
     });

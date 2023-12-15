@@ -5,7 +5,7 @@ describe("getAttributes", () => {
     test("get attributes from element", () => {
         const element = document.createElement("div");
         element.setAttribute("data-test", "test");
-        const attributes = getAttributes(element);
+        const attributes = getAttributes(element, {});
 
         expect(attributes).toStrictEqual([
             {
@@ -21,7 +21,7 @@ describe("getAttributes", () => {
         const element = document.createElement("div");
         const value = "{{test}}";
         element.setAttribute("data-test", value);
-        const attributes = getAttributes(element);
+        const attributes = getAttributes(element, {});
 
         expect(attributes).toStrictEqual([
             {
@@ -32,6 +32,8 @@ describe("getAttributes", () => {
                         end: value.length - 1,
                         start: 0,
                         value: "test",
+                        evaluated: null,
+                        dependencies: [],
                     },
                 ],
                 reactive: true,
