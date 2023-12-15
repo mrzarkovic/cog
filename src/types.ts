@@ -35,6 +35,7 @@ export type ReactiveNode = {
     attributes: Attribute[];
     expressions: Expression[];
     shouldUpdate: boolean;
+    newAttributes: string[];
 };
 
 export type UnknownFunction = (...args: unknown[]) => unknown;
@@ -60,12 +61,13 @@ export type StateObject = {
     registerUpdate: (key: string) => void;
     clearUpdates: () => void;
 };
-type StateKey = string;
+export type StateKey = string;
 export type State = Record<StateKey, StateValue>;
 export type StateValue = {
     value: unknown;
     dependents: ReactiveNodeId[];
     computants: StateKey[];
+    dependencies: StateKey[];
 };
 
 export type ElementWithHandler = Element & {
@@ -99,4 +101,6 @@ export type Expression = {
     start: number;
     end: number;
     value: string;
+    dependencies: string[];
+    evaluated: string | null;
 };

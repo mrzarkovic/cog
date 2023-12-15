@@ -24,7 +24,12 @@ export const init = (): Cog => {
             reactiveNodes.get(Number(id))
         );
 
-        reconcile(reactiveNodes, nodesToReconcile, state.value);
+        reconcile(
+            reactiveNodes,
+            nodesToReconcile,
+            state.value,
+            state.updatedKeys
+        );
         reactiveNodes.clean();
         state.clearUpdates();
     }

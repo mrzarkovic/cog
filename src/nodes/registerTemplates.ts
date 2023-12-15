@@ -82,9 +82,12 @@ function addParentIdToChildren(template: string, parentId: number) {
     return refinedTemplate;
 }
 
-function getCustomElementAttributes(element: HTMLElement) {
-    const attributes = getAttributes(element);
-    const childrenExpressions = extractTemplateExpressions(element.innerHTML);
+function getCustomElementAttributes(element: HTMLElement, state: State) {
+    const attributes = getAttributes(element, state);
+    const childrenExpressions = extractTemplateExpressions(
+        element.innerHTML,
+        state
+    );
     attributes.push({
         name: "children",
         value: element.innerHTML,
@@ -102,22 +105,33 @@ function registerCustomElement(
 ) {
     return function (this: HTMLElement) {
         const elementId = reactiveNodes.id();
+        const parentId = this.dataset.parentId
+            ? Number(this.dataset.parentId)
+            : null;
 
-        const attributes = getCustomElementAttributes(this);
+        const attributesLocalState = getLocalState(
+            parentId,
+            [],
+            state,
+            [],
+            reactiveNodes.list
+        );
+
+        const attributes = getCustomElementAttributes(
+            this,
+            attributesLocalState
+        );
 
         const refinedTemplate = addParentIdToChildren(
             template.innerHTML,
             elementId
         );
 
-        const parentId = this.dataset.parentId
-            ? Number(this.dataset.parentId)
-            : null;
-
         const localState = getLocalState(
             parentId,
             attributes,
             state,
+            [],
             reactiveNodes.list
         );
 

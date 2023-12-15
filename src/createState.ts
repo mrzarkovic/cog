@@ -21,6 +21,7 @@ export function createState(): StateObject {
                     value,
                     dependents: [],
                     computants: [],
+                    dependencies: [],
                 };
             } else {
                 this.state[key].value = value;

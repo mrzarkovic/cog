@@ -16,8 +16,8 @@ import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
-import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
+import { convertAttributeName } from "../attributes/convertAttributeName";
 
 function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
     const merged = oldArray.concat(newArray);
@@ -30,7 +30,6 @@ function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
 }
 
 function updateCustomElement(
-    changedNode: HTMLElement,
     originalNode: CogHTMLElement,
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
@@ -39,10 +38,17 @@ function updateCustomElement(
 ) {
     const changedAttributes = attributes?.slice() ?? [];
 
-    let newAttributes: Attribute[] = [];
-    if (changedAttributes.length) {
-        newAttributes = getAttributes(changedNode);
-    }
+    const newAttributes: Attribute[] = [];
+
+    changedAttributes.forEach((attribute) => {
+        newAttributes.push({
+            name: attribute.name,
+            value: attribute.newValue as string,
+            expressions: [],
+            reactive: false,
+        });
+    });
+
     if (content !== undefined) {
         newAttributes.push({
             name: "children",
@@ -59,6 +65,9 @@ function updateCustomElement(
             newAttributes
         );
         reactiveNode.attributes = mergedAttributes;
+        reactiveNode.newAttributes = reactiveNode.attributes.map((a) =>
+            convertAttributeName(a.name)
+        );
 
         if (
             nodesToReconcile.filter((n) => n.id === reactiveNode.id).length == 0
@@ -99,9 +108,11 @@ function handleChildrenAddition(
     originalNode: CogHTMLElement,
     addChildren: HTMLElement[]
 ) {
+    const fragment = document.createDocumentFragment();
     for (let i = 0; i < addChildren.length; i++) {
-        originalNode.appendChild(addChildren[i]);
+        fragment.appendChild(addChildren[i]);
     }
+    originalNode.appendChild(fragment);
 }
 
 function handleChildrenRemoval(
@@ -132,7 +143,6 @@ function handleNodeChanges(
 
         if (isCustomElement(change.node)) {
             updateCustomElement(
-                change.node,
                 originalNode,
                 change.content,
                 change.attributes,
@@ -190,21 +200,31 @@ function handleChildrenChanges(
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
     nodesToReconcile: ReactiveNode[],
-    state: State
+    state: State,
+    stateChanges: string[]
 ) => {
     for (let nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
         const reactiveNode = nodesToReconcile[nodeIndex];
+        const localStateChanges = [
+            ...stateChanges,
+            ...reactiveNode.newAttributes,
+        ];
+
+        reactiveNode.newAttributes = [];
 
         const localState = getLocalState(
             reactiveNode.parentId,
             reactiveNode.attributes,
             state,
+            localStateChanges,
             nodesToReconcile
         );
+
         const updatedContent = evaluateTemplate(
             reactiveNode.template,
             reactiveNode.expressions,
-            localState
+            localState,
+            localStateChanges
         );
 
         const oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(

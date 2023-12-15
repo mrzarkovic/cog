@@ -73,7 +73,7 @@ function htmlToText(html) {
 }
 ;// CONCATENATED MODULE: ./src/expressions/sanitizeExpression.ts
 function sanitizeExpression(expression) {
-  return expression.replace(/[\r\n]+/g, "");
+  return expression.replace(/[\r\n]+/g, "").trim();
 }
 ;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
 var functionCache = {};
@@ -87,13 +87,22 @@ var createExpressionScope = function createExpressionScope(expression, state) {
   }
   return functionCache[index];
 };
+;// CONCATENATED MODULE: ./src/html/removeTagsAndAttributeNames.ts
+var tagRegex = /<\/?[\w-]+/g;
+var attrRegex = /[\w-]+(\s*=\s*("|')[^"']*("|'))/g;
+var specialCharRegex = /[^\w\s]/g;
+var spaceRegex = /\s+/g;
+function removeTagsAndAttributeNames(htmlString) {
+  return htmlString.replace(tagRegex, "").replace(attrRegex, "$1").replace(specialCharRegex, " ").trim().replace(spaceRegex, "@");
+}
 ;// CONCATENATED MODULE: ./src/html/evaluateTemplate.ts
 
 
 
 
 
-var evaluateTemplate = function evaluateTemplate(template, expressions, state) {
+
+var evaluateTemplate = function evaluateTemplate(template, expressions, state, stateChanges) {
   var restOfContent = template;
   var updatedContent = "";
   for (var i = 0; i < expressions.length; i++) {
@@ -103,8 +112,15 @@ var evaluateTemplate = function evaluateTemplate(template, expressions, state) {
       value = _expressions$i.value;
     var before = restOfContent.slice(0, start);
     var after = restOfContent.slice(end + 1);
-    var expressionWithScope = createExpressionScope(value, state);
-    var evaluated = evaluateExpression(expressionWithScope, state);
+    var evaluated = expressions[i].evaluated;
+    var intersection = expressions[i].dependencies.filter(function (value) {
+      return stateChanges.includes(value);
+    });
+    if (intersection.length || evaluated === null) {
+      var expressionWithScope = createExpressionScope(value, state);
+      evaluated = evaluateExpression(expressionWithScope, state);
+      expressions[i].evaluated = evaluated;
+    }
     updatedContent += "".concat(before).concat(evaluated);
     restOfContent = after;
   }
@@ -116,35 +132,55 @@ var evaluateTemplate = function evaluateTemplate(template, expressions, state) {
  * Extracts all template expressions from a template string.
  * start and end are relative to the last template expression.
  */
-var extractTemplateExpressions = function extractTemplateExpressions(template) {
+var extractTemplateExpressions = function extractTemplateExpressions(template, state) {
   var expressions = [];
   var restOfContent = String(template);
   var hasTemplateExpression = true;
-  while (hasTemplateExpression) {
+  var _loop = function _loop() {
     var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
       start = _findNextTemplateExpr.start,
       end = _findNextTemplateExpr.end;
     if (end === -1) {
       hasTemplateExpression = false;
-      break;
+      return 1; // break
     }
     var htmlValue = restOfContent.slice(start + 2, end - 1);
     var after = restOfContent.slice(end + 1);
     var value = sanitizeExpression(htmlToText(htmlValue));
+    var uniqueIndex = {};
+    var dependencies = new Set();
+    removeTagsAndAttributeNames(value).split("@").filter(function (wordFromExpression) {
+      return uniqueIndex[wordFromExpression] ? false : uniqueIndex[wordFromExpression] = true;
+    }).filter(function (wordFromExpression) {
+      return state[wordFromExpression];
+    }).forEach(function (dependency) {
+      if (state[dependency].dependencies.length) {
+        state[dependency].dependencies.forEach(function (dep) {
+          return dependencies.add(dep);
+        });
+      } else {
+        dependencies.add(dependency);
+      }
+    });
     expressions.push({
       start: start,
       end: end,
-      value: value
+      value: value,
+      dependencies: Array.from(dependencies),
+      evaluated: null
     });
     restOfContent = after;
+  };
+  while (hasTemplateExpression) {
+    if (_loop()) break;
   }
   return expressions;
 };
 ;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
 
-var getAttributes = function getAttributes(element) {
+var getAttributes = function getAttributes(element, state) {
   var attributes = Array.from(element.attributes).map(function (attribute) {
-    var expressions = extractTemplateExpressions(attribute.value);
+    var expressions = extractTemplateExpressions(attribute.value, state);
     return {
       name: attribute.name,
       value: attribute.value,
@@ -169,15 +205,25 @@ function convertAttributeValue(value) {
 
 
 var attributesToStates = {};
-function attributesToState(attributes, state) {
+function attributesToState(attributes, state, stateChanges) {
   var key = JSON.stringify(attributes) + JSON.stringify(state);
   if (!attributesToStates[key]) {
     var localState = Object.assign({}, state);
     for (var i = 0; i < attributes.length; i++) {
-      localState[convertAttributeName(attributes[i].name)] = {
-        value: convertAttributeValue(evaluateTemplate(attributes[i].value, attributes[i].expressions, state)),
+      var attributeName = convertAttributeName(attributes[i].name);
+      var value = attributes[i].value;
+      var parentStateDependencies = [];
+      if (attributes[i].reactive) {
+        parentStateDependencies = Array.from(new Set(attributes[i].expressions.map(function (expression) {
+          return expression.dependencies;
+        }).flat()));
+        value = evaluateTemplate(attributes[i].value, attributes[i].expressions, state, stateChanges);
+      }
+      localState[attributeName] = {
+        value: convertAttributeValue(value),
         dependents: [],
-        computants: []
+        computants: [],
+        dependencies: parentStateDependencies
       };
     }
     attributesToStates[key] = localState;
@@ -186,15 +232,15 @@ function attributesToState(attributes, state) {
 }
 ;// CONCATENATED MODULE: ./src/attributes/getLocalState.ts
 
-function getLocalState(parentId, attributes, globalState, reactiveNodes) {
+function getLocalState(parentId, attributes, globalState, stateChanges, reactiveNodes) {
   var parentNode = reactiveNodes.find(function (rn) {
     return rn.id === parentId;
   });
   if (!parentNode) {
-    return attributesToState(attributes, globalState);
+    return attributesToState(attributes, globalState, stateChanges);
   }
-  var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, reactiveNodes);
-  return Object.assign({}, parentState, attributesToState(attributes, parentState));
+  var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, stateChanges, reactiveNodes);
+  return Object.assign({}, parentState, attributesToState(attributes, parentState, stateChanges));
 }
 ;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
 var sanitizeHtml = function sanitizeHtml(html) {
@@ -222,43 +268,15 @@ function findNodes(rootElement, xpath) {
   }
   return elements;
 }
-;// CONCATENATED MODULE: ./src/attributes/getAttributesRecursive.ts
-function getAttributesRecursive(parentId, attributes, reactiveNodes) {
-  if (parentId === null) {
-    return attributes;
-  }
-  var parentNode = reactiveNodes.find(function (rn) {
-    return rn.id === parentId;
-  });
-  var parentAttributes = getAttributesRecursive(parentNode.parentId, parentNode.attributes, reactiveNodes);
-  return parentAttributes.concat(attributes);
-}
-;// CONCATENATED MODULE: ./src/html/removeTagsAndAttributeNames.ts
-var tagRegex = /<\/?[\w-]+/g;
-var attrRegex = /[\w-]+(\s*=\s*("|')[^"']*("|'))/g;
-var specialCharRegex = /[^\w\s]/g;
-var spaceRegex = /\s+/g;
-function removeTagsAndAttributeNames(htmlString) {
-  return htmlString.replace(tagRegex, "").replace(attrRegex, "$1").replace(specialCharRegex, " ").trim().replace(spaceRegex, "@");
-}
 ;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
 
 
-
-
-function assignDependents(elementId, state, parentId, attributes, reactiveNodes, template) {
-  var attributesRecursive = getAttributesRecursive(parentId, attributes, reactiveNodes);
-  var templateAndAttributesString = template + " " + attributesRecursive.map(function (a) {
-    return a.value;
-  }).join(" ");
-  var uniqueIndex = {};
-  extractTemplateExpressions(templateAndAttributesString).map(function (expression) {
-    return removeTagsAndAttributeNames(expression.value).split("@").filter(function (wordFromExpression) {
-      return uniqueIndex[wordFromExpression] ? false : uniqueIndex[wordFromExpression] = true;
-    }).filter(function (wordFromExpression) {
-      return state[wordFromExpression] && state[wordFromExpression].dependents.indexOf(elementId) === -1;
-    }).forEach(function (wordFromExpression) {
-      state[wordFromExpression].dependents.push(elementId);
+function assignDependents(elementId, expressions, state) {
+  expressions.map(function (expression) {
+    expression.dependencies.forEach(function (dependency) {
+      if (state[dependency].dependents.indexOf(elementId) === -1) {
+        state[dependency].dependents.push(elementId);
+      }
     });
   });
 }
@@ -267,10 +285,10 @@ function registerReactiveNode(elementId, reactiveNodes, originalElement, templat
   var attributes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
   var parentId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
   var refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
-  var expressions = extractTemplateExpressions(refinedTemplate);
-  var updatedContent = evaluateTemplate(refinedTemplate, expressions, state);
+  var expressions = extractTemplateExpressions(refinedTemplate, state);
+  var updatedContent = evaluateTemplate(refinedTemplate, expressions, state, []);
   var element = elementFromString(updatedContent);
-  assignDependents(elementId, state, parentId, attributes, reactiveNodes.list, refinedTemplate);
+  assignDependents(elementId, expressions, state);
   reactiveNodes.add({
     id: elementId,
     parentId: parentId,
@@ -279,7 +297,8 @@ function registerReactiveNode(elementId, reactiveNodes, originalElement, templat
     lastTemplateEvaluation: element.cloneNode(true),
     attributes: attributes,
     expressions: expressions,
-    shouldUpdate: false
+    shouldUpdate: false,
+    newAttributes: []
   });
   (_originalElement$pare = originalElement.parentElement) === null || _originalElement$pare === void 0 || _originalElement$pare.replaceChild(element, originalElement);
   return element;
@@ -338,9 +357,9 @@ function addParentIdToChildren(template, parentId) {
   }
   return refinedTemplate;
 }
-function getCustomElementAttributes(element) {
-  var attributes = getAttributes(element);
-  var childrenExpressions = extractTemplateExpressions(element.innerHTML);
+function getCustomElementAttributes(element, state) {
+  var attributes = getAttributes(element, state);
+  var childrenExpressions = extractTemplateExpressions(element.innerHTML, state);
   attributes.push({
     name: "children",
     value: element.innerHTML,
@@ -352,10 +371,11 @@ function getCustomElementAttributes(element) {
 function registerCustomElement(template, state, reactiveNodes) {
   return function () {
     var elementId = reactiveNodes.id();
-    var attributes = getCustomElementAttributes(this);
-    var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
     var parentId = this.dataset.parentId ? Number(this.dataset.parentId) : null;
-    var localState = getLocalState(parentId, attributes, state, reactiveNodes.list);
+    var attributesLocalState = getLocalState(parentId, [], state, [], reactiveNodes.list);
+    var attributes = getCustomElementAttributes(this, attributesLocalState);
+    var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
+    var localState = getLocalState(parentId, attributes, state, [], reactiveNodes.list);
     var newElement = registerReactiveNode(elementId, reactiveNodes, this, refinedTemplate, localState, attributes, parentId);
     newElement.cogAnchorId = elementId;
   };
@@ -558,6 +578,12 @@ function findCorrespondingNode(nodeInA, rootA, rootB) {
   return correspondingNodeInB;
 }
 ;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 
 
@@ -576,13 +602,18 @@ function mergeAttributes(oldArray, newArray) {
   }
   return Object.values(attributes);
 }
-function updateCustomElement(changedNode, originalNode, content, attributes, reactiveNodes, nodesToReconcile) {
+function updateCustomElement(originalNode, content, attributes, reactiveNodes, nodesToReconcile) {
   var _attributes$slice;
   var changedAttributes = (_attributes$slice = attributes === null || attributes === void 0 ? void 0 : attributes.slice()) !== null && _attributes$slice !== void 0 ? _attributes$slice : [];
   var newAttributes = [];
-  if (changedAttributes.length) {
-    newAttributes = getAttributes(changedNode);
-  }
+  changedAttributes.forEach(function (attribute) {
+    newAttributes.push({
+      name: attribute.name,
+      value: attribute.newValue,
+      expressions: [],
+      reactive: false
+    });
+  });
   if (content !== undefined) {
     newAttributes.push({
       name: "children",
@@ -595,6 +626,9 @@ function updateCustomElement(changedNode, originalNode, content, attributes, rea
     var reactiveNode = reactiveNodes.get(originalNode.cogAnchorId);
     var mergedAttributes = mergeAttributes(reactiveNode.attributes, newAttributes);
     reactiveNode.attributes = mergedAttributes;
+    reactiveNode.newAttributes = reactiveNode.attributes.map(function (a) {
+      return convertAttributeName(a.name);
+    });
     if (nodesToReconcile.filter(function (n) {
       return n.id === reactiveNode.id;
     }).length == 0) {
@@ -618,9 +652,11 @@ function handleAttributeChange(originalNode, attributes) {
   }
 }
 function handleChildrenAddition(originalNode, addChildren) {
+  var fragment = document.createDocumentFragment();
   for (var i = 0; i < addChildren.length; i++) {
-    originalNode.appendChild(addChildren[i]);
+    fragment.appendChild(addChildren[i]);
   }
+  originalNode.appendChild(fragment);
 }
 function handleChildrenRemoval(originalNode, removeChildren) {
   for (var i = 0; i < removeChildren.length; i++) {
@@ -632,7 +668,7 @@ function handleNodeChanges(changedNodes, oldElement, newElement, element, localS
     var change = changedNodes[i];
     var originalNode = findCorrespondingNode(change.node, newElement, element);
     if (isCustomElement(change.node)) {
-      updateCustomElement(change.node, originalNode, change.content, change.attributes, reactiveNodes, nodesToReconcile);
+      updateCustomElement(originalNode, change.content, change.attributes, reactiveNodes, nodesToReconcile);
     } else {
       var _handleChildrenChange = handleChildrenChanges(change, oldElement, element),
         addChildren = _handleChildrenChange.addChildren,
@@ -668,11 +704,13 @@ function handleChildrenChanges(changedNode, oldElement, element) {
     removeChildren: removeChildren
   };
 }
-var reconcile = function reconcile(reactiveNodes, nodesToReconcile, state) {
+var reconcile = function reconcile(reactiveNodes, nodesToReconcile, state, stateChanges) {
   for (var nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
     var reactiveNode = nodesToReconcile[nodeIndex];
-    var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, state, nodesToReconcile);
-    var updatedContent = evaluateTemplate(reactiveNode.template, reactiveNode.expressions, localState);
+    var localStateChanges = [].concat(_toConsumableArray(stateChanges), _toConsumableArray(reactiveNode.newAttributes));
+    reactiveNode.newAttributes = [];
+    var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, state, localStateChanges, nodesToReconcile);
+    var updatedContent = evaluateTemplate(reactiveNode.template, reactiveNode.expressions, localState, localStateChanges);
     var oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(true);
     var newElement = elementFromString(updatedContent);
     var changedNodes = compareNodes(oldElement, newElement);
@@ -701,7 +739,8 @@ function createState() {
         this.state[key] = {
           value: value,
           dependents: [],
-          computants: []
+          computants: [],
+          dependencies: []
         };
       } else {
         this.state[key].value = value;
@@ -780,7 +819,7 @@ var init = function init() {
     var nodesToReconcile = uniqueDependents.map(function (id) {
       return reactiveNodes.get(Number(id));
     });
-    reconcile(reactiveNodes, nodesToReconcile, state.value);
+    reconcile(reactiveNodes, nodesToReconcile, state.value, state.updatedKeys);
     reactiveNodes.clean();
     state.clearUpdates();
   }
@@ -867,12 +906,12 @@ var _init = init(),
   render = _init.render;
 
 ;// CONCATENATED MODULE: ./examples/src/ts-module-todo.ts
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function ts_module_todo_toConsumableArray(arr) { return ts_module_todo_arrayWithoutHoles(arr) || ts_module_todo_iterableToArray(arr) || ts_module_todo_unsupportedIterableToArray(arr) || ts_module_todo_nonIterableSpread(); }
+function ts_module_todo_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function ts_module_todo_unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return ts_module_todo_arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return ts_module_todo_arrayLikeToArray(o, minLen); }
+function ts_module_todo_iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function ts_module_todo_arrayWithoutHoles(arr) { if (Array.isArray(arr)) return ts_module_todo_arrayLikeToArray(arr); }
+function ts_module_todo_arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 document.addEventListener("DOMContentLoaded", function () {
   render(document.getElementById("app"));
@@ -884,7 +923,7 @@ var todos = variable("todos", [{
 variable("save", function () {
   var todo = document.querySelector("[data-input=todo");
   if (todo !== null && todo !== void 0 && todo.value) {
-    todos.set([].concat(_toConsumableArray(todos.value), [{
+    todos.set([].concat(ts_module_todo_toConsumableArray(todos.value), [{
       text: todo.value,
       done: false
     }]));
@@ -892,7 +931,7 @@ variable("save", function () {
   }
 });
 variable("toggleTodo", function (index) {
-  var newTodos = _toConsumableArray(todos.value);
+  var newTodos = ts_module_todo_toConsumableArray(todos.value);
   newTodos[index].done = !newTodos[index].done;
   todos.set(newTodos);
 });

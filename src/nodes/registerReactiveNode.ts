@@ -1,13 +1,11 @@
-import { getAttributesRecursive } from "../attributes/getAttributesRecursive";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
-import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
 import {
     Attribute,
     CogHTMLElement,
-    ReactiveNode,
+    Expression,
     ReactiveNodesList,
     State,
 } from "../types";
@@ -15,39 +13,16 @@ import { elementFromString } from "./elementFromString";
 
 function assignDependents(
     elementId: number,
-    state: State,
-    parentId: number | null,
-    attributes: Attribute[],
-    reactiveNodes: ReactiveNode[],
-    template: string
+    expressions: Expression[],
+    state: State
 ) {
-    const attributesRecursive = getAttributesRecursive(
-        parentId,
-        attributes,
-        reactiveNodes
-    );
-    const templateAndAttributesString =
-        template + " " + attributesRecursive.map((a) => a.value).join(" ");
-    const uniqueIndex: Record<string, boolean> = {};
-
-    extractTemplateExpressions(templateAndAttributesString).map((expression) =>
-        removeTagsAndAttributeNames(expression.value)
-            .split("@")
-            .filter((wordFromExpression) =>
-                uniqueIndex[wordFromExpression]
-                    ? false
-                    : (uniqueIndex[wordFromExpression] = true)
-            )
-            .filter(
-                (wordFromExpression) =>
-                    state[wordFromExpression] &&
-                    state[wordFromExpression].dependents.indexOf(elementId) ===
-                        -1
-            )
-            .forEach((wordFromExpression) => {
-                state[wordFromExpression].dependents.push(elementId);
-            })
-    );
+    expressions.map((expression) => {
+        expression.dependencies.forEach((dependency) => {
+            if (state[dependency].dependents.indexOf(elementId) === -1) {
+                state[dependency].dependents.push(elementId);
+            }
+        });
+    });
 }
 
 export function registerReactiveNode(
@@ -60,23 +35,19 @@ export function registerReactiveNode(
     parentId: number | null = null
 ) {
     const refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
-    const expressions = extractTemplateExpressions(refinedTemplate);
+
+    const expressions = extractTemplateExpressions(refinedTemplate, state);
+
     const updatedContent = evaluateTemplate(
         refinedTemplate,
         expressions,
-        state
+        state,
+        []
     );
 
     const element = elementFromString(updatedContent);
 
-    assignDependents(
-        elementId,
-        state,
-        parentId,
-        attributes,
-        reactiveNodes.list,
-        refinedTemplate
-    );
+    assignDependents(elementId, expressions, state);
 
     reactiveNodes.add({
         id: elementId,
@@ -87,6 +58,7 @@ export function registerReactiveNode(
         attributes,
         expressions,
         shouldUpdate: false,
+        newAttributes: [],
     });
 
     originalElement.parentElement?.replaceChild(element, originalElement);
