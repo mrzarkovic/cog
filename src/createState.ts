@@ -16,8 +16,21 @@ export function createState(): StateObject {
                 this.state = {};
             }
 
-            this.state[key] = value;
-            this.updatedKeys.push(key);
+            if (!this.state[key]) {
+                this.state[key] = {
+                    value,
+                    dependents: [],
+                    computants: [],
+                    dependencies: [],
+                };
+            } else {
+                this.state[key].value = value;
+            }
+        },
+        registerUpdate(key: string) {
+            if (this.updatedKeys.indexOf(key) === -1) {
+                this.updatedKeys.push(key);
+            }
         },
         clearUpdates() {
             this.updatedKeys = [];

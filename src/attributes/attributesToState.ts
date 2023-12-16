@@ -1,27 +1,48 @@
 import { evaluateTemplate } from "../html/evaluateTemplate";
-import { Attribute, State } from "../types";
-import { convertAttribute } from "./convertAttribute";
+import { Attribute, State, StateKey } from "../types";
+import { convertAttributeName } from "./convertAttributeName";
 import { convertAttributeValue } from "./convertAttributeValue";
 
 const attributesToStates: Record<string, State> = {};
 
-export function attributesToState(attributes: Attribute[], state: State) {
+export function attributesToState(
+    attributes: Attribute[],
+    state: State,
+    stateChanges: string[]
+) {
     const key = JSON.stringify(attributes) + JSON.stringify(state);
 
     if (!attributesToStates[key]) {
         const localState: State = Object.assign({}, state);
 
         for (let i = 0; i < attributes.length; i++) {
-            localState[convertAttribute(attributes[i].name)] =
-                convertAttributeValue(
-                    attributes[i].reactive
-                        ? evaluateTemplate(
-                              attributes[i].value,
-                              attributes[i].expressions,
-                              state
-                          )
-                        : attributes[i].value
+            const attributeName = convertAttributeName(attributes[i].name);
+
+            let value = attributes[i].value;
+            let parentStateDependencies: StateKey[] = [];
+            if (attributes[i].reactive) {
+                parentStateDependencies = Array.from(
+                    new Set(
+                        attributes[i].expressions
+                            .map((expression) => expression.dependencies)
+                            .flat()
+                    )
                 );
+
+                value = evaluateTemplate(
+                    attributes[i].value,
+                    attributes[i].expressions,
+                    state,
+                    stateChanges
+                );
+            }
+
+            localState[attributeName] = {
+                value: convertAttributeValue(value),
+                dependents: [],
+                computants: [],
+                dependencies: parentStateDependencies,
+            };
         }
 
         attributesToStates[key] = localState;

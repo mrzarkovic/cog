@@ -16,8 +16,8 @@ import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
 import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
-import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
+import { convertAttributeName } from "../attributes/convertAttributeName";
 
 function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
     const merged = oldArray.concat(newArray);
@@ -29,19 +29,26 @@ function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
     return Object.values(attributes);
 }
 
-function handleCustomElement(
-    changedNode: HTMLElement,
+function updateCustomElement(
     originalNode: CogHTMLElement,
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
-    reactiveNodes: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList,
+    nodesToReconcile: ReactiveNode[]
 ) {
     const changedAttributes = attributes?.slice() ?? [];
 
-    let newAttributes: Attribute[] = [];
-    if (changedAttributes.length) {
-        newAttributes = getAttributes(changedNode);
-    }
+    const newAttributes: Attribute[] = [];
+
+    changedAttributes.forEach((attribute) => {
+        newAttributes.push({
+            name: attribute.name,
+            value: attribute.newValue as string,
+            expressions: [],
+            reactive: false,
+        });
+    });
+
     if (content !== undefined) {
         newAttributes.push({
             name: "children",
@@ -52,14 +59,21 @@ function handleCustomElement(
     }
 
     if (newAttributes.length) {
-        const nodeIndex = reactiveNodes.index[originalNode.cogAnchorId];
-        const reactiveNode = reactiveNodes.list[nodeIndex];
+        const reactiveNode = reactiveNodes.get(originalNode.cogAnchorId);
         const mergedAttributes = mergeAttributes(
             reactiveNode.attributes,
             newAttributes
         );
+        reactiveNode.attributes = mergedAttributes;
+        reactiveNode.newAttributes = reactiveNode.attributes.map((a) =>
+            convertAttributeName(a.name)
+        );
 
-        reactiveNodes.update(nodeIndex, "attributes", mergedAttributes);
+        if (
+            nodesToReconcile.filter((n) => n.id === reactiveNode.id).length == 0
+        ) {
+            nodesToReconcile.push(reactiveNode);
+        }
     }
 }
 
@@ -110,81 +124,48 @@ function handleChildrenRemoval(
     }
 }
 
-const updateElement = (
-    originalNode: CogHTMLElement,
-    changedNode: HTMLElement,
-    content: string | undefined,
-    attributes: ChangedAttribute[] | undefined,
-    addChildren: HTMLElement[],
-    removeChildren: HTMLElement[],
-    localState: State,
-    reactiveNodes: ReactiveNodesList
-) => {
-    if (isCustomElement(changedNode)) {
-        handleCustomElement(
-            changedNode,
-            originalNode,
-            content,
-            attributes,
-            reactiveNodes
-        );
-        return;
-    }
-
-    if (content !== undefined) {
-        handleContentChange(originalNode, content, localState);
-    } else if (attributes !== undefined) {
-        handleAttributeChange(originalNode, attributes);
-    } else if (addChildren.length) {
-        handleChildrenAddition(originalNode, addChildren);
-    } else if (removeChildren.length) {
-        handleChildrenRemoval(originalNode, removeChildren);
-    }
-};
-
-const stateVariableUsageRegex = (key: string) =>
-    new RegExp(`\\b${key}\\b|[^\\w]${key}[^\\w]`, "gm");
-
-function checkIfChangedStateIsUsedInExpression(
-    updatedStateKeys: string[],
-    expression: string
-) {
-    return updatedStateKeys
-        .map(stateVariableUsageRegex)
-        .some((re) => re.test(expression));
-}
-
 function handleNodeChanges(
     changedNodes: ChangedNode[],
     oldElement: CogHTMLElement,
     newElement: CogHTMLElement,
     element: HTMLElement,
     localState: State,
-    reactiveNodes: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList,
+    nodesToReconcile: ReactiveNode[]
 ) {
     for (let i = 0; i < changedNodes.length; i++) {
+        const change = changedNodes[i];
         const originalNode = findCorrespondingNode(
-            changedNodes[i].node,
+            change.node,
             newElement,
             element
         ) as CogHTMLElement;
 
-        const { addChildren, removeChildren } = handleChildrenChanges(
-            changedNodes[i],
-            oldElement,
-            element
-        );
+        if (isCustomElement(change.node)) {
+            updateCustomElement(
+                originalNode,
+                change.content,
+                change.attributes,
+                reactiveNodes,
+                nodesToReconcile
+            );
+        } else {
+            const { addChildren, removeChildren } = handleChildrenChanges(
+                change,
+                oldElement,
+                element
+            );
 
-        updateElement(
-            originalNode,
-            changedNodes[i].node,
-            changedNodes[i].content,
-            changedNodes[i].attributes,
-            addChildren,
-            removeChildren,
-            localState,
-            reactiveNodes
-        );
+            if (change.content !== undefined) {
+                handleContentChange(originalNode, change.content, localState);
+            } else if (change.attributes !== undefined) {
+                handleAttributeChange(originalNode, change.attributes);
+            } else if (addChildren.length) {
+                handleChildrenAddition(originalNode, addChildren);
+            } else if (removeChildren.length) {
+                handleChildrenRemoval(originalNode, removeChildren);
+            }
+        }
     }
 }
 
@@ -216,78 +197,55 @@ function handleChildrenChanges(
     return { addChildren, removeChildren };
 }
 
-function nodeNeedsUpdate(updatedStateKeys: string[], node: ReactiveNode) {
-    if (node.shouldUpdate) {
-        return true;
-    }
-
-    return checkIfChangedStateIsUsedInExpression(
-        updatedStateKeys,
-        node.updateCheckString
-    );
-}
-
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
+    nodesToReconcile: ReactiveNode[],
     state: State,
-    updatedStateKeys: string[]
+    stateChanges: string[]
 ) => {
-    for (
-        let nodeIndex = 0;
-        nodeIndex < reactiveNodes.value.length;
-        nodeIndex++
-    ) {
-        const {
-            parentId,
-            attributes,
-            element,
-            template,
-            lastTemplateEvaluation,
-            expressions,
-        } = reactiveNodes.value[nodeIndex];
+    for (let nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
+        const reactiveNode = nodesToReconcile[nodeIndex];
+        const localStateChanges = [
+            ...stateChanges,
+            ...reactiveNode.newAttributes,
+        ];
 
-        const shouldUpdate = nodeNeedsUpdate(
-            updatedStateKeys,
-            reactiveNodes.value[nodeIndex]
+        reactiveNode.newAttributes = [];
+
+        const localState = getLocalState(
+            reactiveNode.parentId,
+            reactiveNode.attributes,
+            state,
+            localStateChanges,
+            nodesToReconcile
         );
 
-        if (shouldUpdate) {
-            reactiveNodes.update(nodeIndex, "shouldUpdate", false);
+        const updatedContent = evaluateTemplate(
+            reactiveNode.template,
+            reactiveNode.expressions,
+            localState,
+            localStateChanges
+        );
 
-            const localState = getLocalState(
-                parentId,
-                attributes,
-                state,
-                reactiveNodes.list
+        const oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(
+            true
+        ) as CogHTMLElement;
+        const newElement = elementFromString(updatedContent);
+        const changedNodes = compareNodes(oldElement, newElement);
+
+        if (changedNodes.length > 0) {
+            nodesToReconcile[nodeIndex].lastTemplateEvaluation =
+                newElement.cloneNode(true) as CogHTMLElement;
+
+            handleNodeChanges(
+                changedNodes,
+                oldElement,
+                newElement,
+                reactiveNode.element,
+                localState,
+                reactiveNodes,
+                nodesToReconcile
             );
-            const updatedContent = evaluateTemplate(
-                template,
-                expressions,
-                localState
-            );
-
-            const newElement = elementFromString(updatedContent);
-            const changedNodes = compareNodes(
-                lastTemplateEvaluation,
-                newElement
-            );
-
-            if (changedNodes.length > 0) {
-                reactiveNodes.update(
-                    nodeIndex,
-                    "lastTemplateEvaluation",
-                    newElement.cloneNode(true) as CogHTMLElement
-                );
-
-                handleNodeChanges(
-                    changedNodes,
-                    lastTemplateEvaluation,
-                    newElement,
-                    element,
-                    localState,
-                    reactiveNodes
-                );
-            }
         }
     }
 };

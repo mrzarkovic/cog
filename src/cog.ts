@@ -1,4 +1,4 @@
-import { type Cog } from "./types";
+import { type Cog, UnknownFunction } from "./types";
 import { registerTemplates } from "./nodes/registerTemplates";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { registerNativeElements } from "./nodes/registerNativeElements";
@@ -7,12 +7,29 @@ import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
 
 export const init = (): Cog => {
+    let stateFunctionExecuting: string | null = null;
     const reactiveNodes = createReactiveNodes();
     let updateStateTimeout: number | null = null;
     const state = createState();
 
     function reRender() {
-        reconcile(reactiveNodes, state.value, state.updatedKeys);
+        const uniqueKeys: Record<number, boolean> = {};
+        state.updatedKeys
+            .map((stateKey) => state.value[stateKey].dependents)
+            .flat()
+            .forEach((id) => (uniqueKeys[id] = true));
+        const uniqueDependents = Object.keys(uniqueKeys);
+
+        const nodesToReconcile = uniqueDependents.map((id) =>
+            reactiveNodes.get(Number(id))
+        );
+
+        reconcile(
+            reactiveNodes,
+            nodesToReconcile,
+            state.value,
+            state.updatedKeys
+        );
         reactiveNodes.clean();
         state.clearUpdates();
     }
@@ -20,8 +37,11 @@ export const init = (): Cog => {
     let lastFrameTime = 0;
     const frameDelay = 1000 / 60;
 
-    function updateState<T>(name: string, value: T) {
-        state.set(name, value);
+    function scheduleReRender(stateKey: string) {
+        state.value[stateKey].computants.forEach((computant) => {
+            state.registerUpdate(computant);
+        });
+        state.registerUpdate(stateKey);
         if (updateStateTimeout !== null) {
             cancelAnimationFrame(updateStateTimeout);
         }
@@ -39,23 +59,69 @@ export const init = (): Cog => {
         addAllEventListeners(rootElement, state.value);
     };
 
+    const setFunctionValue = (name: string, value: UnknownFunction) => {
+        state.set(name, (...args: unknown[]) => {
+            stateFunctionExecuting = name;
+            const result = value(...args);
+            stateFunctionExecuting = null;
+            return result;
+        });
+    };
+
+    const setArrayValue = (name: string, value: unknown[]) => {
+        const valueProxy = new Proxy(value, {
+            get(target, propKey) {
+                const originalMethod = target[
+                    propKey as keyof typeof target
+                ] as UnknownFunction;
+                if (propKey === "push") {
+                    return (...args: unknown[]) => {
+                        scheduleReRender(name);
+                        return originalMethod.apply(target, args);
+                    };
+                }
+                return originalMethod;
+            },
+        });
+        state.set(name, valueProxy);
+    };
+
+    const variable = <T>(name: string, value: T) => {
+        if (value instanceof Function) {
+            setFunctionValue(name, value as UnknownFunction);
+        } else if (Array.isArray(value)) {
+            setArrayValue(name, value);
+        } else {
+            state.set(name, value);
+        }
+
+        return {
+            get value() {
+                if (
+                    stateFunctionExecuting !== null &&
+                    state.value[name].computants.indexOf(
+                        stateFunctionExecuting
+                    ) === -1
+                ) {
+                    state.value[name].computants.push(stateFunctionExecuting);
+                }
+
+                return state.value[name].value as T;
+            },
+            set value(newVal: T) {
+                state.set(name, newVal);
+                scheduleReRender(name);
+            },
+            set: (newVal: T) => {
+                state.set(name, newVal);
+                scheduleReRender(name);
+            },
+        };
+    };
+
     return {
         render,
-        variable: <T>(name: string, value: T) => {
-            state.set(name, value);
-
-            return {
-                set value(newVal: T) {
-                    updateState(name, newVal);
-                },
-                get value() {
-                    return state.value[name] as T;
-                },
-                set: (newVal: T) => {
-                    updateState(name, newVal);
-                },
-            };
-        },
+        variable,
     };
 };
 

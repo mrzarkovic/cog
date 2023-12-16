@@ -4,21 +4,23 @@ import { createExpressionScope } from "../../expressions/createExpressionScope";
 describe("createExpressionScope", () => {
     test("create scoped function for executing the expression", () => {
         const expressionWithScope = createExpressionScope("a + b", {
-            a: 1,
-            b: 2,
+            a: { value: 1, dependents: [] },
+            b: { value: 2, dependents: [] },
         });
 
-        expect(expressionWithScope({ a: 2, b: 3 })).toStrictEqual(5);
+        expect(
+            expressionWithScope({ a: { value: 2 }, b: { value: 3 } })
+        ).toStrictEqual(5);
     });
 
     test("fail to call scoped function when state is missing", () => {
         const expressionWithScope = createExpressionScope("a + b", {
-            a: 1,
+            a: { value: 1, dependents: [] },
         });
 
         expect(() => {
             expressionWithScope({
-                a: 0,
+                a: { value: 0, dependents: [] },
             });
         }).toThrow("b is not defined");
     });

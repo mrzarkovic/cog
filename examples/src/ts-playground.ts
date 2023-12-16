@@ -8,7 +8,7 @@ const names = variable("names", ["Alice", "Bob", "Carol"]);
 const count = variable("count", 0);
 const checked = variable("checked", true);
 
-variable("isOk", (count: number) => count % 2 === 0);
+variable("isOk", () => count.value % 2 === 0);
 
 window.toggleChecked = () => {
     checked.value = !checked.value;
@@ -37,10 +37,9 @@ function generateRandomString() {
     return result;
 }
 
-const times: number[] = [];
-
 const fps = variable("fps", 0);
 
+const times: number[] = [];
 function refreshLoop() {
     window.requestAnimationFrame(() => {
         const now = performance.now();
@@ -53,4 +52,4 @@ function refreshLoop() {
     });
 }
 
-// refreshLoop();
+refreshLoop();

@@ -134,7 +134,7 @@ describe("cog", () => {
         template.id = "my-template7";
         template.innerHTML = "<div>Hello World!</div>";
         const container = document.createElement("div");
-        container.setAttribute("data-testid", "container");
+        container.setAttribute("data-testid", "container-add-children");
         container.innerHTML =
             "{{ new Array(count).fill(0).map( (n, i) => `<my-template7></my-template7>`)}}";
         root.appendChild(template);
@@ -147,7 +147,9 @@ describe("cog", () => {
         count.value = 5;
 
         await waitFor(() => {
-            expect(getByTestId(root, "container").children.length).toBe(5);
+            expect(
+                getByTestId(root, "container-add-children").children.length
+            ).toBe(5);
         });
     });
 
@@ -157,7 +159,7 @@ describe("cog", () => {
         template.id = "my-template8";
         template.innerHTML = "<div>Hello World!</div>";
         const container = document.createElement("div");
-        container.setAttribute("data-testid", "container");
+        container.setAttribute("data-testid", "container-remove-children");
         container.innerHTML =
             "{{ new Array(count).fill(0).map( (n, i) => `<my-template8></my-template8>`)}}";
         root.appendChild(template);
@@ -170,7 +172,9 @@ describe("cog", () => {
         count.value = 1;
 
         await waitFor(() => {
-            expect(getByTestId(root, "container").children.length).toBe(1);
+            expect(
+                getByTestId(root, "container-remove-children").children.length
+            ).toBe(1);
         });
     });
 
@@ -203,7 +207,7 @@ describe("cog", () => {
         const container = document.createElement("template");
         container.id = "my-template-container";
         container.innerHTML =
-            "<div>{{ new Array(1).fill(0).map( (n, i) => `<my-template10 data-child={{dataParent}}></my-template8>`)}}</div>";
+            "<div>{{ new Array(1).fill(0).map( (n, i) => `<my-template10 data-child={{dataParent}}></my-template10>`)}}</div>";
         const parent = document.createElement("my-template-container");
         parent.setAttribute("data-parent", "{{name}}");
         root.appendChild(template);

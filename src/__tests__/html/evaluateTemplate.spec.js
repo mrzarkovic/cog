@@ -7,18 +7,22 @@ import {
 describe("evaluateTemplate", () => {
     test("extractTemplateExpressions", () => {
         const template = "Hello {{name}}! {{count}}";
-        const expressions = extractTemplateExpressions(template);
+        const expressions = extractTemplateExpressions(template, {});
 
         expect(expressions).toStrictEqual([
             {
                 value: "name",
                 start: 6,
                 end: 13,
+                evaluated: null,
+                dependencies: [],
             },
             {
                 value: "count",
                 start: 2,
                 end: 10,
+                evaluated: null,
+                dependencies: [],
             },
         ]);
     });
@@ -30,17 +34,30 @@ describe("evaluateTemplate", () => {
                 value: "name",
                 start: 6,
                 end: 13,
+                evaluated: null,
+                dependencies: [],
             },
             {
                 value: "count",
                 start: 2,
                 end: 10,
+                evaluated: null,
+                dependencies: [],
             },
         ];
-        const evaluatedTemplate = evaluateTemplate(template, expressions, {
-            name: "John",
-            count: 2,
-        });
+        const evaluatedTemplate = evaluateTemplate(
+            template,
+            expressions,
+            {
+                name: {
+                    value: "John",
+                },
+                count: {
+                    value: 2,
+                },
+            },
+            []
+        );
 
         expect(evaluatedTemplate).toEqual("Hello John! 2");
     });

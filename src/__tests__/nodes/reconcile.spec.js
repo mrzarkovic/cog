@@ -17,12 +17,27 @@ describe("reconcile", () => {
         document.body.appendChild(root);
         const reactiveNodes = createReactiveNodes();
 
-        registerNativeElements(root, { name: "John" }, reactiveNodes);
+        registerNativeElements(
+            root,
+            {
+                name: {
+                    value: "John",
+                    dependents: [],
+                    dependencies: [],
+                },
+            },
+            reactiveNodes
+        );
 
         reconcile(
             reactiveNodes,
+            reactiveNodes.list,
             {
-                name: "Mike",
+                name: {
+                    value: "Mike",
+                    dependents: [],
+                    dependencies: [],
+                },
             },
             ["name"]
         );
@@ -41,12 +56,21 @@ describe("reconcile", () => {
 
         const reactiveNodes = createReactiveNodes();
 
-        registerNativeElements(root, { checked: "false" }, reactiveNodes);
+        registerNativeElements(
+            root,
+            { checked: { value: "false", dependents: [], dependencies: [] } },
+            reactiveNodes
+        );
 
         reconcile(
             reactiveNodes,
+            reactiveNodes.list,
             {
-                checked: true,
+                checked: {
+                    value: true,
+                    dependents: [],
+                    dependencies: [],
+                },
             },
             ["checked"]
         );

@@ -7,6 +7,6 @@ describe("removeTagsAndAttributeNames", () => {
             "<my-component data-attribute='{{ true }}'>{{ isTrue() ? true : false }}</my-component>";
         const result = removeTagsAndAttributeNames(template);
 
-        expect(result).toEqual(" true isTrue() true false ");
+        expect(result).toEqual("true@isTrue@true@false");
     });
 });

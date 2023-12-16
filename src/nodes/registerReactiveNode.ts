@@ -1,11 +1,29 @@
-import { getAttributesRecursive } from "../attributes/getAttributesRecursive";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
 } from "../html/evaluateTemplate";
-import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
-import { Attribute, CogHTMLElement, ReactiveNodesList, State } from "../types";
+import {
+    Attribute,
+    CogHTMLElement,
+    Expression,
+    ReactiveNodesList,
+    State,
+} from "../types";
 import { elementFromString } from "./elementFromString";
+
+function assignDependents(
+    elementId: number,
+    expressions: Expression[],
+    state: State
+) {
+    expressions.map((expression) => {
+        expression.dependencies.forEach((dependency) => {
+            if (state[dependency].dependents.indexOf(elementId) === -1) {
+                state[dependency].dependents.push(elementId);
+            }
+        });
+    });
+}
 
 export function registerReactiveNode(
     elementId: number,
@@ -17,29 +35,19 @@ export function registerReactiveNode(
     parentId: number | null = null
 ) {
     const refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
-    const expressions = extractTemplateExpressions(refinedTemplate);
+
+    const expressions = extractTemplateExpressions(refinedTemplate, state);
+
     const updatedContent = evaluateTemplate(
         refinedTemplate,
         expressions,
-        state
+        state,
+        []
     );
 
     const element = elementFromString(updatedContent);
 
-    const attributesRecursive = getAttributesRecursive(
-        parentId,
-        attributes,
-        reactiveNodes.list
-    );
-
-    const templateForUpdateCheck =
-        refinedTemplate +
-        " " +
-        attributesRecursive.map((a) => a.value).join(" ");
-    const expression = extractTemplateExpressions(templateForUpdateCheck)
-        .map((e) => e.value)
-        .join(" ");
-    const updateCheckString = removeTagsAndAttributeNames(expression);
+    assignDependents(elementId, expressions, state);
 
     reactiveNodes.add({
         id: elementId,
@@ -47,10 +55,10 @@ export function registerReactiveNode(
         element,
         template: refinedTemplate,
         lastTemplateEvaluation: element.cloneNode(true) as CogHTMLElement,
-        updateCheckString,
         attributes,
         expressions,
         shouldUpdate: false,
+        newAttributes: [],
     });
 
     originalElement.parentElement?.replaceChild(element, originalElement);

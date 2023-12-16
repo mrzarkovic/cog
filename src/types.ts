@@ -24,17 +24,21 @@ export type Attribute = {
     reactive: boolean;
 };
 
+type ReactiveNodeId = number;
+
 export type ReactiveNode = {
-    id: number;
-    parentId: number | null;
+    id: ReactiveNodeId;
+    parentId: ReactiveNodeId | null;
     element: HTMLElement;
     template: HTMLString;
     lastTemplateEvaluation: CogHTMLElement;
-    updateCheckString: string;
     attributes: Attribute[];
     expressions: Expression[];
     shouldUpdate: boolean;
+    newAttributes: string[];
 };
+
+export type UnknownFunction = (...args: unknown[]) => unknown;
 
 export type ChangedAttribute = {
     name: string;
@@ -54,9 +58,17 @@ export type StateObject = {
     updatedKeys: string[];
     get value(): State;
     set: <T>(name: string, value: T) => void;
+    registerUpdate: (key: string) => void;
     clearUpdates: () => void;
 };
-export type State = Record<string, unknown>;
+export type StateKey = string;
+export type State = Record<StateKey, StateValue>;
+export type StateValue = {
+    value: unknown;
+    dependents: ReactiveNodeId[];
+    computants: StateKey[];
+    dependencies: StateKey[];
+};
 
 export type ElementWithHandler = Element & {
     [key: string]: (e: Event) => void;
@@ -70,6 +82,7 @@ export type ReactiveNodesList = {
     list: ReactiveNode[];
     lastId: number;
     get value(): ReactiveNode[];
+    get: (id: number) => ReactiveNode;
     add: (item: ReactiveNode) => void;
     update: (
         index: number,
@@ -88,4 +101,6 @@ export type Expression = {
     start: number;
     end: number;
     value: string;
+    dependencies: string[];
+    evaluated: string | null;
 };

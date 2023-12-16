@@ -9,15 +9,15 @@ export function createReactiveNodes(): ReactiveNodesList {
         get value() {
             return this.list;
         },
+        get(id: number) {
+            return this.list[this.index[id]];
+        },
         add(item: ReactiveNode) {
             this.list.push(item);
             this.index[item.id] = this.list.length - 1;
         },
-        update(index: number, property: keyof ReactiveNode, value: unknown) {
-            if (property === "attributes") {
-                this.list[index].shouldUpdate = true;
-            }
-            this.list[index][property] = value as never;
+        update(id: number, property: keyof ReactiveNode, value: unknown) {
+            this.list[this.index[id]][property] = value as never;
         },
         clean() {
             this.list = cleanReactiveNodesList(this.list);
