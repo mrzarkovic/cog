@@ -55,7 +55,6 @@ export const init = (): Cog => {
     }
 
     const render = (rootElement: HTMLElement) => {
-        console.log(state);
         addAllEventListeners(rootElement, state.value);
         registerNativeElements(rootElement, state.value, reactiveNodes);
         registerTemplates(rootElement, state, reactiveNodes);
@@ -131,9 +130,12 @@ export const init = (): Cog => {
                         throw new Error("Can't call outside of a template");
                     }
 
-                    return state.getTemplateState(template).customElements[
-                        Number(cogId)
-                    ][name].value as T;
+                    const value =
+                        state.getTemplateState(template).customElements[
+                            Number(cogId)
+                        ][name].value;
+
+                    return value as T;
                 }
 
                 if (

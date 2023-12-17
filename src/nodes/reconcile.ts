@@ -248,6 +248,7 @@ export const reconcile = (
             true
         ) as CogHTMLElement;
         const newElement = elementFromString(updatedContent);
+
         const changedNodes = compareNodes(oldElement, newElement);
 
         if (changedNodes.length > 0) {

@@ -1,1 +1,1094 @@
-!function(n,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports["t"]=t():n["t"]=t()}(self,(()=>(()=>{"use strict";var n={};function t(n,t){var r=n(t);return Array.isArray(r)&&(r=r.join("")),r}(n=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(n,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(n,"o",{value:!0})})(n);var r={},e=function(n,t){var e=n+JSON.stringify(Object.keys(t).join(""));if(!r[e]){var o="return (state) => {".concat(Object.keys(t).map((function(n){return"const ".concat(n,' = state["').concat(n,'"].value;')})).join("\n")," return ").concat(n,"}");r[e]=Function(o)()}return r[e]},o=/<\/?[\w-]+/g,i=/[\w-]+(\s*=\s*("|')[^"']*("|'))/g,u=/[^\w\s]/g,a=/\s+/g,c=function(n,r,o,i){for(var u=n,a="",c=0;c<r.length;c++){var f=r[c],l=f.start,s=f.end,v=f.value,d=u.slice(0,l),m=u.slice(s+1),b=r[c].i,h=r[c].u.filter((function(n){return i.includes(n)}));(h.length||null===b)&&(b=t(e(v,o),o),r[c].i=b),a+="".concat(d).concat(b),u=m}return a+u},f=function(n,t){for(var r=[],e=String(n),c=!0,f=function(){var n=function(n){for(var t=n.indexOf("{{"),r=0,e=t;e<n.length;e++)if("{"===n[e]&&"{"===n[e+1]?(r++,e++):"}"===n[e]&&"}"===n[e+1]&&(r--,e++),0===r)return{start:t,end:e};return{start:t,end:-1}}(e),f=n.start,l=n.end;if(-1===l)return c=!1,1;var s,v,d,m=e.slice(f+2,l-1),b=e.slice(l+1),h=(s=m,(v=document.createElement("div")).innerHTML=function(n){return n.replace(/<(?=[^<>]*>)/g,"&lt;").replace(/(?<=[^<>]*)>/g,"&gt;")}(s),(v.textContent||v.innerText||"").replace(/[\r\n]+/g,"").trim()),p={},y=new Set;(d=h,d.replace(o,"").replace(i,"$1").replace(u," ").trim().replace(a,"@")).split("@").filter((function(n){return!p[n]&&(p[n]=!0)})).filter((function(n){return t[n]})).forEach((function(n){t[n].u.length?t[n].u.forEach((function(n){return y.add(n)})):y.add(n)})),r.push({start:f,end:l,value:h,u:Array.from(y),i:null}),e=b};c&&!f(););return r},l=function(n){return n.split("-").reduce((function(n,t,r){return n+(r?t[0].toUpperCase()+t.slice(1):t)}),"")};function s(n){return"true"===n||"false"!==n&&("null"===n?null:"undefined"===n?void 0:""===n?"":isNaN(Number(n))?n:Number(n))}var v={};function d(n,t,r){var e=JSON.stringify(n)+JSON.stringify(t);if(!v[e]){for(var o=Object.assign({},t),i=0;i<n.length;i++){var u=l(n[i].name),a=n[i].value,f=[];n[i].l&&(f=Array.from(new Set(n[i].v.map((function(n){return n.u})).flat())),a=c(n[i].value,n[i].v,t,r)),o[u]={value:s(a),m:[],h:[],u:f}}v[e]=o}return v[e]}function m(n,t,r,e,o){var i=o.find((function(t){return t.id===n}));if(!i)return d(t,r,e);var u=m(i.parentId,i.attributes,r,e,o);return Object.assign({},u,d(t,u,e))}var b=function(n,t,r){var o=t.getAttribute("data-on-".concat(n));if(!o)throw new Error("Missing data-handler attribute");var i=e(o,r);return function(t){try{i(r),t.preventDefault()}catch(t){throw new Error("".concat(t.message,": data-on-").concat(n,"=").concat(o))}}};function h(n,t,r){n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var e=b(t,n,r);n.addEventListener(t,e),n["".concat(t,"Handler")]=e}))}function p(n,t){h(n,"click",t),h(n,"change",t)}function y(n){return(new DOMParser).parseFromString(n,"text/html").body.firstChild}function j(n,t){for(var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:function(){return!0},e=[],o=document.evaluate(t,n,null,XPathResult.ORDERED_NODE_ITERATOR_TYPE,null),i=o.iterateNext();i;)r(i)&&e.push(i),i=o.iterateNext();return e}function g(n,t,r,e,o){var i,u=arguments.length>5&&void 0!==arguments[5]?arguments[5]:[],a=arguments.length>6&&void 0!==arguments[6]?arguments[6]:null,l=arguments.length>7&&void 0!==arguments[7]?arguments[7]:null,s=e.replace(/>\s*([\s\S]*?)\s*</g,">$1<"),v=f(s,o),d=y(c(s,v,o,[]));return function(n,t,r){t.map((function(t){t.u.forEach((function(t){-1===r[t].m.indexOf(n)&&r[t].m.push(n)}))}))}(n,v,o),t.add({id:n,parentId:a,element:d,p:s,lastTemplateEvaluation:d.cloneNode(!0),attributes:u,v,shouldUpdate:!1,j:[],O:l}),null===(i=r.parentElement)||void 0===i||i.replaceChild(d,r),d}function O(n){return O="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(n){return typeof n}:function(n){return n&&"function"==typeof Symbol&&n.constructor===Symbol&&n!==Symbol.prototype?"symbol":typeof n},O(n)}function S(n,t){var r=Object.keys(n);if(Object.getOwnPropertySymbols){var e=Object.getOwnPropertySymbols(n);t&&(e=e.filter((function(t){return Object.getOwnPropertyDescriptor(n,t).enumerable}))),r.push.apply(r,e)}return r}function w(n){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?S(Object(r),!0).forEach((function(t){var e,o,i;e=n,o=t,i=r[t],(o=function(n){var t=function(n,t){if("object"!==O(n)||null===n)return n;var r=n[Symbol.toPrimitive];if(void 0!==r){var e=r.call(n,"string");if("object"!==O(e))return e;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(n)}(n);return"symbol"===O(t)?t:String(t)}(o))in e?Object.defineProperty(e,o,{value:i,enumerable:!0,configurable:!0,writable:!0}):e[o]=i})):Object.getOwnPropertyDescriptors?Object.defineProperties(n,Object.getOwnPropertyDescriptors(r)):S(Object(r)).forEach((function(t){Object.defineProperty(n,t,Object.getOwnPropertyDescriptor(r,t))}))}return n}function A(n,t,r,e){function o(){return Reflect.construct(HTMLElement,[],o)}o.prototype=Object.create(HTMLElement.prototype),o.prototype.constructor=o,o.prototype.connectedCallback=function(n,t,r){return function(){var e=this.tagName.toLowerCase(),o=r.id(),i=this.dataset.parentId?Number(this.dataset.parentId):null;t.S(e,o);var u=t.value;if(t.A&&t.A[e]){var a=t.A[e].customElements[o];Object.keys(a).forEach((function(n){if(a[n].value instanceof Function){var t=a[n].value;a[n].value=function(){for(var n=arguments.length,r=new Array(n),e=0;e<n;e++)r[e]=arguments[e];return t.apply(void 0,r.concat(["cogId:".concat(o)]))}}})),u=w(w({},t.value),a)}var c=function(n,t){var r=function(n,t){return Array.from(n.attributes).map((function(n){var r=f(n.value,t);return{name:n.name,value:n.value,v:r,l:!!r.length}}))}(n,t),e=f(n.innerHTML,t);return r.push({name:"children",value:n.innerHTML,v:e,l:!!e.length}),r}(this,m(i,[],t.value,[],r.list)),l=function(n,t){var r=y(n);if(r.nodeType!==Node.TEXT_NODE){N(r,t);for(var e=r.querySelectorAll("*"),o=0;o<e.length;o++)N(e[o],t)}var i=r.outerHTML;return i||(i=r.textContent),i}(n.innerHTML,o),s=m(i,c,u,[],r.list),v=g(o,r,this,l,s,c,i,e);p(v,u),v.cogAnchorId=o}}(t,r,e),customElements.define(n,o)}function N(n,t){n.tagName.includes("-")&&n.setAttribute("data-parent-id",String(t))}function x(n,t){for(var r=[],e=0;e<n.attributes.length;e++){var o=n.attributes[e],i=t.getAttribute(o.name);i!==o.value&&r.push({name:o.name,newValue:s(i||"")})}return r}function E(n,t){if(t.name.startsWith("data-attribute-")){var r=t.name.substring(15);t.newValue?(n[r]=!0,n.setAttribute(r,t.newValue)):(n[r]=!1,n.removeAttribute(r))}}var T=function(n){return n.nodeType!==Node.TEXT_NODE&&-1!==n.tagName.indexOf("-")};function I(n,t){n.querySelectorAll("[data-on-".concat(t,"]")).forEach((function(n){var r=n["".concat(t,"Handler")];r&&n.removeEventListener(t,r)}))}function M(n,t){if(n.nodeType===Node.TEXT_NODE)return function(n,t){return n.textContent!==t.textContent?[{node:t,content:t.textContent}]:[]}(n,t);var r,e=x(n,t),o=e.length>0?[{node:t,attributes:e}]:[];return T(n)?o.concat((r=t,n.innerHTML!==r.innerHTML?[{node:r,content:r.innerHTML}]:[])):o.concat(function(n,t){for(var r=[],e=[],o=Math.max(n.childNodes.length,t.childNodes.length),i=[],u=0;u<o;u++){var a,c,f=n.childNodes[u],l=t.childNodes[u];if((null==f?void 0:f.nodeType)===Node.TEXT_NODE&&(null==l?void 0:l.nodeType)===Node.TEXT_NODE){if((null===(a=f.textContent)||void 0===a?void 0:a.trim())!==(null===(c=l.textContent)||void 0===c?void 0:c.trim()))return[{node:t,content:t.innerHTML}]}else f?l?i=i.concat(M(f,l)):r.push(f):e.push(l)}return r.length&&i.push({node:t,N:r}),e.length&&i.push({node:t,T:e}),i}(n,t))}function C(n,t,r){for(var e=[],o=n;o!==t;)e.unshift(Array.prototype.indexOf.call(o.parentNode.childNodes,o)),o=o.parentNode;for(var i=r,u=0;u<e.length;u++){var a=e[u];if(!i.childNodes[a])return null;i=i.childNodes[a]}return i}function U(n){return U="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(n){return typeof n}:function(n){return n&&"function"==typeof Symbol&&n.constructor===Symbol&&n!==Symbol.prototype?"symbol":typeof n},U(n)}function k(n,t){var r=Object.keys(n);if(Object.getOwnPropertySymbols){var e=Object.getOwnPropertySymbols(n);t&&(e=e.filter((function(t){return Object.getOwnPropertyDescriptor(n,t).enumerable}))),r.push.apply(r,e)}return r}function F(n){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?k(Object(r),!0).forEach((function(t){var e,o,i;e=n,o=t,i=r[t],(o=function(n){var t=function(n,t){if("object"!==U(n)||null===n)return n;var r=n[Symbol.toPrimitive];if(void 0!==r){var e=r.call(n,"string");if("object"!==U(e))return e;throw new TypeError("@@toPrimitive must return a primitive value.")}return String(n)}(n);return"symbol"===U(t)?t:String(t)}(o))in e?Object.defineProperty(e,o,{value:i,enumerable:!0,configurable:!0,writable:!0}):e[o]=i})):Object.getOwnPropertyDescriptors?Object.defineProperties(n,Object.getOwnPropertyDescriptors(r)):k(Object(r)).forEach((function(t){Object.defineProperty(n,t,Object.getOwnPropertyDescriptor(r,t))}))}return n}function P(n){return function(n){if(Array.isArray(n))return $(n)}(n)||function(n){if("undefined"!=typeof Symbol&&null!=n[Symbol.iterator]||null!=n["@@iterator"])return Array.from(n)}(n)||function(n,t){if(n){if("string"==typeof n)return $(n,t);var r=Object.prototype.toString.call(n).slice(8,-1);return"Object"===r&&n.constructor&&(r=n.constructor.name),"Map"===r||"Set"===r?Array.from(n):"Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)?$(n,t):void 0}}(n)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function $(n,t){(null==t||t>n.length)&&(t=n.length);for(var r=0,e=new Array(t);r<t;r++)e[r]=n[r];return e}function H(n,t,r,e,o){var i,u=null!==(i=null==r?void 0:r.slice())&&void 0!==i?i:[],a=[];if(u.forEach((function(n){a.push({name:n.name,value:n.newValue,v:[],l:!1})})),void 0!==t&&a.push({name:"children",value:t,v:[],l:!1}),a.length){var c=e.get(n.cogAnchorId),f=function(n,t){for(var r=n.concat(t),e={},o=0;o<r.length;o++)e[r[o].name]=r[o];return Object.values(e)}(c.attributes,a);c.attributes=f,c.j=c.attributes.map((function(n){return l(n.name)})),0==o.filter((function(n){return n.id===c.id})).length&&o.push(c)}}function J(n,t,r){var e;n.nodeType===Node.TEXT_NODE?n.textContent=t:(I(e=n,"click"),I(e,"change"),n.innerHTML=t,p(n,r))}function L(n,t){for(var r=0;r<t.length;r++)E(n,t[r]),n.setAttribute(t[r].name,t[r].newValue)}function R(n,t){for(var r=document.createDocumentFragment(),e=0;e<t.length;e++)r.appendChild(t[e]);n.appendChild(r)}function B(n,t){for(var r=0;r<t.length;r++)n.removeChild(t[r])}function D(n,t,r,e,o,i,u){for(var a=0;a<n.length;a++){var c=n[a],f=C(c.node,r,e);if(T(c.node))H(f,c.content,c.attributes,i,u);else{var l=K(c,t,e),s=l.I,v=l.M;void 0!==c.content?J(f,c.content,o):void 0!==c.attributes?L(f,c.attributes):s.length?R(f,s):v.length&&B(f,v)}}}function K(n,t,r){var e=[],o=[];if(void 0!==n.T&&(o=n.T),void 0!==n.N)for(var i=0;i<n.N.length;i++){var u=C(n.N[i],t,r);u&&e.push(u)}return{I:o,M:e}}function _(n){return function(n){if(Array.isArray(n))return q(n)}(n)||function(n){if("undefined"!=typeof Symbol&&null!=n[Symbol.iterator]||null!=n["@@iterator"])return Array.from(n)}(n)||function(n,t){if(n){if("string"==typeof n)return q(n,t);var r=Object.prototype.toString.call(n).slice(8,-1);return"Object"===r&&n.constructor&&(r=n.constructor.name),"Map"===r||"Set"===r?Array.from(n):"Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)?q(n,t):void 0}}(n)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function q(n,t){(null==t||t>n.length)&&(t=n.length);for(var r=0,e=new Array(t);r<t;r++)e[r]=n[r];return e}var V=function(){var n=null,t={C:0,list:[],index:{},get value(){return this.list},get:function(n){return this.list[this.index[n]]},add:function(n){this.list.push(n),this.index[n.id]=this.list.length-1},update:function(n,t,r){this.list[this.index[n]][t]=r},U:function(){this.list=this.list.filter((function(n){var t=n.element;return document.body.contains(t)})),this.index=this.list.reduce((function(n,t,r){return n[t.id]=r,n}),{})},id:function(){return this.C++}},r=null,e={state:null,A:null,k:[],F:[],P:{},get value(){return this.state||(this.state={}),this.state},$:function(n){return this.A||(this.A={}),this.A[n]},S:function(n,t){if(!this.A)throw new Error("No templates state found");if(!this.A[n])throw new Error("No state found for ".concat(n));this.A[n].customElements[t]={};for(var r=0;r<this.A[n].keys.length;r++)this.A[n].customElements[t][this.A[n].keys[r]]={value:this.A[n].H[this.A[n].keys[r]].value,m:[],h:[],u:[]}},J:function(n,t,r){this.A||(this.A={}),this.A[n]||(this.A[n]={keys:[],H:{},customElements:{}}),this.A[n].H[t]={value:r,m:[],h:[],u:[]},this.A[n].keys.push(t)},L:function(n,t,r,e){this.A[n].customElements[t][r].value=e,-1===this.F.indexOf(t)&&(this.F.push(t),this.P[t]=[]),this.P[t].push(r)},set:function(n,t){this.state||(this.state={}),this.state[n]?this.state[n].value=t:this.state[n]={value:t,m:[],h:[],u:[]}},R:function(n){-1===this.k.indexOf(n)&&this.k.push(n)},B:function(){this.k=[],this.F=[],this.P={}}};var o=0;function i(){null!==r&&cancelAnimationFrame(r),r=requestAnimationFrame((function(n){n-o>16.666666666666668&&(o=n,function(){var n={};e.k.map((function(n){return e.value[n].m})).flat().forEach((function(t){return n[t]=!0}));var r=e.k;e.F.forEach((function(t){n[t]=!0,r=[].concat(_(r),_(e.P[t]))}));var o=Object.keys(n).map((function(n){return t.get(Number(n))}));!function(n,t,r,e){for(var o=0;o<t.length;o++){var i=t[o],u=[].concat(P(e),P(i.j)),a=r.value;if(r.A&&i.O&&r.A[i.O]){var f=r.A[i.O].customElements[i.id];a=F(F({},r.value),f)}i.j=[];var l=m(i.parentId,i.attributes,a,u,t),s=c(i.p,i.v,l,u),v=i.lastTemplateEvaluation.cloneNode(!0),d=y(s),b=M(v,d);b.length>0&&(t[o].lastTemplateEvaluation=d.cloneNode(!0),D(b,v,d,i.element,l,n,t))}}(t,o,e,r),t.U(),e.B()}())}))}var u=function(n){e.value[n].h.forEach((function(n){e.R(n)})),e.R(n),i()};return{render:function(n){console.log(e),p(n,e.value),function(n,t,r){for(var e=j(n,"self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",(function(n){return!T(n)})),o=0;o<e.length;o++){var i=r.id(),u=e[o];u.innerHTML=u.innerHTML.trim();for(var a=g(i,r,u,u.outerHTML,t),c=x(u,a),f=0;f<c.length;f++)E(a,c[f])}}(n,e.value,t),function(n,t,r){for(var e=j(n,"template"),o=document.createDocumentFragment(),i=0;i<e.length;i++){var u=e[i].getAttribute("id");if(u){if(e[i].innerHTML=e[i].innerHTML.replace(/[\r\n]+\s*/g,""),1!==e[i].content.childNodes.length)throw new Error("Template ".concat(u," should have a single child"));A(u,e[i],t,r),o.appendChild(e[i])}}o.textContent=""}(n,e,t)},variable:function(t,r,o){var a=t;return o&&(a="".concat(o,".").concat(t)),r instanceof Function?r=function(t,r){return function(e){for(var o=arguments.length,i=new Array(o>1?o-1:0),u=1;u<o;u++)i[u-1]=arguments[u];"string"==typeof e&&(0===e.indexOf("cogId:")?e=e.replace("cogId:",""):(i.unshift(e),e=null)),n=e?"".concat(t,":").concat(e):t;var a=r.apply(void 0,i);return n=null,a}}(a,r):Array.isArray(r)&&(r=function(n,t){return new Proxy(t,{get:function(t,r){var e=t[r];return"push"===r?function(){u(n);for(var r=arguments.length,o=new Array(r),i=0;i<r;i++)o[i]=arguments[i];return e.apply(t,o)}:e}})}(a,r)),o?e.J(o,t,r):e.set(t,r),{get value(){if(o){var r,i=null===(r=n)||void 0===r?void 0:r.split(":")[1];if(!i)throw new Error("Can't call outside of a template");return e.$(o).customElements[Number(i)][t].value}return null!==n&&-1===e.value[t].h.indexOf(n)&&e.value[t].h.push(n),e.value[t].value},set value(r){if(o){var a,c=null===(a=n)||void 0===a?void 0:a.split(":")[1];if(!c)throw new Error("Can't call outside of a template");e.L(o,Number(c),t,r),i()}else e.set(t,r),u(t)},set:function(n){o||(e.set(t,n),u(t))}}}}}(),X=V.variable,z=V.render;function G(n){return function(n){if(Array.isArray(n))return Q(n)}(n)||function(n){if("undefined"!=typeof Symbol&&null!=n[Symbol.iterator]||null!=n["@@iterator"])return Array.from(n)}(n)||function(n,t){if(n){if("string"==typeof n)return Q(n,t);var r=Object.prototype.toString.call(n).slice(8,-1);return"Object"===r&&n.constructor&&(r=n.constructor.name),"Map"===r||"Set"===r?Array.from(n):"Arguments"===r||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(r)?Q(n,t):void 0}}(n)||function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}()}function Q(n,t){(null==t||t>n.length)&&(t=n.length);for(var r=0,e=new Array(t);r<t;r++)e[r]=n[r];return e}document.addEventListener("DOMContentLoaded",(function(){z(document.getElementById("app"))}));var W=X("todos",[{text:"hello",done:!1}]);X("save",(function(){var n=document.querySelector("[data-input=todo");null!=n&&n.value&&(W.set([].concat(G(W.value),[{text:n.value,done:!1}])),n.value="")})),X("toggleTodo",(function(n){var t=G(W.value);t[n].done=!t[n].done,W.set(t)})),X("Checkbox",(function(n){var t=n.index,r=void 0===t?-1:t,e=n.checked,o=void 0!==e&&e;return'<input type="checkbox" id="todo'.concat(r,'" data-on-change="toggleTodo(').concat(r,')" ').concat(o?"checked":""," />")}));var Y=X("counter",0);return X("increment",(function(){Y.set(Y.value+1)})),n})()));
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["ts-module-todo"] = factory();
+	else
+		root["ts-module-todo"] = factory();
+})(self, () => {
+return /******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./src/expressions/evaluateExpression.ts
+function evaluateExpression(expressionWithScope, state) {
+  var evaluated = expressionWithScope(state);
+  if (Array.isArray(evaluated)) {
+    evaluated = evaluated.join("");
+  }
+  return evaluated;
+}
+;// CONCATENATED MODULE: ./src/html/findNextTemplateExpression.ts
+function findNextTemplateExpression(htmlText) {
+  var start = htmlText.indexOf("{{");
+  var stack = 0;
+  for (var i = start; i < htmlText.length; i++) {
+    if (htmlText[i] === "{" && htmlText[i + 1] === "{") {
+      stack++;
+      i++;
+    } else if (htmlText[i] === "}" && htmlText[i + 1] === "}") {
+      stack--;
+      i++;
+    }
+    if (stack === 0) {
+      return {
+        start: start,
+        end: i
+      };
+    }
+  }
+  return {
+    start: start,
+    end: -1
+  };
+}
+;// CONCATENATED MODULE: ./src/html/htmlToText.ts
+function escapeHtml(html) {
+  return html.replace(/<(?=[^<>]*>)/g, "&lt;").replace(/(?<=[^<>]*)>/g, "&gt;");
+}
+function htmlToText(html) {
+  var tmp = document.createElement("div");
+  tmp.innerHTML = escapeHtml(html);
+  return tmp.textContent || tmp.innerText || "";
+}
+;// CONCATENATED MODULE: ./src/expressions/sanitizeExpression.ts
+function sanitizeExpression(expression) {
+  return expression.replace(/[\r\n]+/g, "").trim();
+}
+;// CONCATENATED MODULE: ./src/expressions/createExpressionScope.ts
+var functionCache = {};
+var createExpressionScope = function createExpressionScope(expression, state) {
+  var index = expression + JSON.stringify(Object.keys(state).join(""));
+  if (!functionCache[index]) {
+    var functionBody = "return (state) => {".concat(Object.keys(state).map(function (variable) {
+      return "const ".concat(variable, " = state[\"").concat(variable, "\"].value;");
+    }).join("\n"), " return ").concat(expression, "}");
+    functionCache[index] = Function(functionBody)();
+  }
+  return functionCache[index];
+};
+;// CONCATENATED MODULE: ./src/html/removeTagsAndAttributeNames.ts
+var tagRegex = /<\/?[\w-]+/g;
+var attrRegex = /[\w-]+(\s*=\s*("|')[^"']*("|'))/g;
+var specialCharRegex = /[^\w\s]/g;
+var spaceRegex = /\s+/g;
+function removeTagsAndAttributeNames(htmlString) {
+  return htmlString.replace(tagRegex, "").replace(attrRegex, "$1").replace(specialCharRegex, " ").trim().replace(spaceRegex, "@");
+}
+;// CONCATENATED MODULE: ./src/html/evaluateTemplate.ts
+
+
+
+
+
+
+var evaluateTemplate = function evaluateTemplate(template, expressions, state, stateChanges) {
+  var restOfContent = template;
+  var updatedContent = "";
+  for (var i = 0; i < expressions.length; i++) {
+    var _expressions$i = expressions[i],
+      start = _expressions$i.start,
+      end = _expressions$i.end,
+      value = _expressions$i.value;
+    var before = restOfContent.slice(0, start);
+    var after = restOfContent.slice(end + 1);
+    var evaluated = expressions[i].evaluated;
+    var intersection = expressions[i].dependencies.filter(function (value) {
+      return stateChanges.includes(value);
+    });
+    if (intersection.length || evaluated === null) {
+      var expressionWithScope = createExpressionScope(value, state);
+      evaluated = evaluateExpression(expressionWithScope, state);
+      expressions[i].evaluated = evaluated;
+    }
+    updatedContent += "".concat(before).concat(evaluated);
+    restOfContent = after;
+  }
+  updatedContent += restOfContent;
+  return updatedContent;
+};
+
+/**
+ * Extracts all template expressions from a template string.
+ * start and end are relative to the last template expression.
+ */
+var extractTemplateExpressions = function extractTemplateExpressions(template, state) {
+  var expressions = [];
+  var restOfContent = String(template);
+  var hasTemplateExpression = true;
+  var _loop = function _loop() {
+    var _findNextTemplateExpr = findNextTemplateExpression(restOfContent),
+      start = _findNextTemplateExpr.start,
+      end = _findNextTemplateExpr.end;
+    if (end === -1) {
+      hasTemplateExpression = false;
+      return 1; // break
+    }
+    var htmlValue = restOfContent.slice(start + 2, end - 1);
+    var after = restOfContent.slice(end + 1);
+    var value = sanitizeExpression(htmlToText(htmlValue));
+    var uniqueIndex = {};
+    var dependencies = new Set();
+    removeTagsAndAttributeNames(value).split("@").filter(function (wordFromExpression) {
+      return uniqueIndex[wordFromExpression] ? false : uniqueIndex[wordFromExpression] = true;
+    }).filter(function (wordFromExpression) {
+      return state[wordFromExpression];
+    }).forEach(function (dependency) {
+      if (state[dependency].dependencies.length) {
+        state[dependency].dependencies.forEach(function (dep) {
+          return dependencies.add(dep);
+        });
+      } else {
+        dependencies.add(dependency);
+      }
+    });
+    expressions.push({
+      start: start,
+      end: end,
+      value: value,
+      dependencies: Array.from(dependencies),
+      evaluated: null
+    });
+    restOfContent = after;
+  };
+  while (hasTemplateExpression) {
+    if (_loop()) break;
+  }
+  return expressions;
+};
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element, state) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var expressions = extractTemplateExpressions(attribute.value, state);
+    return {
+      name: attribute.name,
+      value: attribute.value,
+      expressions: expressions,
+      reactive: !!expressions.length
+    };
+  });
+  return attributes;
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeName.ts
+var convertAttributeName = function convertAttributeName(attribute) {
+  return attribute.split("-").reduce(function (result, part, index) {
+    return result + (index ? part[0].toUpperCase() + part.slice(1) : part);
+  }, "");
+};
+;// CONCATENATED MODULE: ./src/attributes/convertAttributeValue.ts
+function convertAttributeValue(value) {
+  return value === "true" ? true : value === "false" ? false : value === "null" ? null : value === "undefined" ? undefined : value === "" ? "" : !isNaN(Number(value)) ? Number(value) : value;
+}
+;// CONCATENATED MODULE: ./src/attributes/attributesToState.ts
+
+
+
+function attributesToState(attributes, state, stateChanges) {
+  var localState = Object.assign({}, state);
+  for (var i = 0; i < attributes.length; i++) {
+    var attributeName = convertAttributeName(attributes[i].name);
+    var value = attributes[i].value;
+    var parentStateDependencies = [];
+    if (attributes[i].reactive) {
+      parentStateDependencies = Array.from(new Set(attributes[i].expressions.map(function (expression) {
+        return expression.dependencies;
+      }).flat()));
+      value = evaluateTemplate(attributes[i].value, attributes[i].expressions, state, stateChanges);
+    }
+    localState[attributeName] = {
+      value: convertAttributeValue(value),
+      dependents: [],
+      computants: [],
+      dependencies: parentStateDependencies
+    };
+  }
+  return localState;
+}
+;// CONCATENATED MODULE: ./src/attributes/getLocalState.ts
+
+function getLocalState(parentId, attributes, globalState, stateChanges, reactiveNodes) {
+  var parentNode = reactiveNodes.find(function (rn) {
+    return rn.id === parentId;
+  });
+  if (!parentNode) {
+    return attributesToState(attributes, globalState, stateChanges);
+  }
+  var parentState = getLocalState(parentNode.parentId, parentNode.attributes, globalState, stateChanges, reactiveNodes);
+  return Object.assign({}, parentState, attributesToState(attributes, parentState, stateChanges));
+}
+;// CONCATENATED MODULE: ./src/eventListeners/makeEventHandler.ts
+
+var makeEventHandler = function makeEventHandler(eventName, element, state) {
+  var handler = element.getAttribute("data-on-".concat(eventName));
+  if (!handler) {
+    throw new Error("Missing data-handler attribute");
+  }
+  var handlerWithScope = createExpressionScope(handler, state);
+  return function (e) {
+    try {
+      handlerWithScope(state);
+      e.preventDefault();
+    } catch (e) {
+      throw new Error("".concat(e.message, ": data-on-").concat(eventName, "=").concat(handler));
+    }
+  };
+};
+;// CONCATENATED MODULE: ./src/eventListeners/addEventListeners.ts
+
+function addEventListeners(parent, eventName, state) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = makeEventHandler(eventName, element, state);
+    element.addEventListener(eventName, handler);
+    element["".concat(eventName, "Handler")] = handler;
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/addAllEventListeners.ts
+
+function addAllEventListeners(parent, state) {
+  addEventListeners(parent, "click", state);
+  addEventListeners(parent, "change", state);
+}
+;// CONCATENATED MODULE: ./src/html/sanitizeHtml.ts
+var sanitizeHtml = function sanitizeHtml(html) {
+  return html.replace(/[\r\n]+\s*/g, "");
+};
+;// CONCATENATED MODULE: ./src/nodes/elementFromString.ts
+function elementFromString(htmlString) {
+  var parser = new DOMParser();
+  var newElementDoc = parser.parseFromString(htmlString, "text/html");
+  return newElementDoc.body.firstChild;
+}
+;// CONCATENATED MODULE: ./src/nodes/findNodes.ts
+function findNodes(rootElement, xpath) {
+  var check = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : function () {
+    return true;
+  };
+  var elements = [];
+  var result = document.evaluate(xpath, rootElement, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+  var element = result.iterateNext();
+  while (element) {
+    if (check(element)) {
+      elements.push(element);
+    }
+    element = result.iterateNext();
+  }
+  return elements;
+}
+;// CONCATENATED MODULE: ./src/nodes/registerReactiveNode.ts
+
+
+function assignDependents(elementId, expressions, state) {
+  expressions.map(function (expression) {
+    expression.dependencies.forEach(function (dependency) {
+      if (state[dependency].dependents.indexOf(elementId) === -1) {
+        state[dependency].dependents.push(elementId);
+      }
+    });
+  });
+}
+function registerReactiveNode(elementId, reactiveNodes, originalElement, template, state) {
+  var _originalElement$pare;
+  var attributes = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : [];
+  var parentId = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+  var templateName = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
+  var refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
+  var expressions = extractTemplateExpressions(refinedTemplate, state);
+  var updatedContent = evaluateTemplate(refinedTemplate, expressions, state, []);
+  var element = elementFromString(updatedContent);
+  assignDependents(elementId, expressions, state);
+  reactiveNodes.add({
+    id: elementId,
+    parentId: parentId,
+    element: element,
+    template: refinedTemplate,
+    lastTemplateEvaluation: element.cloneNode(true),
+    attributes: attributes,
+    expressions: expressions,
+    shouldUpdate: false,
+    newAttributes: [],
+    templateName: templateName
+  });
+  (_originalElement$pare = originalElement.parentElement) === null || _originalElement$pare === void 0 || _originalElement$pare.replaceChild(element, originalElement);
+  return element;
+}
+;// CONCATENATED MODULE: ./src/nodes/registerTemplates.ts
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+
+
+
+
+
+
+
+function registerTemplates(rootElement, state, reactiveNodes) {
+  var templates = findNodes(rootElement, "template");
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < templates.length; i++) {
+    var name = templates[i].getAttribute("id");
+    if (name) {
+      templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
+      if (templates[i].content.childNodes.length !== 1) {
+        throw new Error("Template ".concat(name, " should have a single child"));
+      }
+      defineCustomElement(name, templates[i], state, reactiveNodes);
+      fragment.appendChild(templates[i]);
+    }
+  }
+  fragment.textContent = "";
+}
+function defineCustomElement(name, template, state, reactiveNodes) {
+  function CustomElement() {
+    return Reflect.construct(HTMLElement, [], CustomElement);
+  }
+  CustomElement.prototype = Object.create(HTMLElement.prototype);
+  CustomElement.prototype.constructor = CustomElement;
+  CustomElement.prototype.connectedCallback = registerCustomElement(template, state, reactiveNodes);
+  customElements.define(name, CustomElement);
+}
+function addParentId(element, parentId) {
+  if (element.tagName.includes("-")) {
+    element.setAttribute("data-parent-id", String(parentId));
+  }
+}
+function addParentIdToChildren(template, parentId) {
+  var newElement = elementFromString(template);
+  if (newElement.nodeType !== Node.TEXT_NODE) {
+    addParentId(newElement, parentId);
+    var childElements = newElement.querySelectorAll("*");
+    for (var i = 0; i < childElements.length; i++) {
+      var child = childElements[i];
+      addParentId(child, parentId);
+    }
+  }
+  var refinedTemplate = newElement.outerHTML;
+  if (!refinedTemplate) {
+    refinedTemplate = newElement.textContent;
+  }
+  return refinedTemplate;
+}
+function getCustomElementAttributes(element, state) {
+  var attributes = getAttributes(element, state);
+  var childrenExpressions = extractTemplateExpressions(element.innerHTML, state);
+  attributes.push({
+    name: "children",
+    value: element.innerHTML,
+    expressions: childrenExpressions,
+    reactive: !!childrenExpressions.length
+  });
+  return attributes;
+}
+function registerCustomElement(template, state, reactiveNodes) {
+  return function () {
+    var templateName = this.tagName.toLowerCase();
+    var elementId = reactiveNodes.id();
+    var parentId = this.dataset.parentId ? Number(this.dataset.parentId) : null;
+    state.registerTemplateState(templateName, elementId);
+    var completeState = state.value;
+    if (state.templates && state.templates[templateName]) {
+      var templateState = state.templates[templateName].customElements[elementId];
+      Object.keys(templateState).forEach(function (key) {
+        if (templateState[key].value instanceof Function) {
+          var originalFunction = templateState[key].value;
+          templateState[key].value = function () {
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+            return originalFunction.apply(void 0, args.concat(["cogId:".concat(elementId)]));
+          };
+        }
+      });
+      completeState = _objectSpread(_objectSpread({}, state.value), templateState);
+    }
+    var attributesLocalState = getLocalState(parentId, [], state.value, [], reactiveNodes.list);
+    var attributes = getCustomElementAttributes(this, attributesLocalState);
+    var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
+    var localState = getLocalState(parentId, attributes, completeState, [], reactiveNodes.list);
+    var newElement = registerReactiveNode(elementId, reactiveNodes, this, refinedTemplate, localState, attributes, parentId, templateName);
+    addAllEventListeners(newElement, completeState);
+    newElement.cogAnchorId = elementId;
+  };
+}
+;// CONCATENATED MODULE: ./src/attributes/getChangedAttributes.ts
+
+function getChangedAttributes(oldElement, newElement) {
+  var changedAttributes = [];
+  for (var i = 0; i < oldElement.attributes.length; i++) {
+    var oldAttr = oldElement.attributes[i];
+    var newAttrValue = newElement.getAttribute(oldAttr.name);
+    if (newAttrValue !== oldAttr.value) {
+      changedAttributes.push({
+        name: oldAttr.name,
+        newValue: convertAttributeValue(newAttrValue || "")
+      });
+    }
+  }
+  return changedAttributes;
+}
+;// CONCATENATED MODULE: ./src/attributes/handleBooleanAttribute.ts
+function handleBooleanAttribute(changedNode, attribute) {
+  if (attribute.name.startsWith("data-attribute-")) {
+    var optionalAttribute = attribute.name.substring(15); // "data-attribute-".length
+
+    if (attribute.newValue) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      changedNode[optionalAttribute] = true;
+      changedNode.setAttribute(optionalAttribute, attribute.newValue);
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      changedNode[optionalAttribute] = false;
+      changedNode.removeAttribute(optionalAttribute);
+    }
+  }
+}
+;// CONCATENATED MODULE: ./src/nodes/isCustomElement.ts
+var isCustomElement = function isCustomElement(element) {
+  return element.nodeType !== Node.TEXT_NODE && element.tagName.indexOf("-") !== -1;
+};
+;// CONCATENATED MODULE: ./src/nodes/registerNativeElements.ts
+
+
+
+
+
+var registerNativeElements = function registerNativeElements(rootElement, state, reactiveNodes) {
+  var elements = findNodes(rootElement, "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]", function (element) {
+    return !isCustomElement(element);
+  });
+  for (var i = 0; i < elements.length; i++) {
+    var elementId = reactiveNodes.id();
+    var element = elements[i];
+    element.innerHTML = element.innerHTML.trim();
+    var template = element.outerHTML;
+    var newElement = registerReactiveNode(elementId, reactiveNodes, element, template, state);
+    var attributes = getChangedAttributes(element, newElement);
+    for (var _i = 0; _i < attributes.length; _i++) {
+      handleBooleanAttribute(newElement, attributes[_i]);
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/eventListeners/removeEventListeners.ts
+function removeEventListeners(parent, eventName) {
+  parent.querySelectorAll("[data-on-".concat(eventName, "]")).forEach(function (element) {
+    var handler = element["".concat(eventName, "Handler")];
+    if (handler) {
+      element.removeEventListener(eventName, handler);
+    }
+  });
+}
+;// CONCATENATED MODULE: ./src/eventListeners/removeAllEventListeners.ts
+
+function removeAllEventListeners(parent) {
+  removeEventListeners(parent, "click");
+  removeEventListeners(parent, "change");
+}
+;// CONCATENATED MODULE: ./src/nodes/compareNodes.ts
+
+
+function compareTextNodes(oldNode, newNode) {
+  if (oldNode.textContent !== newNode.textContent) {
+    return [{
+      node: newNode,
+      content: newNode.textContent
+    }];
+  }
+  return [];
+}
+function compareChildNodes(oldNode, newNode) {
+  var toBeRemoved = [];
+  var toBeAdded = [];
+  var nodesLength = Math.max(oldNode.childNodes.length, newNode.childNodes.length);
+  var changedChildren = [];
+  for (var i = 0; i < nodesLength; i++) {
+    var oldChild = oldNode.childNodes[i];
+    var newChild = newNode.childNodes[i];
+    if ((oldChild === null || oldChild === void 0 ? void 0 : oldChild.nodeType) === Node.TEXT_NODE && (newChild === null || newChild === void 0 ? void 0 : newChild.nodeType) === Node.TEXT_NODE) {
+      var _oldChild$textContent, _newChild$textContent;
+      if (((_oldChild$textContent = oldChild.textContent) === null || _oldChild$textContent === void 0 ? void 0 : _oldChild$textContent.trim()) !== ((_newChild$textContent = newChild.textContent) === null || _newChild$textContent === void 0 ? void 0 : _newChild$textContent.trim())) {
+        return [{
+          node: newNode,
+          content: newNode.innerHTML
+        }];
+      }
+    } else if (!oldChild) {
+      toBeAdded.push(newChild);
+    } else if (!newChild) {
+      toBeRemoved.push(oldChild);
+    } else {
+      changedChildren = changedChildren.concat(compareNodes(oldChild, newChild));
+    }
+  }
+  if (toBeRemoved.length) {
+    changedChildren.push({
+      node: newNode,
+      toBeRemoved: toBeRemoved
+    });
+  }
+  if (toBeAdded.length) {
+    changedChildren.push({
+      node: newNode,
+      toBeAdded: toBeAdded
+    });
+  }
+  return changedChildren;
+}
+function compareCustomElementChildren(oldElement, newElement) {
+  if (oldElement.innerHTML !== newElement.innerHTML) {
+    return [{
+      node: newElement,
+      content: newElement.innerHTML
+    }];
+  }
+  return [];
+}
+function compareNodes(oldNode, newNode) {
+  if (oldNode.nodeType === Node.TEXT_NODE) {
+    return compareTextNodes(oldNode, newNode);
+  }
+  var changedAttributes = getChangedAttributes(oldNode, newNode);
+  var changedChildren = changedAttributes.length > 0 ? [{
+    node: newNode,
+    attributes: changedAttributes
+  }] : [];
+  if (isCustomElement(oldNode)) {
+    return changedChildren.concat(compareCustomElementChildren(oldNode, newNode));
+  }
+  return changedChildren.concat(compareChildNodes(oldNode, newNode));
+}
+;// CONCATENATED MODULE: ./src/nodes/findCorrespondingNode.ts
+function findCorrespondingNode(nodeInA, rootA, rootB) {
+  var pathInA = [];
+  var temp = nodeInA;
+  while (temp !== rootA) {
+    pathInA.unshift(Array.prototype.indexOf.call(temp.parentNode.childNodes, temp));
+    temp = temp.parentNode;
+  }
+  var correspondingNodeInB = rootB;
+  for (var i = 0; i < pathInA.length; i++) {
+    var index = pathInA[i];
+    if (correspondingNodeInB.childNodes[index]) {
+      correspondingNodeInB = correspondingNodeInB.childNodes[index];
+    } else {
+      return null;
+    }
+  }
+  return correspondingNodeInB;
+}
+;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
+function reconcile_typeof(o) { "@babel/helpers - typeof"; return reconcile_typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, reconcile_typeof(o); }
+function reconcile_ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function reconcile_objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? reconcile_ownKeys(Object(t), !0).forEach(function (r) { reconcile_defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : reconcile_ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function reconcile_defineProperty(obj, key, value) { key = reconcile_toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function reconcile_toPropertyKey(arg) { var key = reconcile_toPrimitive(arg, "string"); return reconcile_typeof(key) === "symbol" ? key : String(key); }
+function reconcile_toPrimitive(input, hint) { if (reconcile_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (reconcile_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+
+
+
+
+
+
+
+
+
+function mergeAttributes(oldArray, newArray) {
+  var merged = oldArray.concat(newArray);
+  var attributes = {};
+  for (var i = 0; i < merged.length; i++) {
+    attributes[merged[i].name] = merged[i];
+  }
+  return Object.values(attributes);
+}
+function updateCustomElement(originalNode, content, attributes, reactiveNodes, nodesToReconcile) {
+  var _attributes$slice;
+  var changedAttributes = (_attributes$slice = attributes === null || attributes === void 0 ? void 0 : attributes.slice()) !== null && _attributes$slice !== void 0 ? _attributes$slice : [];
+  var newAttributes = [];
+  changedAttributes.forEach(function (attribute) {
+    newAttributes.push({
+      name: attribute.name,
+      value: attribute.newValue,
+      expressions: [],
+      reactive: false
+    });
+  });
+  if (content !== undefined) {
+    newAttributes.push({
+      name: "children",
+      value: content,
+      expressions: [],
+      reactive: false
+    });
+  }
+  if (newAttributes.length) {
+    var reactiveNode = reactiveNodes.get(originalNode.cogAnchorId);
+    var mergedAttributes = mergeAttributes(reactiveNode.attributes, newAttributes);
+    reactiveNode.attributes = mergedAttributes;
+    reactiveNode.newAttributes = reactiveNode.attributes.map(function (a) {
+      return convertAttributeName(a.name);
+    });
+    if (nodesToReconcile.filter(function (n) {
+      return n.id === reactiveNode.id;
+    }).length == 0) {
+      nodesToReconcile.push(reactiveNode);
+    }
+  }
+}
+function handleContentChange(originalNode, content, localState) {
+  if (originalNode.nodeType === Node.TEXT_NODE) {
+    originalNode.textContent = content;
+  } else {
+    removeAllEventListeners(originalNode);
+    originalNode.innerHTML = content;
+    addAllEventListeners(originalNode, localState);
+  }
+}
+function handleAttributeChange(originalNode, attributes) {
+  for (var i = 0; i < attributes.length; i++) {
+    handleBooleanAttribute(originalNode, attributes[i]);
+    originalNode.setAttribute(attributes[i].name, attributes[i].newValue);
+  }
+}
+function handleChildrenAddition(originalNode, addChildren) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < addChildren.length; i++) {
+    fragment.appendChild(addChildren[i]);
+  }
+  originalNode.appendChild(fragment);
+}
+function handleChildrenRemoval(originalNode, removeChildren) {
+  for (var i = 0; i < removeChildren.length; i++) {
+    originalNode.removeChild(removeChildren[i]);
+  }
+}
+function handleNodeChanges(changedNodes, oldElement, newElement, element, localState, reactiveNodes, nodesToReconcile) {
+  for (var i = 0; i < changedNodes.length; i++) {
+    var change = changedNodes[i];
+    var originalNode = findCorrespondingNode(change.node, newElement, element);
+    if (isCustomElement(change.node)) {
+      updateCustomElement(originalNode, change.content, change.attributes, reactiveNodes, nodesToReconcile);
+    } else {
+      var _handleChildrenChange = handleChildrenChanges(change, oldElement, element),
+        addChildren = _handleChildrenChange.addChildren,
+        removeChildren = _handleChildrenChange.removeChildren;
+      if (change.content !== undefined) {
+        handleContentChange(originalNode, change.content, localState);
+      } else if (change.attributes !== undefined) {
+        handleAttributeChange(originalNode, change.attributes);
+      } else if (addChildren.length) {
+        handleChildrenAddition(originalNode, addChildren);
+      } else if (removeChildren.length) {
+        handleChildrenRemoval(originalNode, removeChildren);
+      }
+    }
+  }
+}
+function handleChildrenChanges(changedNode, oldElement, element) {
+  var removeChildren = [];
+  var addChildren = [];
+  if (changedNode.toBeAdded !== undefined) {
+    addChildren = changedNode.toBeAdded;
+  }
+  if (changedNode.toBeRemoved !== undefined) {
+    for (var i = 0; i < changedNode.toBeRemoved.length; i++) {
+      var child = findCorrespondingNode(changedNode.toBeRemoved[i], oldElement, element);
+      if (child) {
+        removeChildren.push(child);
+      }
+    }
+  }
+  return {
+    addChildren: addChildren,
+    removeChildren: removeChildren
+  };
+}
+var reconcile = function reconcile(reactiveNodes, nodesToReconcile, state, stateChanges) {
+  for (var nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
+    var reactiveNode = nodesToReconcile[nodeIndex];
+    var localStateChanges = [].concat(_toConsumableArray(stateChanges), _toConsumableArray(reactiveNode.newAttributes));
+    var completeState = state.value;
+    if (state.templates && reactiveNode.templateName && state.templates[reactiveNode.templateName]) {
+      var templateState = state.templates[reactiveNode.templateName].customElements[reactiveNode.id];
+      completeState = reconcile_objectSpread(reconcile_objectSpread({}, state.value), templateState);
+    }
+    reactiveNode.newAttributes = [];
+    var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, completeState, localStateChanges, nodesToReconcile);
+    var updatedContent = evaluateTemplate(reactiveNode.template, reactiveNode.expressions, localState, localStateChanges);
+    var oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(true);
+    var newElement = elementFromString(updatedContent);
+    var changedNodes = compareNodes(oldElement, newElement);
+    if (changedNodes.length > 0) {
+      nodesToReconcile[nodeIndex].lastTemplateEvaluation = newElement.cloneNode(true);
+      handleNodeChanges(changedNodes, oldElement, newElement, reactiveNode.element, localState, reactiveNodes, nodesToReconcile);
+    }
+  }
+};
+;// CONCATENATED MODULE: ./src/createState.ts
+function createState() {
+  return {
+    state: null,
+    templates: null,
+    updatedKeys: [],
+    updatedCustomElements: [],
+    customElementsUpdatedKeys: {},
+    get value() {
+      if (!this.state) {
+        this.state = {};
+      }
+      return this.state;
+    },
+    getTemplateState: function getTemplateState(template) {
+      if (!this.templates) {
+        this.templates = {};
+      }
+      return this.templates[template];
+    },
+    registerTemplateState: function registerTemplateState(template, elementId) {
+      if (!this.templates) {
+        throw new Error("No templates state found");
+      }
+      if (!this.templates[template]) {
+        throw new Error("No state found for ".concat(template));
+      }
+      this.templates[template].customElements[elementId] = {};
+      for (var i = 0; i < this.templates[template].keys.length; i++) {
+        this.templates[template].customElements[elementId][this.templates[template].keys[i]] = {
+          value: this.templates[template].initial[this.templates[template].keys[i]].value,
+          dependents: [],
+          computants: [],
+          dependencies: []
+        };
+      }
+    },
+    setTemplate: function setTemplate(template, stateKey, value) {
+      if (!this.templates) {
+        this.templates = {};
+      }
+      if (!this.templates[template]) {
+        this.templates[template] = {
+          keys: [],
+          initial: {},
+          customElements: {}
+        };
+      }
+      this.templates[template].initial[stateKey] = {
+        value: value,
+        dependents: [],
+        computants: [],
+        dependencies: []
+      };
+      this.templates[template].keys.push(stateKey);
+    },
+    updateTemplateState: function updateTemplateState(template, elementId, stateKey, value) {
+      this.templates[template].customElements[elementId][stateKey].value = value;
+      if (this.updatedCustomElements.indexOf(elementId) === -1) {
+        this.updatedCustomElements.push(elementId);
+        this.customElementsUpdatedKeys[elementId] = [];
+      }
+      this.customElementsUpdatedKeys[elementId].push(stateKey);
+    },
+    set: function set(stateKey, value) {
+      if (!this.state) {
+        this.state = {};
+      }
+      if (!this.state[stateKey]) {
+        this.state[stateKey] = {
+          value: value,
+          dependents: [],
+          computants: [],
+          dependencies: []
+        };
+      } else {
+        this.state[stateKey].value = value;
+      }
+    },
+    registerUpdate: function registerUpdate(stateKey) {
+      if (this.updatedKeys.indexOf(stateKey) === -1) {
+        this.updatedKeys.push(stateKey);
+      }
+    },
+    clearUpdates: function clearUpdates() {
+      this.updatedKeys = [];
+      this.updatedCustomElements = [];
+      this.customElementsUpdatedKeys = {};
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/nodes/cleanReactiveNodesList.ts
+var cleanReactiveNodesList = function cleanReactiveNodesList(reactiveNodes) {
+  return reactiveNodes.filter(function (_ref) {
+    var element = _ref.element;
+    var contains = document.body.contains(element);
+    return contains;
+  });
+};
+;// CONCATENATED MODULE: ./src/createReactiveNodes.ts
+
+function createReactiveNodes() {
+  return {
+    lastId: 0,
+    list: [],
+    index: {},
+    get value() {
+      return this.list;
+    },
+    get: function get(id) {
+      return this.list[this.index[id]];
+    },
+    add: function add(item) {
+      this.list.push(item);
+      this.index[item.id] = this.list.length - 1;
+    },
+    update: function update(id, property, value) {
+      this.list[this.index[id]][property] = value;
+    },
+    clean: function clean() {
+      this.list = cleanReactiveNodesList(this.list);
+      this.index = this.list.reduce(function (index, item, i) {
+        index[item.id] = i;
+        return index;
+      }, {});
+    },
+    id: function id() {
+      return this.lastId++;
+    }
+  };
+}
+;// CONCATENATED MODULE: ./src/cog.ts
+function cog_toConsumableArray(arr) { return cog_arrayWithoutHoles(arr) || cog_iterableToArray(arr) || cog_unsupportedIterableToArray(arr) || cog_nonIterableSpread(); }
+function cog_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function cog_unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return cog_arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return cog_arrayLikeToArray(o, minLen); }
+function cog_iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function cog_arrayWithoutHoles(arr) { if (Array.isArray(arr)) return cog_arrayLikeToArray(arr); }
+function cog_arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+
+
+
+
+
+var init = function init() {
+  var stateFunctionExecuting = null;
+  var reactiveNodes = createReactiveNodes();
+  var updateStateTimeout = null;
+  var state = createState();
+  function reRender() {
+    var uniqueKeys = {};
+    state.updatedKeys.map(function (stateKey) {
+      return state.value[stateKey].dependents;
+    }).flat().forEach(function (id) {
+      return uniqueKeys[id] = true;
+    });
+    var updatedKeys = state.updatedKeys;
+    state.updatedCustomElements.forEach(function (id) {
+      uniqueKeys[id] = true;
+      updatedKeys = [].concat(cog_toConsumableArray(updatedKeys), cog_toConsumableArray(state.customElementsUpdatedKeys[id]));
+    });
+    var uniqueDependents = Object.keys(uniqueKeys);
+    var nodesToReconcile = uniqueDependents.map(function (id) {
+      return reactiveNodes.get(Number(id));
+    });
+    reconcile(reactiveNodes, nodesToReconcile, state, updatedKeys);
+    reactiveNodes.clean();
+    state.clearUpdates();
+  }
+  var lastFrameTime = 0;
+  var frameDelay = 1000 / 60;
+  function scheduleReRender() {
+    if (updateStateTimeout !== null) {
+      cancelAnimationFrame(updateStateTimeout);
+    }
+    updateStateTimeout = requestAnimationFrame(function (currentTime) {
+      if (currentTime - lastFrameTime > frameDelay) {
+        lastFrameTime = currentTime;
+        reRender();
+      }
+    });
+  }
+  var render = function render(rootElement) {
+    addAllEventListeners(rootElement, state.value);
+    registerNativeElements(rootElement, state.value, reactiveNodes);
+    registerTemplates(rootElement, state, reactiveNodes);
+  };
+  var getFunctionValue = function getFunctionValue(name, value) {
+    return function (cogId) {
+      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        args[_key - 1] = arguments[_key];
+      }
+      if (typeof cogId === "string") {
+        if (cogId.indexOf("cogId:") === 0) {
+          cogId = cogId.replace("cogId:", "");
+        } else {
+          args.unshift(cogId);
+          cogId = null;
+        }
+      }
+      stateFunctionExecuting = cogId ? "".concat(name, ":").concat(cogId) : name;
+      var result = value.apply(void 0, args);
+      stateFunctionExecuting = null;
+      return result;
+    };
+  };
+  var registerStateUpdate = function registerStateUpdate(stateKey) {
+    state.value[stateKey].computants.forEach(function (computant) {
+      state.registerUpdate(computant);
+    });
+    state.registerUpdate(stateKey);
+    scheduleReRender();
+  };
+  var getArrayValue = function getArrayValue(name, value) {
+    return new Proxy(value, {
+      get: function get(target, propKey) {
+        var originalMethod = target[propKey];
+        if (propKey === "push") {
+          return function () {
+            registerStateUpdate(name);
+            for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+              args[_key2] = arguments[_key2];
+            }
+            return originalMethod.apply(target, args);
+          };
+        }
+        return originalMethod;
+      }
+    });
+  };
+  var variable = function variable(name, value, template) {
+    var fullStateName = name;
+    if (template) {
+      fullStateName = "".concat(template, ".").concat(name);
+    }
+    if (value instanceof Function) {
+      value = getFunctionValue(fullStateName, value);
+    } else if (Array.isArray(value)) {
+      value = getArrayValue(fullStateName, value);
+    }
+    if (template) {
+      state.setTemplate(template, name, value);
+    } else {
+      state.set(name, value);
+    }
+    return {
+      get value() {
+        if (template) {
+          var _stateFunctionExecuti;
+          var cogId = (_stateFunctionExecuti = stateFunctionExecuting) === null || _stateFunctionExecuti === void 0 ? void 0 : _stateFunctionExecuti.split(":")[1];
+          if (!cogId) {
+            throw new Error("Can't call outside of a template");
+          }
+          var _value = state.getTemplateState(template).customElements[Number(cogId)][name].value;
+          return _value;
+        }
+        if (stateFunctionExecuting !== null && state.value[name].computants.indexOf(stateFunctionExecuting) === -1) {
+          state.value[name].computants.push(stateFunctionExecuting);
+        }
+        return state.value[name].value;
+      },
+      set value(newVal) {
+        if (template) {
+          var _stateFunctionExecuti2;
+          var cogId = (_stateFunctionExecuti2 = stateFunctionExecuting) === null || _stateFunctionExecuti2 === void 0 ? void 0 : _stateFunctionExecuti2.split(":")[1];
+          if (!cogId) {
+            throw new Error("Can't call outside of a template");
+          }
+          state.updateTemplateState(template, Number(cogId), name, newVal);
+          scheduleReRender();
+        } else {
+          state.set(name, newVal);
+          registerStateUpdate(name);
+        }
+      },
+      set: function set(newVal) {
+        if (template) {
+          return;
+        }
+        state.set(name, newVal);
+        registerStateUpdate(name);
+      }
+    };
+  };
+  return {
+    render: render,
+    variable: variable
+  };
+};
+var _init = init(),
+  variable = _init.variable,
+  render = _init.render;
+
+;// CONCATENATED MODULE: ./examples/src/ts-module-todo.ts
+function ts_module_todo_toConsumableArray(arr) { return ts_module_todo_arrayWithoutHoles(arr) || ts_module_todo_iterableToArray(arr) || ts_module_todo_unsupportedIterableToArray(arr) || ts_module_todo_nonIterableSpread(); }
+function ts_module_todo_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function ts_module_todo_unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return ts_module_todo_arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return ts_module_todo_arrayLikeToArray(o, minLen); }
+function ts_module_todo_iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function ts_module_todo_arrayWithoutHoles(arr) { if (Array.isArray(arr)) return ts_module_todo_arrayLikeToArray(arr); }
+function ts_module_todo_arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+
+document.addEventListener("DOMContentLoaded", function () {
+  render(document.getElementById("app"));
+});
+var todos = variable("todos", [{
+  text: "hello",
+  done: false
+}]);
+variable("save", function () {
+  var todo = document.querySelector("[data-input=todo");
+  if (todo !== null && todo !== void 0 && todo.value) {
+    todos.set([].concat(ts_module_todo_toConsumableArray(todos.value), [{
+      text: todo.value,
+      done: false
+    }]));
+    todo.value = "";
+  }
+});
+variable("toggleTodo", function (index) {
+  var newTodos = ts_module_todo_toConsumableArray(todos.value);
+  newTodos[index].done = !newTodos[index].done;
+  todos.set(newTodos);
+});
+variable("Checkbox", function (_ref) {
+  var _ref$index = _ref.index,
+    index = _ref$index === void 0 ? -1 : _ref$index,
+    _ref$checked = _ref.checked,
+    checked = _ref$checked === void 0 ? false : _ref$checked;
+  return "<input type=\"checkbox\" id=\"todo".concat(index, "\" data-on-change=\"toggleTodo(").concat(index, ")\" ").concat(checked ? "checked" : "", " />");
+});
+var counter = variable("counter", 0);
+variable("increment", function () {
+  counter.set(counter.value + 1);
+});
+/******/ 	return __webpack_exports__;
+/******/ })()
+;
+});

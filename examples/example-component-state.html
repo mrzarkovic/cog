@@ -14,18 +14,17 @@
         <div id="app" class="py-40 px-8 max-w-md mx-auto">
             <template id="my-counter">
                 <div>
-                    <div>State count: {{ count }}</div>
-                    <button
-                        data-on-click="increment()"
-                        class="btn btn-primary btn-sm"
-                    >
+                    <div class="text-center text-6xl pb-4">{{ count }}</div>
+                    <button data-on-click="increment()" class="btn btn-success">
                         Increment
                     </button>
                 </div>
             </template>
-            <my-counter></my-counter>
-            <my-counter></my-counter>
-            <my-counter></my-counter>
+            <div class="flex justify-between">
+                <my-counter></my-counter>
+                <my-counter></my-counter>
+                <my-counter></my-counter>
+            </div>
         </div>
         <script src="/examples/dist/ts-component-state.js"></script>
     </body>

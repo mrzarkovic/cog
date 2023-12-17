@@ -5,11 +5,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 const count = variable("count", 0, "my-counter");
-variable(
-    "increment",
-    () => {
-        count.value++;
-        console.log("my-counter increment", count.value);
-    },
-    "my-counter"
-);
+variable("increment", () => count.value++, "my-counter");
