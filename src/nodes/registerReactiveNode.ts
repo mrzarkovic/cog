@@ -11,7 +11,7 @@ import {
 } from "../types";
 import { elementFromString } from "./elementFromString";
 
-function assignDependents(
+export function assignDependents(
     elementId: number,
     expressions: Expression[],
     state: State
@@ -32,7 +32,8 @@ export function registerReactiveNode(
     template: string,
     state: State,
     attributes: Attribute[] = [],
-    parentId: number | null = null
+    parentId: number | null = null,
+    templateName: string | null = null
 ) {
     const refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
 
@@ -59,6 +60,7 @@ export function registerReactiveNode(
         expressions,
         shouldUpdate: false,
         newAttributes: [],
+        templateName,
     });
 
     originalElement.parentElement?.replaceChild(element, originalElement);

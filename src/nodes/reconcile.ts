@@ -6,6 +6,7 @@ import {
     ReactiveNode,
     ReactiveNodesList,
     State,
+    StateObject,
 } from "../types";
 import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "../eventListeners/removeAllEventListeners";
@@ -200,7 +201,7 @@ function handleChildrenChanges(
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
     nodesToReconcile: ReactiveNode[],
-    state: State,
+    state: StateObject,
     stateChanges: string[]
 ) => {
     for (let nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
@@ -209,13 +210,29 @@ export const reconcile = (
             ...stateChanges,
             ...reactiveNode.newAttributes,
         ];
+        let completeState = state.value;
+
+        if (
+            state.templates &&
+            reactiveNode.templateName &&
+            state.templates[reactiveNode.templateName]
+        ) {
+            const templateState =
+                state.templates[reactiveNode.templateName].customElements[
+                    reactiveNode.id
+                ];
+            completeState = {
+                ...state.value,
+                ...templateState,
+            };
+        }
 
         reactiveNode.newAttributes = [];
 
         const localState = getLocalState(
             reactiveNode.parentId,
             reactiveNode.attributes,
-            state,
+            completeState,
             localStateChanges,
             nodesToReconcile
         );

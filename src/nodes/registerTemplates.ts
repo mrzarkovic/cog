@@ -1,15 +1,21 @@
 import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
+import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { extractTemplateExpressions } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
-import { ReactiveNodesList, State } from "../types";
+import {
+    ReactiveNodesList,
+    State,
+    StateObject,
+    UnknownFunction,
+} from "../types";
 import { elementFromString } from "./elementFromString";
 import { findNodes } from "./findNodes";
 import { registerReactiveNode } from "./registerReactiveNode";
 
 export function registerTemplates(
     rootElement: Node,
-    state: State,
+    state: StateObject,
     reactiveNodes: ReactiveNodesList
 ) {
     const templates = findNodes<HTMLTemplateElement>(rootElement, "template");
@@ -37,7 +43,7 @@ export function registerTemplates(
 function defineCustomElement(
     name: string,
     template: HTMLTemplateElement,
-    state: State,
+    state: StateObject,
     reactiveNodes: ReactiveNodesList
 ) {
     function CustomElement() {
@@ -100,19 +106,43 @@ function getCustomElementAttributes(element: HTMLElement, state: State) {
 
 function registerCustomElement(
     template: HTMLTemplateElement,
-    state: State,
+    state: StateObject,
     reactiveNodes: ReactiveNodesList
 ) {
     return function (this: HTMLElement) {
+        const templateName = this.tagName.toLowerCase();
         const elementId = reactiveNodes.id();
         const parentId = this.dataset.parentId
             ? Number(this.dataset.parentId)
             : null;
 
+        state.registerTemplateState(templateName, elementId);
+
+        let completeState = state.value;
+        if (state.templates && state.templates[templateName]) {
+            const templateState =
+                state.templates[templateName].customElements[elementId];
+
+            Object.keys(templateState).forEach((key) => {
+                if (templateState[key].value instanceof Function) {
+                    const originalFunction = templateState[key]
+                        .value as UnknownFunction;
+                    templateState[key].value = (...args: unknown[]) => {
+                        return originalFunction(...args, `cogId:${elementId}`);
+                    };
+                }
+            });
+
+            completeState = {
+                ...state.value,
+                ...templateState,
+            };
+        }
+
         const attributesLocalState = getLocalState(
             parentId,
             [],
-            state,
+            state.value,
             [],
             reactiveNodes.list
         );
@@ -130,7 +160,7 @@ function registerCustomElement(
         const localState = getLocalState(
             parentId,
             attributes,
-            state,
+            completeState,
             [],
             reactiveNodes.list
         );
@@ -142,8 +172,10 @@ function registerCustomElement(
             refinedTemplate,
             localState,
             attributes,
-            parentId
+            parentId,
+            templateName
         );
+        addAllEventListeners(newElement, completeState);
 
         newElement.cogAnchorId = elementId;
     };

@@ -2,7 +2,8 @@ export interface Cog {
     render: (rootElement: HTMLElement) => void;
     variable: <T>(
         name: string,
-        value: T
+        value: T,
+        template?: TemplateName
     ) => {
         set value(newVal: T);
         get value(): T;
@@ -55,12 +56,42 @@ export type ChangedNode = {
 
 export type StateObject = {
     state: State | null;
-    updatedKeys: string[];
+    templates: StateTemplates | null;
+    updatedKeys: StateKey[];
     get value(): State;
-    set: <T>(name: string, value: T) => void;
-    registerUpdate: (key: string) => void;
+    registerTemplateState(
+        template: TemplateName,
+        elementId: ReactiveNodeId
+    ): void;
+    getTemplateState(template: TemplateName): TemplateState;
+    updateTemplateState(
+        template: TemplateName,
+        elementId: ReactiveNodeId,
+        stateKey: StateKey,
+        value: unknown
+    ): void;
+    set: <T>(stateKey: StateKey, value: T) => void;
+    setTemplate: (
+        template: TemplateName,
+        stateKey: StateKey,
+        value: unknown
+    ) => void;
+    registerUpdate: (stateKey: StateKey) => void;
     clearUpdates: () => void;
 };
+
+export type TemplateName = string;
+
+export type StateTemplates = Record<TemplateName, TemplateState>;
+
+export type TemplateState = {
+    keys: StateKey[];
+    initial: Record<StateKey, StateValue>;
+    customElements: Record<ReactiveNodeId, CustomElementState>;
+};
+
+export type CustomElementState = Record<StateKey, StateValue>;
+
 export type StateKey = string;
 export type State = Record<StateKey, StateValue>;
 export type StateValue = {
