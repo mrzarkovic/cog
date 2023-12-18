@@ -4,7 +4,8 @@ export function createState(): StateObject {
     return {
         state: null,
         templates: null,
-        updatedKeys: [],
+        updatedElements: [],
+        elementsUpdatedKeys: {},
         updatedCustomElements: [],
         customElementsUpdatedKeys: {},
         get value() {
@@ -39,7 +40,7 @@ export function createState(): StateObject {
                 }
             }
         },
-        setTemplate(
+        initializeTemplateState(
             template: TemplateName,
             stateKey: StateKey,
             value: unknown
@@ -76,9 +77,14 @@ export function createState(): StateObject {
                 this.updatedCustomElements.push(elementId);
                 this.customElementsUpdatedKeys[elementId] = [];
             }
-            this.customElementsUpdatedKeys[elementId].push(stateKey);
+            if (
+                this.customElementsUpdatedKeys[elementId].indexOf(stateKey) ===
+                -1
+            ) {
+                this.customElementsUpdatedKeys[elementId].push(stateKey);
+            }
         },
-        set(stateKey: StateKey, value: unknown) {
+        initializeGlobalState(stateKey: StateKey, value: unknown) {
             if (!this.state) {
                 this.state = {};
             }
@@ -94,15 +100,33 @@ export function createState(): StateObject {
                 this.state[stateKey].value = value;
             }
         },
-        registerUpdate(stateKey: string) {
-            if (this.updatedKeys.indexOf(stateKey) === -1) {
-                this.updatedKeys.push(stateKey);
-            }
+        updateGlobalState(stateKey: StateKey, value: unknown) {
+            this.state![stateKey].value = value;
+
+            this.value[stateKey].computants.forEach((computant) => {
+                this._registerGlobalStateUpdate(computant);
+            });
+
+            this._registerGlobalStateUpdate(stateKey);
+        },
+        _registerGlobalStateUpdate(stateKey: StateKey) {
+            this.value[stateKey].dependents.forEach((dependent) => {
+                if (this.updatedElements.indexOf(dependent) === -1) {
+                    this.updatedElements.push(dependent);
+                    this.elementsUpdatedKeys[dependent] = [];
+                }
+                if (
+                    this.elementsUpdatedKeys[dependent].indexOf(stateKey) === -1
+                ) {
+                    this.elementsUpdatedKeys[dependent].push(stateKey);
+                }
+            });
         },
         clearUpdates() {
-            this.updatedKeys = [];
             this.updatedCustomElements = [];
             this.customElementsUpdatedKeys = {};
+            this.updatedElements = [];
+            this.elementsUpdatedKeys = {};
         },
     };
 }

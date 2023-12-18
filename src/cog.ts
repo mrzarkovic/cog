@@ -13,27 +13,27 @@ export const init = (): Cog => {
     const state = createState();
 
     function reRender() {
-        const uniqueKeys: Record<number, boolean> = {};
-        state.updatedKeys
-            .map((stateKey) => state.value[stateKey].dependents)
-            .flat()
-            .forEach((id) => (uniqueKeys[id] = true));
+        state.updatedElements.forEach((elementId) => {
+            const reactiveNode = reactiveNodes.get(elementId);
 
-        let updatedKeys = state.updatedKeys;
-
-        state.updatedCustomElements.forEach((id) => {
-            uniqueKeys[id] = true;
-            updatedKeys = updatedKeys.concat(
-                state.customElementsUpdatedKeys[id]
+            reconcile(
+                reactiveNodes,
+                reactiveNode,
+                state,
+                state.elementsUpdatedKeys[elementId]
             );
         });
-        const uniqueDependents = Object.keys(uniqueKeys);
 
-        const nodesToReconcile = uniqueDependents.map((id) =>
-            reactiveNodes.get(Number(id))
-        );
+        state.updatedCustomElements.forEach((elementId) => {
+            const reactiveNode = reactiveNodes.get(elementId);
+            reconcile(
+                reactiveNodes,
+                reactiveNode,
+                state,
+                state.customElementsUpdatedKeys[elementId]
+            );
+        });
 
-        reconcile(reactiveNodes, nodesToReconcile, state, updatedKeys);
         reactiveNodes.clean();
         state.clearUpdates();
     }
@@ -78,9 +78,9 @@ export const init = (): Cog => {
 
     const registerStateUpdate = (stateKey: string) => {
         state.value[stateKey].computants.forEach((computant) => {
-            state.registerUpdate(computant);
+            state._registerGlobalStateUpdate(computant);
         });
-        state.registerUpdate(stateKey);
+        state._registerGlobalStateUpdate(stateKey);
         scheduleReRender();
     };
 
@@ -116,9 +116,9 @@ export const init = (): Cog => {
         }
 
         if (template) {
-            state.setTemplate(template, name, value);
+            state.initializeTemplateState(template, name, value);
         } else {
-            state.set(name, value);
+            state.initializeGlobalState(name, value);
         }
 
         return {
@@ -163,18 +163,17 @@ export const init = (): Cog => {
                         name,
                         newVal
                     );
-                    scheduleReRender();
                 } else {
-                    state.set(name, newVal);
-                    registerStateUpdate(name);
+                    state.updateGlobalState(name, newVal);
                 }
+                scheduleReRender();
             },
             set: (newVal: T) => {
                 if (template) {
                     return;
                 }
-                state.set(name, newVal);
-                registerStateUpdate(name);
+                state.updateGlobalState(name, newVal);
+                scheduleReRender();
             },
         };
     };

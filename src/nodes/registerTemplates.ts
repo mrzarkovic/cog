@@ -140,7 +140,7 @@ function registerCustomElement(
         const parentState = getLocalState(
             parentId,
             [],
-            state.value,
+            completeState,
             [],
             reactiveNodes.list
         );

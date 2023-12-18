@@ -58,7 +58,8 @@ export type ChangedNode = {
 export type StateObject = {
     state: State | null;
     templates: StateTemplates | null;
-    updatedKeys: StateKey[];
+    updatedElements: ReactiveNodeId[];
+    elementsUpdatedKeys: Record<ReactiveNodeId, StateKey[]>;
     updatedCustomElements: ReactiveNodeId[];
     customElementsUpdatedKeys: Record<ReactiveNodeId, StateKey[]>;
     get value(): State;
@@ -67,19 +68,21 @@ export type StateObject = {
         elementId: ReactiveNodeId
     ): void;
     getTemplateState(template: TemplateName): TemplateState;
+
+    initializeTemplateState: (
+        template: TemplateName,
+        stateKey: StateKey,
+        value: unknown
+    ) => void;
     updateTemplateState(
         template: TemplateName,
         elementId: ReactiveNodeId,
         stateKey: StateKey,
         value: unknown
     ): void;
-    set: <T>(stateKey: StateKey, value: T) => void;
-    setTemplate: (
-        template: TemplateName,
-        stateKey: StateKey,
-        value: unknown
-    ) => void;
-    registerUpdate: (stateKey: StateKey) => void;
+    initializeGlobalState: <T>(stateKey: StateKey, value: T) => void;
+    updateGlobalState: <T>(stateKey: StateKey, value: T) => void;
+    _registerGlobalStateUpdate: (stateKey: StateKey) => void;
     clearUpdates: () => void;
 };
 

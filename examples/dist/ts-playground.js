@@ -421,7 +421,7 @@ function registerCustomElement(template, state, reactiveNodes) {
       });
       completeState = Object.assign({}, state.value, templateState);
     }
-    var parentState = getLocalState(parentId, [], state.value, [], reactiveNodes.list);
+    var parentState = getLocalState(parentId, [], completeState, [], reactiveNodes.list);
     var attributes = getCustomElementAttributes(this, parentState);
     var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
     var localState = attributesToState(attributes, parentState, []);
@@ -616,7 +616,7 @@ function mergeAttributes(oldArray, newArray) {
   }
   return Object.values(attributes);
 }
-function updateCustomElement(originalNode, content, attributes, reactiveNodes, nodesToReconcile) {
+function updateCustomElement(originalNode, content, attributes, reactiveNodes, state, updatedKeys) {
   var _attributes$slice;
   var changedAttributes = (_attributes$slice = attributes === null || attributes === void 0 ? void 0 : attributes.slice()) !== null && _attributes$slice !== void 0 ? _attributes$slice : [];
   var newAttributes = [];
@@ -643,11 +643,7 @@ function updateCustomElement(originalNode, content, attributes, reactiveNodes, n
     reactiveNode.newAttributes = reactiveNode.attributes.map(function (a) {
       return convertAttributeName(a.name);
     });
-    if (nodesToReconcile.filter(function (n) {
-      return n.id === reactiveNode.id;
-    }).length == 0) {
-      nodesToReconcile.push(reactiveNode);
-    }
+    reconcile(reactiveNodes, reactiveNode, state, updatedKeys);
   }
 }
 function handleContentChange(originalNode, content, localState) {
@@ -677,12 +673,12 @@ function handleChildrenRemoval(originalNode, removeChildren) {
     originalNode.removeChild(removeChildren[i]);
   }
 }
-function handleNodeChanges(changedNodes, oldElement, newElement, element, localState, reactiveNodes, nodesToReconcile) {
+function handleNodeChanges(changedNodes, oldElement, newElement, element, localState, reactiveNodes, state, updatedKeys) {
   for (var i = 0; i < changedNodes.length; i++) {
     var change = changedNodes[i];
     var originalNode = findCorrespondingNode(change.node, newElement, element);
     if (isCustomElement(change.node)) {
-      updateCustomElement(originalNode, change.content, change.attributes, reactiveNodes, nodesToReconcile);
+      updateCustomElement(originalNode, change.content, change.attributes, reactiveNodes, state, updatedKeys);
     } else {
       var _handleChildrenChange = handleChildrenChanges(change, oldElement, element),
         addChildren = _handleChildrenChange.addChildren,
@@ -718,25 +714,22 @@ function handleChildrenChanges(changedNode, oldElement, element) {
     removeChildren: removeChildren
   };
 }
-var reconcile = function reconcile(reactiveNodes, nodesToReconcile, state, stateChanges) {
-  for (var nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
-    var reactiveNode = nodesToReconcile[nodeIndex];
-    var localStateChanges = stateChanges.concat(reactiveNode.newAttributes);
-    var completeState = state.value;
-    if (state.templates && reactiveNode.templateName && state.templates[reactiveNode.templateName]) {
-      var templateState = state.templates[reactiveNode.templateName].customElements[reactiveNode.id];
-      completeState = Object.assign({}, state.value, templateState);
-    }
-    reactiveNode.newAttributes = [];
-    var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, completeState, localStateChanges, nodesToReconcile);
-    var updatedContent = evaluateTemplate(reactiveNode.template, reactiveNode.expressions, localState, localStateChanges);
-    var oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(true);
-    var newElement = elementFromString(updatedContent);
-    var changedNodes = compareNodes(oldElement, newElement);
-    if (changedNodes.length > 0) {
-      nodesToReconcile[nodeIndex].lastTemplateEvaluation = newElement.cloneNode(true);
-      handleNodeChanges(changedNodes, oldElement, newElement, reactiveNode.element, localState, reactiveNodes, nodesToReconcile);
-    }
+var reconcile = function reconcile(reactiveNodes, reactiveNode, state, stateChanges) {
+  var localStateChanges = stateChanges.concat(reactiveNode.newAttributes);
+  var completeState = state.value;
+  if (state.templates && reactiveNode.templateName && state.templates[reactiveNode.templateName]) {
+    var templateState = state.templates[reactiveNode.templateName].customElements[reactiveNode.id];
+    completeState = Object.assign({}, state.value, templateState);
+  }
+  reactiveNode.newAttributes = [];
+  var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, completeState, localStateChanges, reactiveNodes.list);
+  var updatedContent = evaluateTemplate(reactiveNode.template, reactiveNode.expressions, localState, localStateChanges);
+  var oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(true);
+  var newElement = elementFromString(updatedContent);
+  var changedNodes = compareNodes(oldElement, newElement);
+  if (changedNodes.length > 0) {
+    reactiveNode.lastTemplateEvaluation = newElement.cloneNode(true);
+    handleNodeChanges(changedNodes, oldElement, newElement, reactiveNode.element, localState, reactiveNodes, state, stateChanges);
   }
 };
 ;// CONCATENATED MODULE: ./src/createState.ts
@@ -744,7 +737,8 @@ function createState() {
   return {
     state: null,
     templates: null,
-    updatedKeys: [],
+    updatedElements: [],
+    elementsUpdatedKeys: {},
     updatedCustomElements: [],
     customElementsUpdatedKeys: {},
     get value() {
@@ -772,7 +766,7 @@ function createState() {
         }
       }
     },
-    setTemplate: function setTemplate(template, stateKey, value) {
+    initializeTemplateState: function initializeTemplateState(template, stateKey, value) {
       if (!this.templates) {
         this.templates = {};
       }
@@ -797,9 +791,11 @@ function createState() {
         this.updatedCustomElements.push(elementId);
         this.customElementsUpdatedKeys[elementId] = [];
       }
-      this.customElementsUpdatedKeys[elementId].push(stateKey);
+      if (this.customElementsUpdatedKeys[elementId].indexOf(stateKey) === -1) {
+        this.customElementsUpdatedKeys[elementId].push(stateKey);
+      }
     },
-    set: function set(stateKey, value) {
+    initializeGlobalState: function initializeGlobalState(stateKey, value) {
       if (!this.state) {
         this.state = {};
       }
@@ -814,15 +810,31 @@ function createState() {
         this.state[stateKey].value = value;
       }
     },
-    registerUpdate: function registerUpdate(stateKey) {
-      if (this.updatedKeys.indexOf(stateKey) === -1) {
-        this.updatedKeys.push(stateKey);
-      }
+    updateGlobalState: function updateGlobalState(stateKey, value) {
+      var _this = this;
+      this.state[stateKey].value = value;
+      this.value[stateKey].computants.forEach(function (computant) {
+        _this._registerGlobalStateUpdate(computant);
+      });
+      this._registerGlobalStateUpdate(stateKey);
+    },
+    _registerGlobalStateUpdate: function _registerGlobalStateUpdate(stateKey) {
+      var _this2 = this;
+      this.value[stateKey].dependents.forEach(function (dependent) {
+        if (_this2.updatedElements.indexOf(dependent) === -1) {
+          _this2.updatedElements.push(dependent);
+          _this2.elementsUpdatedKeys[dependent] = [];
+        }
+        if (_this2.elementsUpdatedKeys[dependent].indexOf(stateKey) === -1) {
+          _this2.elementsUpdatedKeys[dependent].push(stateKey);
+        }
+      });
     },
     clearUpdates: function clearUpdates() {
-      this.updatedKeys = [];
       this.updatedCustomElements = [];
       this.customElementsUpdatedKeys = {};
+      this.updatedElements = [];
+      this.elementsUpdatedKeys = {};
     }
   };
 }
@@ -879,22 +891,14 @@ var init = function init() {
   var updateStateTimeout = null;
   var state = createState();
   function reRender() {
-    var uniqueKeys = {};
-    state.updatedKeys.map(function (stateKey) {
-      return state.value[stateKey].dependents;
-    }).flat().forEach(function (id) {
-      return uniqueKeys[id] = true;
+    state.updatedElements.forEach(function (elementId) {
+      var reactiveNode = reactiveNodes.get(elementId);
+      reconcile(reactiveNodes, reactiveNode, state, state.elementsUpdatedKeys[elementId]);
     });
-    var updatedKeys = state.updatedKeys;
-    state.updatedCustomElements.forEach(function (id) {
-      uniqueKeys[id] = true;
-      updatedKeys = updatedKeys.concat(state.customElementsUpdatedKeys[id]);
+    state.updatedCustomElements.forEach(function (elementId) {
+      var reactiveNode = reactiveNodes.get(elementId);
+      reconcile(reactiveNodes, reactiveNode, state, state.customElementsUpdatedKeys[elementId]);
     });
-    var uniqueDependents = Object.keys(uniqueKeys);
-    var nodesToReconcile = uniqueDependents.map(function (id) {
-      return reactiveNodes.get(Number(id));
-    });
-    reconcile(reactiveNodes, nodesToReconcile, state, updatedKeys);
     reactiveNodes.clean();
     state.clearUpdates();
   }
@@ -937,9 +941,9 @@ var init = function init() {
   };
   var registerStateUpdate = function registerStateUpdate(stateKey) {
     state.value[stateKey].computants.forEach(function (computant) {
-      state.registerUpdate(computant);
+      state._registerGlobalStateUpdate(computant);
     });
-    state.registerUpdate(stateKey);
+    state._registerGlobalStateUpdate(stateKey);
     scheduleReRender();
   };
   var getArrayValue = function getArrayValue(name, value) {
@@ -970,9 +974,9 @@ var init = function init() {
       value = getArrayValue(fullStateName, value);
     }
     if (template) {
-      state.setTemplate(template, name, value);
+      state.initializeTemplateState(template, name, value);
     } else {
-      state.set(name, value);
+      state.initializeGlobalState(name, value);
     }
     return {
       get value() {
@@ -998,18 +1002,17 @@ var init = function init() {
             throw new Error("Can't call outside of a template");
           }
           state.updateTemplateState(template, Number(cogId), name, newVal);
-          scheduleReRender();
         } else {
-          state.set(name, newVal);
-          registerStateUpdate(name);
+          state.updateGlobalState(name, newVal);
         }
+        scheduleReRender();
       },
       set: function set(newVal) {
         if (template) {
           return;
         }
-        state.set(name, newVal);
-        registerStateUpdate(name);
+        state.updateGlobalState(name, newVal);
+        scheduleReRender();
       }
     };
   };
@@ -1053,19 +1056,21 @@ function generateRandomString() {
   return result;
 }
 var fps = variable("fps", 0);
-var times = [];
-function refreshLoop() {
-  window.requestAnimationFrame(function () {
-    var now = performance.now();
-    while (times.length > 0 && times[0] <= now - 1000) {
-      times.shift();
-    }
-    times.push(now);
-    fps.value = times.length;
-    refreshLoop();
-  });
-}
-refreshLoop();
+
+// const times: number[] = [];
+// function refreshLoop() {
+//     window.requestAnimationFrame(() => {
+//         const now = performance.now();
+//         while (times.length > 0 && times[0] <= now - 1000) {
+//             times.shift();
+//         }
+//         times.push(now);
+//         fps.value = times.length;
+//         refreshLoop();
+//     });
+// }
+
+// refreshLoop();
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;
