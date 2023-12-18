@@ -1,3 +1,4 @@
+import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
 import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
@@ -133,13 +134,10 @@ function registerCustomElement(
                 }
             });
 
-            completeState = {
-                ...state.value,
-                ...templateState,
-            };
+            completeState = Object.assign({}, state.value, templateState);
         }
 
-        const attributesLocalState = getLocalState(
+        const parentState = getLocalState(
             parentId,
             [],
             state.value,
@@ -147,23 +145,14 @@ function registerCustomElement(
             reactiveNodes.list
         );
 
-        const attributes = getCustomElementAttributes(
-            this,
-            attributesLocalState
-        );
+        const attributes = getCustomElementAttributes(this, parentState);
 
         const refinedTemplate = addParentIdToChildren(
             template.innerHTML,
             elementId
         );
 
-        const localState = getLocalState(
-            parentId,
-            attributes,
-            completeState,
-            [],
-            reactiveNodes.list
-        );
+        const localState = attributesToState(attributes, parentState, []);
 
         const newElement = registerReactiveNode(
             elementId,
@@ -175,7 +164,9 @@ function registerCustomElement(
             parentId,
             templateName
         );
-        addAllEventListeners(newElement, completeState);
+        if (newElement.nodeType !== Node.TEXT_NODE) {
+            addAllEventListeners(newElement, completeState);
+        }
 
         newElement.cogAnchorId = elementId;
     };

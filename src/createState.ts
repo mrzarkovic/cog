@@ -22,26 +22,21 @@ export function createState(): StateObject {
             return this.templates[template];
         },
         registerTemplateState(template: TemplateName, elementId: number) {
-            if (!this.templates) {
-                throw new Error("No templates state found");
-            }
-            if (!this.templates[template]) {
-                throw new Error(`No state found for ${template}`);
-            }
+            if (this.templates && this.templates[template]) {
+                this.templates[template].customElements[elementId] = {};
 
-            this.templates[template].customElements[elementId] = {};
-
-            for (let i = 0; i < this.templates[template].keys.length; i++) {
-                this.templates[template].customElements[elementId][
-                    this.templates[template].keys[i]
-                ] = {
-                    value: this.templates[template].initial[
+                for (let i = 0; i < this.templates[template].keys.length; i++) {
+                    this.templates[template].customElements[elementId][
                         this.templates[template].keys[i]
-                    ].value,
-                    dependents: [],
-                    computants: [],
-                    dependencies: [],
-                };
+                    ] = {
+                        value: this.templates[template].initial[
+                            this.templates[template].keys[i]
+                        ].value,
+                        dependents: [],
+                        computants: [],
+                        dependencies: [],
+                    };
+                }
             }
         },
         setTemplate(

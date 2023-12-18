@@ -176,20 +176,6 @@ var extractTemplateExpressions = function extractTemplateExpressions(template, s
   }
   return expressions;
 };
-;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
-
-var getAttributes = function getAttributes(element, state) {
-  var attributes = Array.from(element.attributes).map(function (attribute) {
-    var expressions = extractTemplateExpressions(attribute.value, state);
-    return {
-      name: attribute.name,
-      value: attribute.value,
-      expressions: expressions,
-      reactive: !!expressions.length
-    };
-  });
-  return attributes;
-};
 ;// CONCATENATED MODULE: ./src/attributes/convertAttributeName.ts
 var convertAttributeName = function convertAttributeName(attribute) {
   return attribute.split("-").reduce(function (result, part, index) {
@@ -225,6 +211,20 @@ function attributesToState(attributes, state, stateChanges) {
   }
   return localState;
 }
+;// CONCATENATED MODULE: ./src/attributes/getAttributes.ts
+
+var getAttributes = function getAttributes(element, state) {
+  var attributes = Array.from(element.attributes).map(function (attribute) {
+    var expressions = extractTemplateExpressions(attribute.value, state);
+    return {
+      name: attribute.name,
+      value: attribute.value,
+      expressions: expressions,
+      reactive: !!expressions.length
+    };
+  });
+  return attributes;
+};
 ;// CONCATENATED MODULE: ./src/attributes/getLocalState.ts
 
 function getLocalState(parentId, attributes, globalState, stateChanges, reactiveNodes) {
@@ -333,12 +333,7 @@ function registerReactiveNode(elementId, reactiveNodes, originalElement, templat
   return element;
 }
 ;// CONCATENATED MODULE: ./src/nodes/registerTemplates.ts
-function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -424,14 +419,16 @@ function registerCustomElement(template, state, reactiveNodes) {
           };
         }
       });
-      completeState = _objectSpread(_objectSpread({}, state.value), templateState);
+      completeState = Object.assign({}, state.value, templateState);
     }
-    var attributesLocalState = getLocalState(parentId, [], state.value, [], reactiveNodes.list);
-    var attributes = getCustomElementAttributes(this, attributesLocalState);
+    var parentState = getLocalState(parentId, [], state.value, [], reactiveNodes.list);
+    var attributes = getCustomElementAttributes(this, parentState);
     var refinedTemplate = addParentIdToChildren(template.innerHTML, elementId);
-    var localState = getLocalState(parentId, attributes, completeState, [], reactiveNodes.list);
+    var localState = attributesToState(attributes, parentState, []);
     var newElement = registerReactiveNode(elementId, reactiveNodes, this, refinedTemplate, localState, attributes, parentId, templateName);
-    addAllEventListeners(newElement, completeState);
+    if (newElement.nodeType !== Node.TEXT_NODE) {
+      addAllEventListeners(newElement, completeState);
+    }
     newElement.cogAnchorId = elementId;
   };
 }
@@ -601,18 +598,6 @@ function findCorrespondingNode(nodeInA, rootA, rootB) {
   return correspondingNodeInB;
 }
 ;// CONCATENATED MODULE: ./src/nodes/reconcile.ts
-function reconcile_typeof(o) { "@babel/helpers - typeof"; return reconcile_typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, reconcile_typeof(o); }
-function reconcile_ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function reconcile_objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? reconcile_ownKeys(Object(t), !0).forEach(function (r) { reconcile_defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : reconcile_ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
-function reconcile_defineProperty(obj, key, value) { key = reconcile_toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function reconcile_toPropertyKey(arg) { var key = reconcile_toPrimitive(arg, "string"); return reconcile_typeof(key) === "symbol" ? key : String(key); }
-function reconcile_toPrimitive(input, hint) { if (reconcile_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (reconcile_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 
 
@@ -736,11 +721,11 @@ function handleChildrenChanges(changedNode, oldElement, element) {
 var reconcile = function reconcile(reactiveNodes, nodesToReconcile, state, stateChanges) {
   for (var nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
     var reactiveNode = nodesToReconcile[nodeIndex];
-    var localStateChanges = [].concat(_toConsumableArray(stateChanges), _toConsumableArray(reactiveNode.newAttributes));
+    var localStateChanges = stateChanges.concat(reactiveNode.newAttributes);
     var completeState = state.value;
     if (state.templates && reactiveNode.templateName && state.templates[reactiveNode.templateName]) {
       var templateState = state.templates[reactiveNode.templateName].customElements[reactiveNode.id];
-      completeState = reconcile_objectSpread(reconcile_objectSpread({}, state.value), templateState);
+      completeState = Object.assign({}, state.value, templateState);
     }
     reactiveNode.newAttributes = [];
     var localState = getLocalState(reactiveNode.parentId, reactiveNode.attributes, completeState, localStateChanges, nodesToReconcile);
@@ -775,20 +760,16 @@ function createState() {
       return this.templates[template];
     },
     registerTemplateState: function registerTemplateState(template, elementId) {
-      if (!this.templates) {
-        throw new Error("No templates state found");
-      }
-      if (!this.templates[template]) {
-        throw new Error("No state found for ".concat(template));
-      }
-      this.templates[template].customElements[elementId] = {};
-      for (var i = 0; i < this.templates[template].keys.length; i++) {
-        this.templates[template].customElements[elementId][this.templates[template].keys[i]] = {
-          value: this.templates[template].initial[this.templates[template].keys[i]].value,
-          dependents: [],
-          computants: [],
-          dependencies: []
-        };
+      if (this.templates && this.templates[template]) {
+        this.templates[template].customElements[elementId] = {};
+        for (var i = 0; i < this.templates[template].keys.length; i++) {
+          this.templates[template].customElements[elementId][this.templates[template].keys[i]] = {
+            value: this.templates[template].initial[this.templates[template].keys[i]].value,
+            dependents: [],
+            computants: [],
+            dependencies: []
+          };
+        }
       }
     },
     setTemplate: function setTemplate(template, stateKey, value) {
@@ -886,12 +867,6 @@ function createReactiveNodes() {
   };
 }
 ;// CONCATENATED MODULE: ./src/cog.ts
-function cog_toConsumableArray(arr) { return cog_arrayWithoutHoles(arr) || cog_iterableToArray(arr) || cog_unsupportedIterableToArray(arr) || cog_nonIterableSpread(); }
-function cog_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function cog_unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return cog_arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return cog_arrayLikeToArray(o, minLen); }
-function cog_iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function cog_arrayWithoutHoles(arr) { if (Array.isArray(arr)) return cog_arrayLikeToArray(arr); }
-function cog_arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 
 
@@ -913,7 +888,7 @@ var init = function init() {
     var updatedKeys = state.updatedKeys;
     state.updatedCustomElements.forEach(function (id) {
       uniqueKeys[id] = true;
-      updatedKeys = [].concat(cog_toConsumableArray(updatedKeys), cog_toConsumableArray(state.customElementsUpdatedKeys[id]));
+      updatedKeys = updatedKeys.concat(state.customElementsUpdatedKeys[id]);
     });
     var uniqueDependents = Object.keys(uniqueKeys);
     var nodesToReconcile = uniqueDependents.map(function (id) {

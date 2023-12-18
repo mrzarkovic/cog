@@ -37,6 +37,7 @@ export type ReactiveNode = {
     expressions: Expression[];
     shouldUpdate: boolean;
     newAttributes: string[];
+    templateName: TemplateName | null;
 };
 
 export type UnknownFunction = (...args: unknown[]) => unknown;
@@ -58,6 +59,8 @@ export type StateObject = {
     state: State | null;
     templates: StateTemplates | null;
     updatedKeys: StateKey[];
+    updatedCustomElements: ReactiveNodeId[];
+    customElementsUpdatedKeys: Record<ReactiveNodeId, StateKey[]>;
     get value(): State;
     registerTemplateState(
         template: TemplateName,

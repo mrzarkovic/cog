@@ -23,10 +23,9 @@ export const init = (): Cog => {
 
         state.updatedCustomElements.forEach((id) => {
             uniqueKeys[id] = true;
-            updatedKeys = [
-                ...updatedKeys,
-                ...state.customElementsUpdatedKeys[id],
-            ];
+            updatedKeys = updatedKeys.concat(
+                state.customElementsUpdatedKeys[id]
+            );
         });
         const uniqueDependents = Object.keys(uniqueKeys);
 

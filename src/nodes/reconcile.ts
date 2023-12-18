@@ -206,10 +206,9 @@ export const reconcile = (
 ) => {
     for (let nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
         const reactiveNode = nodesToReconcile[nodeIndex];
-        const localStateChanges = [
-            ...stateChanges,
-            ...reactiveNode.newAttributes,
-        ];
+        const localStateChanges = stateChanges.concat(
+            reactiveNode.newAttributes
+        );
         let completeState = state.value;
 
         if (
@@ -221,10 +220,7 @@ export const reconcile = (
                 state.templates[reactiveNode.templateName].customElements[
                     reactiveNode.id
                 ];
-            completeState = {
-                ...state.value,
-                ...templateState,
-            };
+            completeState = Object.assign({}, state.value, templateState);
         }
 
         reactiveNode.newAttributes = [];
