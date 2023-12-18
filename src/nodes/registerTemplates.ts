@@ -1,3 +1,4 @@
+import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
 import { extractTemplateExpressions } from "../html/evaluateTemplate";
@@ -109,7 +110,7 @@ function registerCustomElement(
             ? Number(this.dataset.parentId)
             : null;
 
-        const attributesLocalState = getLocalState(
+        const parentState = getLocalState(
             parentId,
             [],
             state,
@@ -117,23 +118,14 @@ function registerCustomElement(
             reactiveNodes.list
         );
 
-        const attributes = getCustomElementAttributes(
-            this,
-            attributesLocalState
-        );
+        const attributes = getCustomElementAttributes(this, parentState);
 
         const refinedTemplate = addParentIdToChildren(
             template.innerHTML,
             elementId
         );
 
-        const localState = getLocalState(
-            parentId,
-            attributes,
-            state,
-            [],
-            reactiveNodes.list
-        );
+        const localState = attributesToState(attributes, parentState, []);
 
         const newElement = registerReactiveNode(
             elementId,
