@@ -60,8 +60,6 @@ export type StateObject = {
     templates: StateTemplates | null;
     updatedElements: ReactiveNodeId[];
     elementsUpdatedKeys: Record<ReactiveNodeId, StateKey[]>;
-    updatedCustomElements: ReactiveNodeId[];
-    customElementsUpdatedKeys: Record<ReactiveNodeId, StateKey[]>;
     get value(): State;
     registerTemplateState(
         template: TemplateName,
@@ -83,7 +81,7 @@ export type StateObject = {
     initializeGlobalState: <T>(stateKey: StateKey, value: T) => void;
     updateGlobalState: <T>(stateKey: StateKey, value: T) => void;
     _registerGlobalStateUpdate: (stateKey: StateKey) => void;
-    _registerTemplateStateUpdate: (
+    _registerStateUpdate: (
         elementId: ReactiveNodeId,
         stateKey: StateKey
     ) => void;

@@ -6,8 +6,6 @@ export function createState(): StateObject {
         templates: null,
         updatedElements: [],
         elementsUpdatedKeys: {},
-        updatedCustomElements: [],
-        customElementsUpdatedKeys: {},
         get value() {
             if (!this.state) {
                 this.state = {};
@@ -72,10 +70,10 @@ export function createState(): StateObject {
             this.templates![template].customElements[elementId][
                 stateKey
             ].computants.forEach((computant) => {
-                this._registerTemplateStateUpdate(elementId, computant);
+                this._registerStateUpdate(elementId, computant);
             });
 
-            this._registerTemplateStateUpdate(elementId, stateKey);
+            this._registerStateUpdate(elementId, stateKey);
         },
         initializeGlobalState(stateKey: StateKey, value: unknown) {
             if (!this.state) {
@@ -103,36 +101,30 @@ export function createState(): StateObject {
             this._registerGlobalStateUpdate(stateKey);
         },
         _registerGlobalStateUpdate(stateKey: StateKey) {
+            const parts = stateKey.split(".");
+            // If computant is a template state
+            if (parts.length > 1) {
+                const temp = parts[1].split(":");
+                const stateKey = temp[0];
+                const elementId = Number(temp[1]);
+                this._registerStateUpdate(elementId, stateKey);
+                return;
+            }
             this.value[stateKey].dependents.forEach((dependent) => {
-                if (this.updatedElements.indexOf(dependent) === -1) {
-                    this.updatedElements.push(dependent);
-                    this.elementsUpdatedKeys[dependent] = [];
-                }
-                if (
-                    this.elementsUpdatedKeys[dependent].indexOf(stateKey) === -1
-                ) {
-                    this.elementsUpdatedKeys[dependent].push(stateKey);
-                }
+                this._registerStateUpdate(dependent, stateKey);
             });
         },
-        _registerTemplateStateUpdate(
-            elementId: ReactiveNodeId,
-            stateKey: StateKey
-        ) {
-            if (this.updatedCustomElements.indexOf(elementId) === -1) {
-                this.updatedCustomElements.push(elementId);
-                this.customElementsUpdatedKeys[elementId] = [];
+
+        _registerStateUpdate(elementId: ReactiveNodeId, stateKey: StateKey) {
+            if (this.updatedElements.indexOf(elementId) === -1) {
+                this.updatedElements.push(elementId);
+                this.elementsUpdatedKeys[elementId] = [];
             }
-            if (
-                this.customElementsUpdatedKeys[elementId].indexOf(stateKey) ===
-                -1
-            ) {
-                this.customElementsUpdatedKeys[elementId].push(stateKey);
+            if (this.elementsUpdatedKeys[elementId].indexOf(stateKey) === -1) {
+                this.elementsUpdatedKeys[elementId].push(stateKey);
             }
         },
         clearUpdates() {
-            this.updatedCustomElements = [];
-            this.customElementsUpdatedKeys = {};
             this.updatedElements = [];
             this.elementsUpdatedKeys = {};
         },

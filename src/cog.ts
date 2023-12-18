@@ -13,6 +13,7 @@ export const init = (): Cog => {
     const state = createState();
 
     function reRender() {
+        console.log({ state });
         state.updatedElements.forEach((elementId) => {
             const reactiveNode = reactiveNodes.get(elementId);
 
@@ -21,16 +22,6 @@ export const init = (): Cog => {
                 reactiveNode,
                 state,
                 state.elementsUpdatedKeys[elementId]
-            );
-        });
-
-        state.updatedCustomElements.forEach((elementId) => {
-            const reactiveNode = reactiveNodes.get(elementId);
-            reconcile(
-                reactiveNodes,
-                reactiveNode,
-                state,
-                state.customElementsUpdatedKeys[elementId]
             );
         });
 
@@ -180,6 +171,7 @@ export const init = (): Cog => {
                         newVal
                     );
                 } else {
+                    console.log("here");
                     state.updateGlobalState(name, newVal);
                 }
                 scheduleReRender();

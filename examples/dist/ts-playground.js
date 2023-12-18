@@ -739,8 +739,6 @@ function createState() {
     templates: null,
     updatedElements: [],
     elementsUpdatedKeys: {},
-    updatedCustomElements: [],
-    customElementsUpdatedKeys: {},
     get value() {
       if (!this.state) {
         this.state = {};
@@ -784,9 +782,9 @@ function createState() {
       var _this = this;
       this.templates[template].customElements[elementId][stateKey].value = value;
       this.templates[template].customElements[elementId][stateKey].computants.forEach(function (computant) {
-        _this._registerTemplateStateUpdate(elementId, computant);
+        _this._registerStateUpdate(elementId, computant);
       });
-      this._registerTemplateStateUpdate(elementId, stateKey);
+      this._registerStateUpdate(elementId, stateKey);
     },
     initializeGlobalState: function initializeGlobalState(stateKey, value) {
       if (!this.state) {
@@ -813,28 +811,29 @@ function createState() {
     },
     _registerGlobalStateUpdate: function _registerGlobalStateUpdate(stateKey) {
       var _this3 = this;
+      var parts = stateKey.split(".");
+      // If computant is a template state
+      if (parts.length > 1) {
+        var temp = parts[1].split(":");
+        var _stateKey = temp[0];
+        var elementId = Number(temp[1]);
+        this._registerStateUpdate(elementId, _stateKey);
+        return;
+      }
       this.value[stateKey].dependents.forEach(function (dependent) {
-        if (_this3.updatedElements.indexOf(dependent) === -1) {
-          _this3.updatedElements.push(dependent);
-          _this3.elementsUpdatedKeys[dependent] = [];
-        }
-        if (_this3.elementsUpdatedKeys[dependent].indexOf(stateKey) === -1) {
-          _this3.elementsUpdatedKeys[dependent].push(stateKey);
-        }
+        _this3._registerStateUpdate(dependent, stateKey);
       });
     },
-    _registerTemplateStateUpdate: function _registerTemplateStateUpdate(elementId, stateKey) {
-      if (this.updatedCustomElements.indexOf(elementId) === -1) {
-        this.updatedCustomElements.push(elementId);
-        this.customElementsUpdatedKeys[elementId] = [];
+    _registerStateUpdate: function _registerStateUpdate(elementId, stateKey) {
+      if (this.updatedElements.indexOf(elementId) === -1) {
+        this.updatedElements.push(elementId);
+        this.elementsUpdatedKeys[elementId] = [];
       }
-      if (this.customElementsUpdatedKeys[elementId].indexOf(stateKey) === -1) {
-        this.customElementsUpdatedKeys[elementId].push(stateKey);
+      if (this.elementsUpdatedKeys[elementId].indexOf(stateKey) === -1) {
+        this.elementsUpdatedKeys[elementId].push(stateKey);
       }
     },
     clearUpdates: function clearUpdates() {
-      this.updatedCustomElements = [];
-      this.customElementsUpdatedKeys = {};
       this.updatedElements = [];
       this.elementsUpdatedKeys = {};
     }
@@ -893,13 +892,12 @@ var init = function init() {
   var updateStateTimeout = null;
   var state = createState();
   function reRender() {
+    console.log({
+      state: state
+    });
     state.updatedElements.forEach(function (elementId) {
       var reactiveNode = reactiveNodes.get(elementId);
       reconcile(reactiveNodes, reactiveNode, state, state.elementsUpdatedKeys[elementId]);
-    });
-    state.updatedCustomElements.forEach(function (elementId) {
-      var reactiveNode = reactiveNodes.get(elementId);
-      reconcile(reactiveNodes, reactiveNode, state, state.customElementsUpdatedKeys[elementId]);
     });
     reactiveNodes.clean();
     state.clearUpdates();
@@ -1015,6 +1013,7 @@ var init = function init() {
           }
           state.updateTemplateState(template, Number(cogId), name, newVal);
         } else {
+          console.log("here");
           state.updateGlobalState(name, newVal);
         }
         scheduleReRender();
