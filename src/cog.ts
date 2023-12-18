@@ -124,17 +124,33 @@ export const init = (): Cog => {
         return {
             get value() {
                 if (template) {
-                    const cogId = stateFunctionExecuting?.split(":")[1];
-                    if (!cogId) {
-                        throw new Error("Can't call outside of a template");
+                    const parts = stateFunctionExecuting?.split(":") || [];
+                    const elementId = parts[1] ? Number(parts[1]) : null;
+                    if (elementId === null) {
+                        throw new Error(
+                            `Can't use outside of a template: ${name} (for ${template})`
+                        );
+                    }
+                    const callerParts = parts![0].split(".");
+                    const callerTemplate = callerParts[0];
+                    const functionName = callerParts[1];
+                    if (callerTemplate !== template) {
+                        throw new Error(
+                            `Can't use from another template: ${name} (for ${template}, used in ${callerTemplate})`
+                        );
                     }
 
-                    const value =
-                        state.getTemplateState(template).customElements[
-                            Number(cogId)
-                        ][name].value;
+                    const stateValue = state.getTemplateState(template)
+                        .customElements[elementId][name] as StateValue;
 
-                    return value as T;
+                    if (
+                        functionName &&
+                        stateValue.computants.indexOf(functionName) === -1
+                    ) {
+                        stateValue.computants.push(functionName);
+                    }
+
+                    return stateValue.value as T;
                 }
 
                 if (
@@ -170,9 +186,20 @@ export const init = (): Cog => {
             },
             set: (newVal: T) => {
                 if (template) {
-                    return;
+                    const cogId = stateFunctionExecuting?.split(":")[1];
+                    if (!cogId) {
+                        throw new Error("Can't call outside of a template");
+                    }
+
+                    state.updateTemplateState(
+                        template,
+                        Number(cogId),
+                        name,
+                        newVal
+                    );
+                } else {
+                    state.updateGlobalState(name, newVal);
                 }
-                state.updateGlobalState(name, newVal);
                 scheduleReRender();
             },
         };

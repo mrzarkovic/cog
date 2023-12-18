@@ -14,7 +14,9 @@
         <div id="app" class="py-40 px-8 max-w-md mx-auto">
             <template id="my-counter">
                 <div>
-                    <div class="text-center text-6xl pb-4">{{ count }}</div>
+                    <div class="text-center text-3xl pb-4">
+                        {{ count }} {{ isEven() ? "even" : "odd" }}
+                    </div>
                     <button data-on-click="increment()" class="btn btn-success">
                         Increment
                     </button>

@@ -96,7 +96,7 @@ export type StateTemplates = Record<TemplateName, TemplateState>;
 
 export type TemplateState = {
     keys: StateKey[];
-    initial: Record<StateKey, StateValue>;
+    initial: Record<StateKey, unknown>;
     customElements: Record<ReactiveNodeId, CustomElementState>;
 };
 

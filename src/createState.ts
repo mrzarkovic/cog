@@ -32,7 +32,7 @@ export function createState(): StateObject {
                     ] = {
                         value: this.templates[template].initial[
                             this.templates[template].keys[i]
-                        ].value,
+                        ],
                         dependents: [],
                         computants: [],
                         dependencies: [],
@@ -56,12 +56,7 @@ export function createState(): StateObject {
                 };
             }
 
-            this.templates[template].initial[stateKey] = {
-                value,
-                dependents: [],
-                computants: [],
-                dependencies: [],
-            };
+            this.templates[template].initial[stateKey] = value;
             this.templates[template].keys.push(stateKey);
         },
         updateTemplateState(
@@ -73,6 +68,12 @@ export function createState(): StateObject {
             this.templates![template].customElements[elementId][
                 stateKey
             ].value = value;
+
+            this.templates![template].customElements[elementId][
+                stateKey
+            ].computants.forEach((computant) => {
+                this._registerTemplateStateUpdate(elementId, computant);
+            });
 
             this._registerTemplateStateUpdate(elementId, stateKey);
         },
