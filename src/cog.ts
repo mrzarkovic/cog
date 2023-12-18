@@ -13,7 +13,6 @@ export const init = (): Cog => {
     const state = createState();
 
     function reRender() {
-        console.log({ state });
         state.updatedElements.forEach((elementId) => {
             const reactiveNode = reactiveNodes.get(elementId);
 
@@ -67,14 +66,6 @@ export const init = (): Cog => {
             return result;
         };
 
-    const registerStateUpdate = (stateKey: string) => {
-        state.value[stateKey].computants.forEach((computant) => {
-            state._registerGlobalStateUpdate(computant);
-        });
-        state._registerGlobalStateUpdate(stateKey);
-        scheduleReRender();
-    };
-
     const getArrayValue = (name: string, value: unknown[]) =>
         new Proxy(value, {
             get(target, propKey) {
@@ -83,7 +74,21 @@ export const init = (): Cog => {
                 ] as UnknownFunction;
                 if (propKey === "push") {
                     return (...args: unknown[]) => {
-                        registerStateUpdate(name);
+                        const parts = stateFunctionExecuting?.split(".");
+
+                        if (parts && parts.length > 1) {
+                            const elementId = Number(parts[1].split(":")[1]);
+                            state._registerStateUpdate(elementId, name);
+                        } else {
+                            state.value[name].computants.forEach(
+                                (computant) => {
+                                    state._registerGlobalStateUpdate(computant);
+                                }
+                            );
+                            state._registerGlobalStateUpdate(name);
+                        }
+
+                        scheduleReRender();
                         return originalMethod.apply(target, args);
                     };
                 }
@@ -102,13 +107,18 @@ export const init = (): Cog => {
                 fullStateName,
                 value as UnknownFunction
             ) as T;
-        } else if (Array.isArray(value)) {
-            value = getArrayValue(fullStateName, value) as T;
         }
 
         if (template) {
-            state.initializeTemplateState(template, name, value);
+            let valueProxy = undefined;
+            if (Array.isArray(value)) {
+                valueProxy = getArrayValue;
+            }
+            state.initializeTemplateState(template, name, value, valueProxy);
         } else {
+            if (Array.isArray(value)) {
+                value = getArrayValue(name, value) as T;
+            }
             state.initializeGlobalState(name, value);
         }
 
@@ -171,7 +181,6 @@ export const init = (): Cog => {
                         newVal
                     );
                 } else {
-                    console.log("here");
                     state.updateGlobalState(name, newVal);
                 }
                 scheduleReRender();

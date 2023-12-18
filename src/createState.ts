@@ -25,12 +25,18 @@ export function createState(): StateObject {
                 this.templates[template].customElements[elementId] = {};
 
                 for (let i = 0; i < this.templates[template].keys.length; i++) {
+                    const stateKey = this.templates[template].keys[i];
+                    let value =
+                        this.templates[template].initial[stateKey].value;
+                    const proxy =
+                        this.templates[template].initial[stateKey].proxy;
+                    if (proxy) {
+                        value = proxy(stateKey, [...(value as unknown[])]);
+                    }
                     this.templates[template].customElements[elementId][
-                        this.templates[template].keys[i]
+                        stateKey
                     ] = {
-                        value: this.templates[template].initial[
-                            this.templates[template].keys[i]
-                        ],
+                        value: value,
                         dependents: [],
                         computants: [],
                         dependencies: [],
@@ -41,7 +47,8 @@ export function createState(): StateObject {
         initializeTemplateState(
             template: TemplateName,
             stateKey: StateKey,
-            value: unknown
+            value: unknown,
+            proxy
         ) {
             if (!this.templates) {
                 this.templates = {};
@@ -54,7 +61,7 @@ export function createState(): StateObject {
                 };
             }
 
-            this.templates[template].initial[stateKey] = value;
+            this.templates[template].initial[stateKey] = { value, proxy };
             this.templates[template].keys.push(stateKey);
         },
         updateTemplateState(
@@ -102,6 +109,7 @@ export function createState(): StateObject {
         },
         _registerGlobalStateUpdate(stateKey: StateKey) {
             const parts = stateKey.split(".");
+
             // If computant is a template state
             if (parts.length > 1) {
                 const temp = parts[1].split(":");

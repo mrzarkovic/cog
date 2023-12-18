@@ -70,7 +70,8 @@ export type StateObject = {
     initializeTemplateState: (
         template: TemplateName,
         stateKey: StateKey,
-        value: unknown
+        value: unknown,
+        proxy?: (name: StateKey, value: unknown[]) => unknown[]
     ) => void;
     updateTemplateState(
         template: TemplateName,
@@ -94,8 +95,13 @@ export type StateTemplates = Record<TemplateName, TemplateState>;
 
 export type TemplateState = {
     keys: StateKey[];
-    initial: Record<StateKey, unknown>;
+    initial: Record<StateKey, TemplateStateInitialValue>;
     customElements: Record<ReactiveNodeId, CustomElementState>;
+};
+
+export type TemplateStateInitialValue = {
+    value: unknown;
+    proxy?: (name: StateKey, value: unknown[]) => unknown[];
 };
 
 export type CustomElementState = Record<StateKey, StateValue>;

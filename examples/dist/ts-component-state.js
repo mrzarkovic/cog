@@ -733,6 +733,12 @@ var reconcile = function reconcile(reactiveNodes, reactiveNode, state, stateChan
   }
 };
 ;// CONCATENATED MODULE: ./src/createState.ts
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function createState() {
   return {
     state: null,
@@ -755,8 +761,14 @@ function createState() {
       if (this.templates && this.templates[template]) {
         this.templates[template].customElements[elementId] = {};
         for (var i = 0; i < this.templates[template].keys.length; i++) {
-          this.templates[template].customElements[elementId][this.templates[template].keys[i]] = {
-            value: this.templates[template].initial[this.templates[template].keys[i]],
+          var stateKey = this.templates[template].keys[i];
+          var value = this.templates[template].initial[stateKey].value;
+          var proxy = this.templates[template].initial[stateKey].proxy;
+          if (proxy) {
+            value = proxy(stateKey, _toConsumableArray(value));
+          }
+          this.templates[template].customElements[elementId][stateKey] = {
+            value: value,
             dependents: [],
             computants: [],
             dependencies: []
@@ -764,7 +776,7 @@ function createState() {
         }
       }
     },
-    initializeTemplateState: function initializeTemplateState(template, stateKey, value) {
+    initializeTemplateState: function initializeTemplateState(template, stateKey, value, proxy) {
       if (!this.templates) {
         this.templates = {};
       }
@@ -775,7 +787,10 @@ function createState() {
           customElements: {}
         };
       }
-      this.templates[template].initial[stateKey] = value;
+      this.templates[template].initial[stateKey] = {
+        value: value,
+        proxy: proxy
+      };
       this.templates[template].keys.push(stateKey);
     },
     updateTemplateState: function updateTemplateState(template, elementId, stateKey, value) {
@@ -812,6 +827,7 @@ function createState() {
     _registerGlobalStateUpdate: function _registerGlobalStateUpdate(stateKey) {
       var _this3 = this;
       var parts = stateKey.split(".");
+
       // If computant is a template state
       if (parts.length > 1) {
         var temp = parts[1].split(":");
@@ -892,9 +908,6 @@ var init = function init() {
   var updateStateTimeout = null;
   var state = createState();
   function reRender() {
-    console.log({
-      state: state
-    });
     state.updatedElements.forEach(function (elementId) {
       var reactiveNode = reactiveNodes.get(elementId);
       reconcile(reactiveNodes, reactiveNode, state, state.elementsUpdatedKeys[elementId]);
@@ -939,20 +952,24 @@ var init = function init() {
       return result;
     };
   };
-  var registerStateUpdate = function registerStateUpdate(stateKey) {
-    state.value[stateKey].computants.forEach(function (computant) {
-      state._registerGlobalStateUpdate(computant);
-    });
-    state._registerGlobalStateUpdate(stateKey);
-    scheduleReRender();
-  };
   var getArrayValue = function getArrayValue(name, value) {
     return new Proxy(value, {
       get: function get(target, propKey) {
         var originalMethod = target[propKey];
         if (propKey === "push") {
           return function () {
-            registerStateUpdate(name);
+            var _stateFunctionExecuti;
+            var parts = (_stateFunctionExecuti = stateFunctionExecuting) === null || _stateFunctionExecuti === void 0 ? void 0 : _stateFunctionExecuti.split(".");
+            if (parts && parts.length > 1) {
+              var elementId = Number(parts[1].split(":")[1]);
+              state._registerStateUpdate(elementId, name);
+            } else {
+              state.value[name].computants.forEach(function (computant) {
+                state._registerGlobalStateUpdate(computant);
+              });
+              state._registerGlobalStateUpdate(name);
+            }
+            scheduleReRender();
             for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
               args[_key2] = arguments[_key2];
             }
@@ -970,19 +987,24 @@ var init = function init() {
     }
     if (value instanceof Function) {
       value = getFunctionValue(fullStateName, value);
-    } else if (Array.isArray(value)) {
-      value = getArrayValue(fullStateName, value);
     }
     if (template) {
-      state.initializeTemplateState(template, name, value);
+      var valueProxy = undefined;
+      if (Array.isArray(value)) {
+        valueProxy = getArrayValue;
+      }
+      state.initializeTemplateState(template, name, value, valueProxy);
     } else {
+      if (Array.isArray(value)) {
+        value = getArrayValue(name, value);
+      }
       state.initializeGlobalState(name, value);
     }
     return {
       get value() {
         if (template) {
-          var _stateFunctionExecuti;
-          var parts = ((_stateFunctionExecuti = stateFunctionExecuting) === null || _stateFunctionExecuti === void 0 ? void 0 : _stateFunctionExecuti.split(":")) || [];
+          var _stateFunctionExecuti2;
+          var parts = ((_stateFunctionExecuti2 = stateFunctionExecuting) === null || _stateFunctionExecuti2 === void 0 ? void 0 : _stateFunctionExecuti2.split(":")) || [];
           var elementId = parts[1] ? Number(parts[1]) : null;
           if (elementId === null) {
             throw new Error("Can't use outside of a template: ".concat(name, " (for ").concat(template, ")"));
@@ -1006,22 +1028,21 @@ var init = function init() {
       },
       set value(newVal) {
         if (template) {
-          var _stateFunctionExecuti2;
-          var cogId = (_stateFunctionExecuti2 = stateFunctionExecuting) === null || _stateFunctionExecuti2 === void 0 ? void 0 : _stateFunctionExecuti2.split(":")[1];
+          var _stateFunctionExecuti3;
+          var cogId = (_stateFunctionExecuti3 = stateFunctionExecuting) === null || _stateFunctionExecuti3 === void 0 ? void 0 : _stateFunctionExecuti3.split(":")[1];
           if (!cogId) {
             throw new Error("Can't call outside of a template");
           }
           state.updateTemplateState(template, Number(cogId), name, newVal);
         } else {
-          console.log("here");
           state.updateGlobalState(name, newVal);
         }
         scheduleReRender();
       },
       set: function set(newVal) {
         if (template) {
-          var _stateFunctionExecuti3;
-          var cogId = (_stateFunctionExecuti3 = stateFunctionExecuting) === null || _stateFunctionExecuti3 === void 0 ? void 0 : _stateFunctionExecuti3.split(":")[1];
+          var _stateFunctionExecuti4;
+          var cogId = (_stateFunctionExecuti4 = stateFunctionExecuting) === null || _stateFunctionExecuti4 === void 0 ? void 0 : _stateFunctionExecuti4.split(":")[1];
           if (!cogId) {
             throw new Error("Can't call outside of a template");
           }
@@ -1047,10 +1068,20 @@ var _init = init(),
 document.addEventListener("DOMContentLoaded", function () {
   render(document.getElementById("app"));
 });
+function generateRandomString() {
+  var result = "";
+  var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var charactersLength = characters.length;
+  for (var i = 0; i < 5; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 variable("count", 100);
 var count = variable("count", 0, "my-counter");
+var names = variable("names", ["Alice", "Bob", "Carol"], "my-counter");
 variable("increment", function () {
-  return count.value++;
+  names.value.push(generateRandomString());
 }, "my-counter");
 variable("isEven", function () {
   return count.value % 2 === 0;
