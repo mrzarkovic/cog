@@ -31,7 +31,7 @@ export function createState(): StateObject {
                     const proxy =
                         this.templates[template].initial[stateKey].proxy;
                     if (proxy) {
-                        value = proxy(stateKey, [...(value as unknown[])]);
+                        value = proxy(stateKey, (value as unknown[]).slice(0));
                     }
                     this.templates[template].customElements[elementId][
                         stateKey

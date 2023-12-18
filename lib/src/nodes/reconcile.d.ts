@@ -1,2 +1,2 @@
-import { ReactiveNode, ReactiveNodesList, State } from "../types";
-export declare const reconcile: (reactiveNodes: ReactiveNodesList, nodesToReconcile: ReactiveNode[], state: State, stateChanges: string[]) => void;
+import { ReactiveNode, ReactiveNodesList, StateObject } from "../types";
+export declare const reconcile: (reactiveNodes: ReactiveNodesList, reactiveNode: ReactiveNode, state: StateObject, stateChanges: string[]) => void;

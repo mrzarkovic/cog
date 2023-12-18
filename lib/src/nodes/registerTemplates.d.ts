@@ -1,2 +1,2 @@
-import { ReactiveNodesList, State } from "../types";
-export declare function registerTemplates(rootElement: Node, state: State, reactiveNodes: ReactiveNodesList): void;
+import { ReactiveNodesList, StateObject } from "../types";
+export declare function registerTemplates(rootElement: Node, state: StateObject, reactiveNodes: ReactiveNodesList): void;
