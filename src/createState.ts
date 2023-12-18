@@ -1,4 +1,4 @@
-import { StateKey, StateObject, TemplateName } from "./types";
+import { ReactiveNodeId, StateKey, StateObject, TemplateName } from "./types";
 
 export function createState(): StateObject {
     return {
@@ -66,23 +66,15 @@ export function createState(): StateObject {
         },
         updateTemplateState(
             template: TemplateName,
-            elementId: number,
+            elementId: ReactiveNodeId,
             stateKey: StateKey,
             value: unknown
         ) {
             this.templates![template].customElements[elementId][
                 stateKey
             ].value = value;
-            if (this.updatedCustomElements.indexOf(elementId) === -1) {
-                this.updatedCustomElements.push(elementId);
-                this.customElementsUpdatedKeys[elementId] = [];
-            }
-            if (
-                this.customElementsUpdatedKeys[elementId].indexOf(stateKey) ===
-                -1
-            ) {
-                this.customElementsUpdatedKeys[elementId].push(stateKey);
-            }
+
+            this._registerTemplateStateUpdate(elementId, stateKey);
         },
         initializeGlobalState(stateKey: StateKey, value: unknown) {
             if (!this.state) {
@@ -121,6 +113,21 @@ export function createState(): StateObject {
                     this.elementsUpdatedKeys[dependent].push(stateKey);
                 }
             });
+        },
+        _registerTemplateStateUpdate(
+            elementId: ReactiveNodeId,
+            stateKey: StateKey
+        ) {
+            if (this.updatedCustomElements.indexOf(elementId) === -1) {
+                this.updatedCustomElements.push(elementId);
+                this.customElementsUpdatedKeys[elementId] = [];
+            }
+            if (
+                this.customElementsUpdatedKeys[elementId].indexOf(stateKey) ===
+                -1
+            ) {
+                this.customElementsUpdatedKeys[elementId].push(stateKey);
+            }
         },
         clearUpdates() {
             this.updatedCustomElements = [];

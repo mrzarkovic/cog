@@ -25,7 +25,7 @@ export type Attribute = {
     reactive: boolean;
 };
 
-type ReactiveNodeId = number;
+export type ReactiveNodeId = number;
 
 export type ReactiveNode = {
     id: ReactiveNodeId;
@@ -83,6 +83,10 @@ export type StateObject = {
     initializeGlobalState: <T>(stateKey: StateKey, value: T) => void;
     updateGlobalState: <T>(stateKey: StateKey, value: T) => void;
     _registerGlobalStateUpdate: (stateKey: StateKey) => void;
+    _registerTemplateStateUpdate: (
+        elementId: ReactiveNodeId,
+        stateKey: StateKey
+    ) => void;
     clearUpdates: () => void;
 };
 

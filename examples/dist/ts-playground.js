@@ -787,13 +787,7 @@ function createState() {
     },
     updateTemplateState: function updateTemplateState(template, elementId, stateKey, value) {
       this.templates[template].customElements[elementId][stateKey].value = value;
-      if (this.updatedCustomElements.indexOf(elementId) === -1) {
-        this.updatedCustomElements.push(elementId);
-        this.customElementsUpdatedKeys[elementId] = [];
-      }
-      if (this.customElementsUpdatedKeys[elementId].indexOf(stateKey) === -1) {
-        this.customElementsUpdatedKeys[elementId].push(stateKey);
-      }
+      this._registerTemplateStateUpdate(elementId, stateKey);
     },
     initializeGlobalState: function initializeGlobalState(stateKey, value) {
       if (!this.state) {
@@ -829,6 +823,15 @@ function createState() {
           _this2.elementsUpdatedKeys[dependent].push(stateKey);
         }
       });
+    },
+    _registerTemplateStateUpdate: function _registerTemplateStateUpdate(elementId, stateKey) {
+      if (this.updatedCustomElements.indexOf(elementId) === -1) {
+        this.updatedCustomElements.push(elementId);
+        this.customElementsUpdatedKeys[elementId] = [];
+      }
+      if (this.customElementsUpdatedKeys[elementId].indexOf(stateKey) === -1) {
+        this.customElementsUpdatedKeys[elementId].push(stateKey);
+      }
     },
     clearUpdates: function clearUpdates() {
       this.updatedCustomElements = [];
@@ -1056,21 +1059,19 @@ function generateRandomString() {
   return result;
 }
 var fps = variable("fps", 0);
-
-// const times: number[] = [];
-// function refreshLoop() {
-//     window.requestAnimationFrame(() => {
-//         const now = performance.now();
-//         while (times.length > 0 && times[0] <= now - 1000) {
-//             times.shift();
-//         }
-//         times.push(now);
-//         fps.value = times.length;
-//         refreshLoop();
-//     });
-// }
-
-// refreshLoop();
+var times = [];
+function refreshLoop() {
+  window.requestAnimationFrame(function () {
+    var now = performance.now();
+    while (times.length > 0 && times[0] <= now - 1000) {
+      times.shift();
+    }
+    times.push(now);
+    fps.value = times.length;
+    refreshLoop();
+  });
+}
+refreshLoop();
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;
