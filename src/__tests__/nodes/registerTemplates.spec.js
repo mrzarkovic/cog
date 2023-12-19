@@ -2,6 +2,7 @@ import "@testing-library/jest-dom";
 
 import { registerTemplates } from "../../nodes/registerTemplates";
 import { createReactiveNodes } from "../../createReactiveNodes";
+import { createState } from "../../createState";
 
 describe("registerTemplates", () => {
     test("add custom elements to list", () => {
@@ -15,8 +16,9 @@ describe("registerTemplates", () => {
         root.appendChild(customElement);
         document.body.appendChild(root);
         const reactiveNodes = createReactiveNodes();
+        const state = createState();
 
-        registerTemplates(root, {}, reactiveNodes);
+        registerTemplates(root, state, reactiveNodes);
 
         expect(reactiveNodes.list.length).toBe(1);
     });
@@ -35,7 +37,8 @@ describe("registerTemplates", () => {
         const reactiveNodes = createReactiveNodes();
 
         expect(() => {
-            registerTemplates(root, {}, reactiveNodes);
+            const state = createState();
+            registerTemplates(root, state, reactiveNodes);
         }).toThrowError("Template my-element should have a single child");
     });
 });
