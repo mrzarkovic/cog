@@ -3,6 +3,7 @@ import "@testing-library/jest-dom";
 import { reconcile } from "../../nodes/reconcile";
 import { createReactiveNodes } from "../../createReactiveNodes";
 import { registerNativeElements } from "../../nodes/registerNativeElements";
+import { createState } from "../../createState";
 import { getByTestId, getByText } from "@testing-library/dom";
 
 describe("reconcile", () => {
@@ -16,31 +17,14 @@ describe("reconcile", () => {
         root.appendChild(element2);
         document.body.appendChild(root);
         const reactiveNodes = createReactiveNodes();
+        const state = createState();
+        state.initializeGlobalState("name", "John");
 
-        registerNativeElements(
-            root,
-            {
-                name: {
-                    value: "John",
-                    dependents: [],
-                    dependencies: [],
-                },
-            },
-            reactiveNodes
-        );
+        registerNativeElements(root, state.value, reactiveNodes);
 
-        reconcile(
-            reactiveNodes,
-            reactiveNodes.list,
-            {
-                name: {
-                    value: "Mike",
-                    dependents: [],
-                    dependencies: [],
-                },
-            },
-            ["name"]
-        );
+        state.updateGlobalState("name", "Mike");
+
+        reconcile(reactiveNodes, reactiveNodes.list[0], state, ["name"]);
 
         expect(getByText(root, "Mike")).toBeInTheDocument();
     });
@@ -55,25 +39,14 @@ describe("reconcile", () => {
         document.body.appendChild(root);
 
         const reactiveNodes = createReactiveNodes();
+        const state = createState();
+        state.initializeGlobalState("checked", false);
 
-        registerNativeElements(
-            root,
-            { checked: { value: "false", dependents: [], dependencies: [] } },
-            reactiveNodes
-        );
+        registerNativeElements(root, state.value, reactiveNodes);
 
-        reconcile(
-            reactiveNodes,
-            reactiveNodes.list,
-            {
-                checked: {
-                    value: true,
-                    dependents: [],
-                    dependencies: [],
-                },
-            },
-            ["checked"]
-        );
+        state.updateGlobalState("checked", true);
+
+        reconcile(reactiveNodes, reactiveNodes.list[0], state, ["checked"]);
 
         expect(
             getByTestId(root, "checkbox").getAttribute("data-attribute-checked")

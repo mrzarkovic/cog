@@ -6,6 +6,7 @@ import {
     ReactiveNode,
     ReactiveNodesList,
     State,
+    StateObject,
 } from "../types";
 import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { removeAllEventListeners } from "../eventListeners/removeAllEventListeners";
@@ -34,7 +35,8 @@ function updateCustomElement(
     content: string | undefined,
     attributes: ChangedAttribute[] | undefined,
     reactiveNodes: ReactiveNodesList,
-    nodesToReconcile: ReactiveNode[]
+    state: StateObject,
+    updatedKeys: string[]
 ) {
     const changedAttributes = attributes?.slice() ?? [];
 
@@ -69,11 +71,7 @@ function updateCustomElement(
             convertAttributeName(a.name)
         );
 
-        if (
-            nodesToReconcile.filter((n) => n.id === reactiveNode.id).length == 0
-        ) {
-            nodesToReconcile.push(reactiveNode);
-        }
+        reconcile(reactiveNodes, reactiveNode, state, updatedKeys);
     }
 }
 
@@ -131,7 +129,8 @@ function handleNodeChanges(
     element: HTMLElement,
     localState: State,
     reactiveNodes: ReactiveNodesList,
-    nodesToReconcile: ReactiveNode[]
+    state: StateObject,
+    updatedKeys: string[]
 ) {
     for (let i = 0; i < changedNodes.length; i++) {
         const change = changedNodes[i];
@@ -147,7 +146,8 @@ function handleNodeChanges(
                 change.content,
                 change.attributes,
                 reactiveNodes,
-                nodesToReconcile
+                state,
+                updatedKeys
             );
         } else {
             const { addChildren, removeChildren } = handleChildrenChanges(
@@ -199,53 +199,63 @@ function handleChildrenChanges(
 
 export const reconcile = (
     reactiveNodes: ReactiveNodesList,
-    nodesToReconcile: ReactiveNode[],
-    state: State,
+    reactiveNode: ReactiveNode,
+    state: StateObject,
     stateChanges: string[]
 ) => {
-    for (let nodeIndex = 0; nodeIndex < nodesToReconcile.length; nodeIndex++) {
-        const reactiveNode = nodesToReconcile[nodeIndex];
-        const localStateChanges = [
-            ...stateChanges,
-            ...reactiveNode.newAttributes,
-        ];
+    const localStateChanges = stateChanges.concat(reactiveNode.newAttributes);
+    let completeState = state.value;
 
-        reactiveNode.newAttributes = [];
+    if (
+        state.templates &&
+        reactiveNode.templateName &&
+        state.templates[reactiveNode.templateName]
+    ) {
+        const templateState =
+            state.templates[reactiveNode.templateName].customElements[
+                reactiveNode.id
+            ];
+        completeState = Object.assign({}, state.value, templateState);
+    }
 
-        const localState = getLocalState(
-            reactiveNode.parentId,
-            reactiveNode.attributes,
-            state,
-            localStateChanges,
-            nodesToReconcile
-        );
+    reactiveNode.newAttributes = [];
 
-        const updatedContent = evaluateTemplate(
-            reactiveNode.template,
-            reactiveNode.expressions,
-            localState,
-            localStateChanges
-        );
+    const localState = getLocalState(
+        reactiveNode.parentId,
+        reactiveNode.attributes,
+        completeState,
+        localStateChanges,
+        reactiveNodes.list
+    );
 
-        const oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(
+    const updatedContent = evaluateTemplate(
+        reactiveNode.template,
+        reactiveNode.expressions,
+        localState,
+        localStateChanges
+    );
+
+    const oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(
+        true
+    ) as CogHTMLElement;
+    const newElement = elementFromString(updatedContent);
+
+    const changedNodes = compareNodes(oldElement, newElement);
+
+    if (changedNodes.length > 0) {
+        reactiveNode.lastTemplateEvaluation = newElement.cloneNode(
             true
         ) as CogHTMLElement;
-        const newElement = elementFromString(updatedContent);
-        const changedNodes = compareNodes(oldElement, newElement);
 
-        if (changedNodes.length > 0) {
-            nodesToReconcile[nodeIndex].lastTemplateEvaluation =
-                newElement.cloneNode(true) as CogHTMLElement;
-
-            handleNodeChanges(
-                changedNodes,
-                oldElement,
-                newElement,
-                reactiveNode.element,
-                localState,
-                reactiveNodes,
-                nodesToReconcile
-            );
-        }
+        handleNodeChanges(
+            changedNodes,
+            oldElement,
+            newElement,
+            reactiveNode.element,
+            localState,
+            reactiveNodes,
+            state,
+            stateChanges
+        );
     }
 };

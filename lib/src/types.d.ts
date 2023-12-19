@@ -1,6 +1,6 @@
 export interface Cog {
     render: (rootElement: HTMLElement) => void;
-    variable: <T>(name: string, value: T) => {
+    variable: <T>(name: string, value: T, template?: TemplateName) => {
         set value(newVal: T);
         get value(): T;
         set: (newVal: T) => void;
@@ -17,7 +17,7 @@ export type Attribute = {
     expressions: Expression[];
     reactive: boolean;
 };
-type ReactiveNodeId = number;
+export type ReactiveNodeId = number;
 export type ReactiveNode = {
     id: ReactiveNodeId;
     parentId: ReactiveNodeId | null;
@@ -28,6 +28,7 @@ export type ReactiveNode = {
     expressions: Expression[];
     shouldUpdate: boolean;
     newAttributes: string[];
+    templateName: TemplateName | null;
 };
 export type UnknownFunction = (...args: unknown[]) => unknown;
 export type ChangedAttribute = {
@@ -43,12 +44,32 @@ export type ChangedNode = {
 };
 export type StateObject = {
     state: State | null;
-    updatedKeys: string[];
+    templates: StateTemplates | null;
+    updatedElements: ReactiveNodeId[];
+    elementsUpdatedKeys: Record<ReactiveNodeId, StateKey[]>;
     get value(): State;
-    set: <T>(name: string, value: T) => void;
-    registerUpdate: (key: string) => void;
+    registerTemplateState(template: TemplateName, elementId: ReactiveNodeId): void;
+    getTemplateState(template: TemplateName): TemplateState;
+    initializeTemplateState: (template: TemplateName, stateKey: StateKey, value: unknown, proxy?: (name: StateKey, value: unknown[]) => unknown[]) => void;
+    updateTemplateState(template: TemplateName, elementId: ReactiveNodeId, stateKey: StateKey, value: unknown): void;
+    initializeGlobalState: <T>(stateKey: StateKey, value: T) => void;
+    updateGlobalState: <T>(stateKey: StateKey, value: T) => void;
+    _registerGlobalStateUpdate: (stateKey: StateKey) => void;
+    _registerStateUpdate: (elementId: ReactiveNodeId, stateKey: StateKey) => void;
     clearUpdates: () => void;
 };
+export type TemplateName = string;
+export type StateTemplates = Record<TemplateName, TemplateState>;
+export type TemplateState = {
+    keys: StateKey[];
+    initial: Record<StateKey, TemplateStateInitialValue>;
+    customElements: Record<ReactiveNodeId, CustomElementState>;
+};
+export type TemplateStateInitialValue = {
+    value: unknown;
+    proxy?: (name: StateKey, value: unknown[]) => unknown[];
+};
+export type CustomElementState = Record<StateKey, StateValue>;
 export type StateKey = string;
 export type State = Record<StateKey, StateValue>;
 export type StateValue = {
@@ -87,4 +108,3 @@ export type Expression = {
     dependencies: string[];
     evaluated: string | null;
 };
-export {};

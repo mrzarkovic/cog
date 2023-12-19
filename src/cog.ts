@@ -1,4 +1,4 @@
-import { type Cog, UnknownFunction } from "./types";
+import { type Cog, UnknownFunction, StateValue } from "./types";
 import { registerTemplates } from "./nodes/registerTemplates";
 import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
 import { registerNativeElements } from "./nodes/registerNativeElements";
@@ -13,23 +13,17 @@ export const init = (): Cog => {
     const state = createState();
 
     function reRender() {
-        const uniqueKeys: Record<number, boolean> = {};
-        state.updatedKeys
-            .map((stateKey) => state.value[stateKey].dependents)
-            .flat()
-            .forEach((id) => (uniqueKeys[id] = true));
-        const uniqueDependents = Object.keys(uniqueKeys);
+        state.updatedElements.forEach((elementId) => {
+            const reactiveNode = reactiveNodes.get(elementId);
 
-        const nodesToReconcile = uniqueDependents.map((id) =>
-            reactiveNodes.get(Number(id))
-        );
+            reconcile(
+                reactiveNodes,
+                reactiveNode,
+                state,
+                state.elementsUpdatedKeys[elementId]
+            );
+        });
 
-        reconcile(
-            reactiveNodes,
-            nodesToReconcile,
-            state.value,
-            state.updatedKeys
-        );
         reactiveNodes.clean();
         state.clearUpdates();
     }
@@ -37,11 +31,7 @@ export const init = (): Cog => {
     let lastFrameTime = 0;
     const frameDelay = 1000 / 60;
 
-    function scheduleReRender(stateKey: string) {
-        state.value[stateKey].computants.forEach((computant) => {
-            state.registerUpdate(computant);
-        });
-        state.registerUpdate(stateKey);
+    function scheduleReRender() {
         if (updateStateTimeout !== null) {
             cancelAnimationFrame(updateStateTimeout);
         }
@@ -54,67 +44,164 @@ export const init = (): Cog => {
     }
 
     const render = (rootElement: HTMLElement) => {
-        registerNativeElements(rootElement, state.value, reactiveNodes);
-        registerTemplates(rootElement, state.value, reactiveNodes);
         addAllEventListeners(rootElement, state.value);
+        registerNativeElements(rootElement, state.value, reactiveNodes);
+        registerTemplates(rootElement, state, reactiveNodes);
     };
 
-    const setFunctionValue = (name: string, value: UnknownFunction) => {
-        state.set(name, (...args: unknown[]) => {
-            stateFunctionExecuting = name;
+    const getFunctionValue =
+        (name: string, value: UnknownFunction) =>
+        (cogId: unknown, ...args: unknown[]) => {
+            if (typeof cogId === "string") {
+                if (cogId.indexOf("cogId:") === 0) {
+                    cogId = cogId.replace("cogId:", "");
+                } else {
+                    args.unshift(cogId);
+                    cogId = null;
+                }
+            }
+            stateFunctionExecuting = cogId ? `${name}:${cogId}` : name;
             const result = value(...args);
             stateFunctionExecuting = null;
             return result;
-        });
-    };
+        };
 
-    const setArrayValue = (name: string, value: unknown[]) => {
-        const valueProxy = new Proxy(value, {
+    const getArrayValue = (name: string, value: unknown[]) =>
+        new Proxy(value, {
             get(target, propKey) {
                 const originalMethod = target[
                     propKey as keyof typeof target
                 ] as UnknownFunction;
                 if (propKey === "push") {
                     return (...args: unknown[]) => {
-                        scheduleReRender(name);
+                        const parts = stateFunctionExecuting?.split(".");
+
+                        if (parts && parts.length > 1) {
+                            const elementId = Number(parts[1].split(":")[1]);
+                            state._registerStateUpdate(elementId, name);
+                        } else {
+                            state.value[name].computants.forEach(
+                                (computant) => {
+                                    state._registerGlobalStateUpdate(computant);
+                                }
+                            );
+                            state._registerGlobalStateUpdate(name);
+                        }
+
+                        scheduleReRender();
                         return originalMethod.apply(target, args);
                     };
                 }
                 return originalMethod;
             },
         });
-        state.set(name, valueProxy);
-    };
 
-    const variable = <T>(name: string, value: T) => {
+    const variable = <T>(name: string, value: T, template?: string) => {
+        let fullStateName = name;
+        if (template) {
+            fullStateName = `${template}.${name}`;
+        }
+
         if (value instanceof Function) {
-            setFunctionValue(name, value as UnknownFunction);
-        } else if (Array.isArray(value)) {
-            setArrayValue(name, value);
+            value = getFunctionValue(
+                fullStateName,
+                value as UnknownFunction
+            ) as T;
+        }
+
+        if (template) {
+            let valueProxy = undefined;
+            if (Array.isArray(value)) {
+                valueProxy = getArrayValue;
+            }
+            state.initializeTemplateState(template, name, value, valueProxy);
         } else {
-            state.set(name, value);
+            if (Array.isArray(value)) {
+                value = getArrayValue(name, value) as T;
+            }
+            state.initializeGlobalState(name, value);
         }
 
         return {
             get value() {
+                if (template) {
+                    const parts = stateFunctionExecuting?.split(":") || [];
+                    const elementId = parts[1] ? Number(parts[1]) : null;
+                    if (elementId === null) {
+                        throw new Error(
+                            `Can't use outside of a template: ${name} (for ${template})`
+                        );
+                    }
+                    const callerParts = parts![0].split(".");
+                    const callerTemplate = callerParts[0];
+                    const functionName = callerParts[1];
+                    if (callerTemplate !== template) {
+                        throw new Error(
+                            `Can't use from another template: ${name} (for ${template}, used in ${callerTemplate})`
+                        );
+                    }
+
+                    const stateValue = state.getTemplateState(template)
+                        .customElements[elementId][name] as StateValue;
+
+                    if (
+                        functionName &&
+                        stateValue.computants.indexOf(functionName) === -1
+                    ) {
+                        stateValue.computants.push(functionName);
+                    }
+
+                    return stateValue.value as T;
+                }
+
                 if (
                     stateFunctionExecuting !== null &&
-                    state.value[name].computants.indexOf(
+                    (state.value[name] as StateValue).computants.indexOf(
                         stateFunctionExecuting
                     ) === -1
                 ) {
-                    state.value[name].computants.push(stateFunctionExecuting);
+                    (state.value[name] as StateValue).computants.push(
+                        stateFunctionExecuting
+                    );
                 }
 
                 return state.value[name].value as T;
             },
             set value(newVal: T) {
-                state.set(name, newVal);
-                scheduleReRender(name);
+                if (template) {
+                    const cogId = stateFunctionExecuting?.split(":")[1];
+                    if (!cogId) {
+                        throw new Error("Can't call outside of a template");
+                    }
+
+                    state.updateTemplateState(
+                        template,
+                        Number(cogId),
+                        name,
+                        newVal
+                    );
+                } else {
+                    state.updateGlobalState(name, newVal);
+                }
+                scheduleReRender();
             },
             set: (newVal: T) => {
-                state.set(name, newVal);
-                scheduleReRender(name);
+                if (template) {
+                    const cogId = stateFunctionExecuting?.split(":")[1];
+                    if (!cogId) {
+                        throw new Error("Can't call outside of a template");
+                    }
+
+                    state.updateTemplateState(
+                        template,
+                        Number(cogId),
+                        name,
+                        newVal
+                    );
+                } else {
+                    state.updateGlobalState(name, newVal);
+                }
+                scheduleReRender();
             },
         };
     };
