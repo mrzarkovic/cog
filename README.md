@@ -7,7 +7,7 @@
 [![dependencies](https://img.shields.io/badge/dependencies-0-blue)](https://www.npmjs.com/package/@mzrk/cog?activeTab=dependencies)
 [![npm](https://img.shields.io/npm/v/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog)
 ![gzip](https://img.badgesize.io/mrzarkovic/Cog/main/lib/cog.js.svg?compression=gzip&label=gzip&max=8000&softmax=5000)
-![Lines](https://img.shields.io/badge/coverage-95.55%25-brightgreen.svg?style=flat)
+![Lines](https://img.shields.io/badge/coverage-81.16%25-yellow.svg?style=flat)
 ![license](https://img.shields.io/npm/l/@mzrk/cog)
 [![downloads](https://img.shields.io/npm/dt/@mzrk/cog)](https://www.npmjs.com/package/@mzrk/cog?activeTab=versions)
 
