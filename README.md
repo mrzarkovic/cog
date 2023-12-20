@@ -129,6 +129,8 @@ Placeholders in the template are replaced with the corresponding data from the c
 <my-text>I'm the child</my-text>
 ```
 
+### Custom attributes as props
+
 Custom data attributes (prefixed with `data-`) can be used to pass additional data to the template. Cog converts these attribute names to camelCase and makes them available as variables inside the template.
 
 ```html
@@ -142,6 +144,23 @@ Custom data attributes (prefixed with `data-`) can be used to pass additional da
 
 <!-- Usage -->
 <my-checkbox data-label="Check it" data-is-checked="true"></my-checkbox>
+```
+
+### Local Component State
+
+Using the `variable()` method we can scope the reactive variables to specific templates.
+
+```js
+const count = variable("count", 0, "my-counter");
+const increment = variable("increment", () => count++, "my-counter");
+```
+
+We can use local `count` and `increment` in Template like this:
+
+```html
+<template id="my-counter">
+    <button data-on-click="increment()">Count is {{ count }}</button>
+</template>
 ```
 
 ## Documentation
