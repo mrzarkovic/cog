@@ -1,0 +1,13 @@
+<template id="toggle-checkbox">
+    <div>
+        <input
+            class="checkbox"
+            type="checkbox"
+            data-attribute-checked="{{ checked }}"
+            data-on-change="toggleChecked()"
+        />
+        <button class="btn btn-primary" data-on-click="toggleChecked()">
+            Toggle
+        </button>
+    </div>
+</template>

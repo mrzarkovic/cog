@@ -1,0 +1,9 @@
+<template id="x-parent">
+    <div class="p-2">
+        {{ names.map( (n, i) => `
+        <x-child data-count="{{ dataParent }}" data-child="${i}"
+            >${n} ${ dataParent}
+        </x-child>
+        `)}}
+    </div>
+</template>

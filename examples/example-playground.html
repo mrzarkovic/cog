@@ -17,40 +17,7 @@
             >
                 {{ fps }}
             </div>
-            <template id="my-template">
-                <div>Hello {{ dataName }}! {{ dataCount }}</div>
-            </template>
-            <template id="x-child">
-                <div class="flex">
-                    <div>
-                        {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
-                        Number(dataCount) % (Number(dataChild) + 2) }}
-                    </div>
-                    <div class="pl-2">{{ children }}</div>
-                </div>
-            </template>
-            <template id="x-child2">
-                <div class="flex">
-                    <div class="pr-2">{{ children }}.</div>
-                    <div>
-                        {{ dataCount }} % {{ Number(dataChild) + 2 }} = {{
-                        Number(dataCount) % (Number(dataChild) + 2) }}
-                    </div>
-                </div>
-            </template>
-            <template id="x-parent">
-                <div class="p-2">
-                    {{ names.map( (n, i) => `
-                    <x-child data-count="{{ dataParent }}" data-child="${i}"
-                        >${n} ${ dataParent}
-                    </x-child>
-                    `)}}
-                </div>
-            </template>
-            <my-template
-                data-name="World"
-                data-count="{{ count }}"
-            ></my-template>
+            <x-greeting data-name="World" data-count="{{ count }}"></x-greeting>
             <div>Count: {{ `<span>${count}</span>` }}</div>
             <div class="p-4">
                 <div>1 {{ count % 3 == 0 ? count : '' }}</div>
@@ -58,44 +25,10 @@
                 <div>3 {{ count % 3 == 2 ? count : '' }}</div>
             </div>
             <div data-id="{{ count }}">Hello World!</div>
-            <div>
-                <input
-                    class="checkbox"
-                    type="checkbox"
-                    data-attribute-checked="{{ checked }}"
-                    onchange="toggleChecked()"
-                />
-                <button class="btn btn-primary" onclick="toggleChecked()">
-                    Toggle
-                </button>
-            </div>
-            <div class="flex items-center">
-                <button onclick="increment()" class="btn btn-success">
-                    Increment
-                </button>
-                <button onclick="decrement()" class="btn btn-error">
-                    Decrement
-                </button>
-                <div class="p-4">{{ count }}</div>
-            </div>
-            <div>
-                {{ isOk() ? `<span>yes</span><span>maybe</span>` :
-                `<span>no</span>` }}
-            </div>
-            <div class="flex">
-                <div class="flex-1">
-                    <div class="p-2">
-                        {{ new Array(count).fill(0).map( (n, i) => `
-                        <x-child2 data-count="${count}" data-child="${i}"
-                            >${ count }</x-child2
-                        >
-                        `)}}
-                    </div>
-                </div>
-                <div class="flex-1">
-                    <x-parent data-parent="{{ count }}"></x-parent>
-                </div>
-            </div>
+            <toggle-checkbox></toggle-checkbox>
+            <count-control></count-control>
+            <is-ok></is-ok>
+            <x-list></x-list>
         </div>
         <script src="/examples/dist/ts-playground.js"></script>
     </body>

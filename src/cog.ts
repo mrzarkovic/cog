@@ -11,6 +11,7 @@ export const init = (): Cog => {
     const reactiveNodes = createReactiveNodes();
     let updateStateTimeout: number | null = null;
     const state = createState();
+    const components: Record<string, string[]> = {};
 
     function reRender() {
         state.updatedElements.forEach((elementId) => {
@@ -44,10 +45,35 @@ export const init = (): Cog => {
         });
     }
 
-    const render = (rootElement: HTMLElement) => {
+    const render = async (rootElement: HTMLElement) => {
+        const componentNames = Object.keys(components);
+        for (let i = 0; i < componentNames.length; i++) {
+            const componentName = componentNames[i];
+            const response = await fetch(
+                `components/${componentName}/index.html`
+            );
+            const data = await response.text();
+
+            rootElement.innerHTML += data;
+
+            for (let j = 0; j < components[componentName].length; j++) {
+                const templateName = components[componentName][j];
+                const response = await fetch(
+                    `components/${componentName}/${templateName}.html`
+                );
+                const data = await response.text();
+
+                rootElement.innerHTML += data;
+            }
+        }
+
         addAllEventListeners(rootElement, state.value);
         registerNativeElements(rootElement, state.value, reactiveNodes);
         registerTemplates(rootElement, state, reactiveNodes);
+    };
+
+    const component = (name: string, templates?: string[]) => {
+        components[name] = templates || [];
     };
 
     const getFunctionValue =
@@ -210,7 +236,8 @@ export const init = (): Cog => {
     return {
         render,
         variable,
+        component,
     };
 };
 
-export const { variable, render } = init();
+export const { variable, render, component } = init();

@@ -1,6 +1,8 @@
 import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
+import { getChangedAttributes } from "../attributes/getChangedAttributes";
 import { getLocalState } from "../attributes/getLocalState";
+import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { extractTemplateExpressions } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
@@ -205,6 +207,11 @@ function registerChildReactiveNodes(
             newElement.parentElement as HTMLElement,
             localState
         );
+    }
+
+    const newAttributes = getChangedAttributes(element, newElement);
+    for (let i = 0; i < newAttributes.length; i++) {
+        handleBooleanAttribute(newElement, newAttributes[i]);
     }
 
     newElement.cogAnchorId = elementId;

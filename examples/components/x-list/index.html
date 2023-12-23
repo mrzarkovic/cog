@@ -1,0 +1,16 @@
+<template id="x-list">
+    <div class="flex">
+        <div class="flex-1">
+            <div class="p-2">
+                {{ new Array(count).fill(0).map( (n, i) => `
+                <x-child2 data-count="${count}" data-child="${i}"
+                    >${ count }</x-child2
+                >
+                `)}}
+            </div>
+        </div>
+        <div class="flex-1">
+            <x-parent data-parent="{{ count }}"></x-parent>
+        </div>
+    </div>
+</template>

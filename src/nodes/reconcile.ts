@@ -65,6 +65,11 @@ function updateCustomElement(
 
     if (newAttributes.length) {
         const reactiveNode = reactiveNodes.get(originalNode.cogAnchorId);
+        if (!reactiveNode) {
+            throw new Error(
+                `Reactive node not found: ${originalNode.nodeName}`
+            );
+        }
         if (reactiveNode.element !== null) {
             reconcileReactiveNode(
                 reactiveNode,

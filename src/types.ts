@@ -1,5 +1,6 @@
 export interface Cog {
     render: (rootElement: HTMLElement) => void;
+    component: (name: string, templates?: string[]) => void;
     variable: <T>(
         name: string,
         value: T,
