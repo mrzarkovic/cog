@@ -5,8 +5,8 @@ export function getLocalState(
     parentId: number | null,
     attributes: Attribute[],
     globalState: State,
-    stateChanges: string[],
-    reactiveNodes: ReactiveNode[]
+    reactiveNodes: ReactiveNode[],
+    stateChanges: string[] = []
 ) {
     const parentNode = reactiveNodes.find((rn) => rn.id === parentId);
 
@@ -18,8 +18,8 @@ export function getLocalState(
         parentNode!.parentId,
         parentNode!.attributes,
         globalState,
-        stateChanges,
-        reactiveNodes
+        reactiveNodes,
+        stateChanges
     );
 
     return Object.assign(

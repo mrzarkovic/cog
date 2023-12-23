@@ -12,6 +12,7 @@ describe("getLocalState", () => {
                         name: "data-parent",
                         value: "parent",
                         expressions: [],
+                        dependents: [],
                     },
                 ],
             },
@@ -23,6 +24,7 @@ describe("getLocalState", () => {
                         name: "data-parent2",
                         value: "parent2",
                         expressions: [],
+                        dependents: [],
                     },
                 ],
             },
@@ -34,6 +36,7 @@ describe("getLocalState", () => {
                         name: "data-parent3",
                         value: "parent3",
                         expressions: [],
+                        dependents: [],
                     },
                 ],
             },
@@ -43,6 +46,7 @@ describe("getLocalState", () => {
                 name: "data-child",
                 value: "child",
                 expressions: [],
+                dependents: [],
             },
         ];
         const globalState = {
@@ -57,8 +61,8 @@ describe("getLocalState", () => {
             2,
             elementAttributes,
             globalState,
-            [],
-            reactiveNodes
+            reactiveNodes,
+            []
         );
 
         expect(localState).toStrictEqual({

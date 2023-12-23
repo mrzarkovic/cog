@@ -23,6 +23,7 @@ export type Attribute = {
     value: string;
     expressions: Expression[];
     reactive: boolean;
+    dependents: ReactiveNodeId[];
 };
 
 export type ReactiveNodeId = number;
@@ -30,9 +31,9 @@ export type ReactiveNodeId = number;
 export type ReactiveNode = {
     id: ReactiveNodeId;
     parentId: ReactiveNodeId | null;
-    element: HTMLElement;
+    element: HTMLElement | null;
     template: HTMLString;
-    lastTemplateEvaluation: CogHTMLElement;
+    lastTemplateEvaluation: CogHTMLElement | null;
     attributes: Attribute[];
     expressions: Expression[];
     shouldUpdate: boolean;
@@ -96,15 +97,13 @@ export type StateTemplates = Record<TemplateName, TemplateState>;
 export type TemplateState = {
     keys: StateKey[];
     initial: Record<StateKey, TemplateStateInitialValue>;
-    customElements: Record<ReactiveNodeId, CustomElementState>;
+    customElements: Record<ReactiveNodeId, State>;
 };
 
 export type TemplateStateInitialValue = {
     value: unknown;
     proxy?: (name: StateKey, value: unknown[]) => unknown[];
 };
-
-export type CustomElementState = Record<StateKey, StateValue>;
 
 export type StateKey = string;
 export type State = Record<StateKey, StateValue>;
@@ -136,6 +135,18 @@ export type ReactiveNodesList = {
     ) => void;
     clean: () => void;
     id: () => number;
+    new: (
+        id: ReactiveNodeId,
+        parentId: ReactiveNodeId | null,
+        attributes: Attribute[],
+        templateName: TemplateName | null,
+        expressions?: Expression[],
+        template?: HTMLString,
+        element?: HTMLElement | null,
+        lastTemplateEvaluation?: CogHTMLElement | null,
+        shouldUpdate?: boolean,
+        newAttributes?: string[]
+    ) => ReactiveNode;
 };
 
 export type CogHTMLElement = HTMLElement & {

@@ -24,7 +24,8 @@ export const init = (): Cog => {
             );
         });
 
-        reactiveNodes.clean();
+        // TODO: Figure this one out
+        // reactiveNodes.clean();
         state.clearUpdates();
     }
 

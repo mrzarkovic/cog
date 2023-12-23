@@ -1,3 +1,5 @@
+import { isCustomElement } from "./isCustomElement";
+
 export function findNodes<T>(
     rootElement: Node,
     xpath: string,
@@ -24,3 +26,13 @@ export function findNodes<T>(
 
     return elements;
 }
+
+export const findReactiveNodes = (rootElement: Node) => {
+    const elements = findNodes<HTMLElement>(
+        rootElement,
+        "self::*[text()[contains(., '{{')] and text()[contains(., '}}')]] | self::*[@*[contains(., '{{') and contains(., '}}')]] | .//*[text()[contains(., '{{')] and text()[contains(., '}}')]] | .//*[@*[contains(., '{{') and contains(., '}}')]]",
+        (element) => !isCustomElement(element)
+    );
+
+    return elements;
+};

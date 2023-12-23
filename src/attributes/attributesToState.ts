@@ -6,7 +6,7 @@ import { convertAttributeValue } from "./convertAttributeValue";
 export function attributesToState(
     attributes: Attribute[],
     state: State,
-    stateChanges: string[]
+    stateChanges: string[] = []
 ) {
     const localState: State = Object.assign({}, state);
 

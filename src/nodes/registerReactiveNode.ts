@@ -1,3 +1,4 @@
+import { convertAttributeName } from "../attributes/convertAttributeName";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
@@ -14,12 +15,25 @@ import { elementFromString } from "./elementFromString";
 export function assignDependents(
     elementId: number,
     expressions: Expression[],
-    state: State
+    state: State,
+    attributes: Attribute[]
 ) {
     expressions.map((expression) => {
         expression.dependencies.forEach((dependency) => {
             if (state[dependency].dependents.indexOf(elementId) === -1) {
                 state[dependency].dependents.push(elementId);
+            }
+            const attribute = attributes.find(
+                (attribute) =>
+                    convertAttributeName(attribute.name) === dependency
+            );
+            if (attribute) {
+                if (!attribute.dependents) {
+                    attribute.dependents = [];
+                }
+                if (attribute.dependents.indexOf(elementId) === -1) {
+                    attribute.dependents.push(elementId);
+                }
             }
         });
     });
@@ -48,20 +62,20 @@ export function registerReactiveNode(
 
     const element = elementFromString(updatedContent);
 
-    assignDependents(elementId, expressions, state);
+    assignDependents(elementId, expressions, state, attributes);
 
-    reactiveNodes.add({
-        id: elementId,
-        parentId,
-        element,
-        template: refinedTemplate,
-        lastTemplateEvaluation: element.cloneNode(true) as CogHTMLElement,
-        attributes,
-        expressions,
-        shouldUpdate: false,
-        newAttributes: [],
-        templateName,
-    });
+    reactiveNodes.add(
+        reactiveNodes.new(
+            elementId,
+            parentId,
+            attributes,
+            templateName,
+            expressions,
+            refinedTemplate,
+            element,
+            element.cloneNode(true) as CogHTMLElement
+        )
+    );
 
     originalElement.parentElement?.replaceChild(element, originalElement);
 

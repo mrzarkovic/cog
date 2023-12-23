@@ -13,6 +13,7 @@ export const getAttributes = (
             value: attribute.value,
             expressions,
             reactive: !!expressions.length,
+            dependents: [],
         };
     });
 
