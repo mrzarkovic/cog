@@ -62,17 +62,60 @@ function updateCustomElement(
 
     if (newAttributes.length) {
         const reactiveNode = reactiveNodes.get(originalNode.cogAnchorId);
-        const mergedAttributes = mergeAttributes(
-            reactiveNode.attributes,
-            newAttributes
-        );
-        reactiveNode.attributes = mergedAttributes;
-        reactiveNode.newAttributes = reactiveNode.attributes.map((a) =>
-            convertAttributeName(a.name)
-        );
+        if (reactiveNode.element !== null) {
+            reconcileReactiveNode(
+                reactiveNode,
+                reactiveNodes,
+                newAttributes,
+                state,
+                updatedKeys
+            );
+        } else {
+            const attributesDependents = {};
+            for (let i = 0; i < reactiveNode.attributes.length; i++) {
+                const attribute = reactiveNode.attributes[i];
+                if (attribute.dependents && attribute.dependents.length) {
+                    attributesDependents[attribute.name] = attribute.dependents;
+                }
+            }
+            for (let i = 0; i < newAttributes.length; i++) {
+                const attributeDependents =
+                    attributesDependents[newAttributes[i].name];
+                for (let j = 0; j < attributeDependents.length; j++) {
+                    const reactiveNode = reactiveNodes.get(
+                        attributeDependents[j]
+                    );
 
-        reconcile(reactiveNodes, reactiveNode, state, updatedKeys);
+                    reconcileReactiveNode(
+                        reactiveNode,
+                        reactiveNodes,
+                        newAttributes,
+                        state,
+                        updatedKeys
+                    );
+                }
+            }
+        }
     }
+}
+
+function reconcileReactiveNode(
+    reactiveNode,
+    reactiveNodes,
+    newAttributes,
+    state,
+    updatedKeys
+) {
+    const mergedAttributes = mergeAttributes(
+        reactiveNode.attributes,
+        newAttributes
+    );
+    reactiveNode.attributes = mergedAttributes;
+    reactiveNode.newAttributes = reactiveNode.attributes.map((a) =>
+        convertAttributeName(a.name)
+    );
+
+    reconcile(reactiveNodes, reactiveNode, state, updatedKeys);
 }
 
 function handleContentChange(
@@ -224,8 +267,8 @@ export const reconcile = (
         reactiveNode.parentId,
         reactiveNode.attributes,
         completeState,
-        localStateChanges,
-        reactiveNodes.list
+        reactiveNodes.list,
+        localStateChanges
     );
 
     const updatedContent = evaluateTemplate(

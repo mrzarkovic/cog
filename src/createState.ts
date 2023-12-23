@@ -1,4 +1,10 @@
-import { ReactiveNodeId, StateKey, StateObject, TemplateName } from "./types";
+import {
+    ReactiveNodeId,
+    StateKey,
+    StateObject,
+    TemplateName,
+    UnknownFunction,
+} from "./types";
 
 export function createState(): StateObject {
     return {
@@ -32,6 +38,15 @@ export function createState(): StateObject {
                         this.templates[template].initial[stateKey].proxy;
                     if (proxy) {
                         value = proxy(stateKey, (value as unknown[]).slice(0));
+                    }
+                    if (value instanceof Function) {
+                        const originalFunction = value as UnknownFunction;
+                        value = (...args: unknown[]) => {
+                            return originalFunction(
+                                ...args,
+                                `cogId:${elementId}`
+                            );
+                        };
                     }
                     this.templates[template].customElements[elementId][
                         stateKey

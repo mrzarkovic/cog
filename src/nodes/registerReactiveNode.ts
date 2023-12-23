@@ -1,3 +1,4 @@
+import { convertAttributeName } from "../attributes/convertAttributeName";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
@@ -20,6 +21,29 @@ export function assignDependents(
         expression.dependencies.forEach((dependency) => {
             if (state[dependency].dependents.indexOf(elementId) === -1) {
                 state[dependency].dependents.push(elementId);
+            }
+        });
+    });
+}
+
+export function assignDependents2(
+    elementId: number,
+    expressions: Expression[],
+    attributes: Attribute[]
+) {
+    expressions.map((expression) => {
+        expression.dependencies.forEach((dependency) => {
+            const attribute = attributes.find(
+                (attribute) =>
+                    convertAttributeName(attribute.name) === dependency
+            );
+            if (attribute) {
+                if (!attribute.dependents) {
+                    attribute.dependents = [];
+                }
+                if (attribute.dependents.indexOf(elementId) === -1) {
+                    attribute.dependents.push(elementId);
+                }
             }
         });
     });
@@ -49,6 +73,7 @@ export function registerReactiveNode(
     const element = elementFromString(updatedContent);
 
     assignDependents(elementId, expressions, state);
+    assignDependents2(elementId, expressions, attributes);
 
     reactiveNodes.add({
         id: elementId,

@@ -10,7 +10,7 @@ export const evaluateTemplate = (
     template: string,
     expressions: Expression[],
     state: State,
-    stateChanges: string[]
+    stateChanges: string[] = []
 ): string => {
     let restOfContent = template;
     let updatedContent = "";

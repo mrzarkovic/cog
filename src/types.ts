@@ -96,15 +96,13 @@ export type StateTemplates = Record<TemplateName, TemplateState>;
 export type TemplateState = {
     keys: StateKey[];
     initial: Record<StateKey, TemplateStateInitialValue>;
-    customElements: Record<ReactiveNodeId, CustomElementState>;
+    customElements: Record<ReactiveNodeId, State>;
 };
 
 export type TemplateStateInitialValue = {
     value: unknown;
     proxy?: (name: StateKey, value: unknown[]) => unknown[];
 };
-
-export type CustomElementState = Record<StateKey, StateValue>;
 
 export type StateKey = string;
 export type State = Record<StateKey, StateValue>;
