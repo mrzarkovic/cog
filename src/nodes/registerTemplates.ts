@@ -5,6 +5,7 @@ import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { extractTemplateExpressions } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
 import {
+    Attribute,
     CogHTMLElement,
     ReactiveNodesList,
     State,
@@ -102,6 +103,7 @@ function getCustomElementAttributes(element: HTMLElement, state: State) {
         value: element.innerHTML,
         expressions: childrenExpressions,
         reactive: !!childrenExpressions.length,
+        dependents: [],
     });
 
     return attributes;
@@ -137,61 +139,73 @@ function registerCustomElement(
 
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = refinedTemplate;
-        // const element = tempDiv.firstChild as HTMLElement;
 
-        reactiveNodes.add({
-            id: elementId,
-            parentId,
-            element: null,
-            template: "",
-            lastTemplateEvaluation: null,
-            attributes,
-            expressions: [],
-            shouldUpdate: false,
-            newAttributes: [],
-            templateName,
-        });
+        reactiveNodes.add(
+            reactiveNodes.new(elementId, parentId, attributes, templateName)
+        );
 
         const elements = findReactiveNodes(tempDiv);
 
         for (let i = 0; i < elements.length; i++) {
             const element = elements[i];
-            const elementId = reactiveNodes.id();
-            const template = element.outerHTML;
-            state.registerTemplateState(templateName, elementId);
-
-            let templateState: State = {};
-            if (state.templates && state.templates[templateName]) {
-                templateState =
-                    state.templates[templateName].customElements[elementId];
-            }
-
-            const localState = attributesToState(
-                attributes,
-                Object.assign({}, parentState, templateState)
-            );
-
-            const newElement = registerReactiveNode(
-                elementId,
-                reactiveNodes,
+            registerChildReactiveNodes(
                 element,
-                template,
-                localState,
-                attributes,
                 parentId,
-                templateName
+                templateName,
+                attributes,
+                parentState,
+                reactiveNodes,
+                state
             );
-
-            if (newElement.nodeType !== Node.TEXT_NODE) {
-                addAllEventListeners(newElement, localState);
-            }
-
-            newElement.cogAnchorId = elementId;
         }
 
-        const contextEl = tempDiv.firstChild as HTMLElement;
+        const contextEl = tempDiv.firstChild as CogHTMLElement;
         contextEl.cogAnchorId = elementId;
 
         this.parentElement?.replaceChild(contextEl, this);
     };
+}
+
+function registerChildReactiveNodes(
+    element: HTMLElement,
+    parentId: number | null,
+    templateName: string,
+    attributes: Attribute[],
+    parentState: State,
+    reactiveNodes: ReactiveNodesList,
+    state: StateObject
+) {
+    const elementId = reactiveNodes.id();
+    const template = element.outerHTML;
+    state.registerTemplateState(templateName, elementId);
+
+    let templateState: State = {};
+    if (state.templates && state.templates[templateName]) {
+        templateState = state.templates[templateName].customElements[elementId];
+    }
+
+    const localState = attributesToState(
+        attributes,
+        Object.assign({}, parentState, templateState)
+    );
+
+    const newElement = registerReactiveNode(
+        elementId,
+        reactiveNodes,
+        element,
+        template,
+        localState,
+        attributes,
+        parentId,
+        templateName
+    );
+
+    if (newElement.nodeType !== Node.TEXT_NODE) {
+        addAllEventListeners(
+            newElement.parentElement as HTMLElement,
+            localState
+        );
+    }
+
+    newElement.cogAnchorId = elementId;
 }

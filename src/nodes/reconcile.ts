@@ -4,6 +4,7 @@ import {
     ChangedNode,
     CogHTMLElement,
     ReactiveNode,
+    ReactiveNodeId,
     ReactiveNodesList,
     State,
     StateObject,
@@ -48,6 +49,7 @@ function updateCustomElement(
             value: attribute.newValue as string,
             expressions: [],
             reactive: false,
+            dependents: [],
         });
     });
 
@@ -57,6 +59,7 @@ function updateCustomElement(
             value: content,
             expressions: [],
             reactive: false,
+            dependents: [],
         });
     }
 
@@ -71,7 +74,7 @@ function updateCustomElement(
                 updatedKeys
             );
         } else {
-            const attributesDependents = {};
+            const attributesDependents: Record<string, ReactiveNodeId[]> = {};
             for (let i = 0; i < reactiveNode.attributes.length; i++) {
                 const attribute = reactiveNode.attributes[i];
                 if (attribute.dependents && attribute.dependents.length) {
@@ -100,11 +103,11 @@ function updateCustomElement(
 }
 
 function reconcileReactiveNode(
-    reactiveNode,
-    reactiveNodes,
-    newAttributes,
-    state,
-    updatedKeys
+    reactiveNode: ReactiveNode,
+    reactiveNodes: ReactiveNodesList,
+    newAttributes: Attribute[],
+    state: StateObject,
+    updatedKeys: string[]
 ) {
     const mergedAttributes = mergeAttributes(
         reactiveNode.attributes,
@@ -278,7 +281,7 @@ export const reconcile = (
         localStateChanges
     );
 
-    const oldElement = reactiveNode.lastTemplateEvaluation.cloneNode(
+    const oldElement = reactiveNode.lastTemplateEvaluation!.cloneNode(
         true
     ) as CogHTMLElement;
     const newElement = elementFromString(updatedContent);
@@ -294,7 +297,7 @@ export const reconcile = (
             changedNodes,
             oldElement,
             newElement,
-            reactiveNode.element,
+            reactiveNode.element!,
             localState,
             reactiveNodes,
             state,

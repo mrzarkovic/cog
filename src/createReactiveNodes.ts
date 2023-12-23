@@ -1,4 +1,14 @@
-import { ReactiveNodesList, ReactiveNode, ReactiveNodeIndex } from "./types";
+import {
+    ReactiveNodesList,
+    ReactiveNode,
+    ReactiveNodeIndex,
+    CogHTMLElement,
+    Attribute,
+    ReactiveNodeId,
+    HTMLString,
+    Expression,
+    TemplateName,
+} from "./types";
 import { cleanReactiveNodesList } from "./nodes/cleanReactiveNodesList";
 
 export function createReactiveNodes(): ReactiveNodesList {
@@ -28,6 +38,31 @@ export function createReactiveNodes(): ReactiveNodesList {
         },
         id() {
             return this.lastId++;
+        },
+        new(
+            id: ReactiveNodeId,
+            parentId: ReactiveNodeId | null,
+            attributes: Attribute[],
+            templateName: TemplateName | null,
+            expressions: Expression[] = [],
+            template: HTMLString = "",
+            element: HTMLElement | null = null,
+            lastTemplateEvaluation: CogHTMLElement | null = null,
+            shouldUpdate: boolean = false,
+            newAttributes: string[] = []
+        ) {
+            return {
+                id,
+                parentId,
+                element,
+                template,
+                lastTemplateEvaluation,
+                attributes,
+                expressions,
+                templateName,
+                shouldUpdate,
+                newAttributes,
+            };
         },
     };
 }
