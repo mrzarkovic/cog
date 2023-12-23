@@ -13,6 +13,7 @@ describe("getAttributes", () => {
                 value: "test",
                 expressions: [],
                 reactive: false,
+                dependents: [],
             },
         ]);
     });
@@ -37,6 +38,7 @@ describe("getAttributes", () => {
                     },
                 ],
                 reactive: true,
+                dependents: [],
             },
         ]);
     });

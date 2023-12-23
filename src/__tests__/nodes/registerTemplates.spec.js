@@ -9,7 +9,7 @@ describe("registerTemplates", () => {
         const root = document.createElement("div");
         const template = document.createElement("template");
         template.setAttribute("id", "my-element");
-        template.innerHTML = "{{ dataName }}";
+        template.innerHTML = "<div>{{ dataName }}</div>";
         const customElement = document.createElement("my-element");
         customElement.setAttribute("data-name", "John");
         root.appendChild(template);
@@ -20,16 +20,16 @@ describe("registerTemplates", () => {
 
         registerTemplates(root, state, reactiveNodes);
 
-        expect(reactiveNodes.list.length).toBe(1);
+        expect(reactiveNodes.list.length).toBe(2);
     });
 
     test("template should have a single child", () => {
         const root = document.createElement("div");
         const template = document.createElement("template");
-        template.setAttribute("id", "my-element");
+        template.setAttribute("id", "my-element2");
         template.innerHTML =
             "<div>{{ dataName }}</div><div>{{ dataName }}</div>";
-        const customElement = document.createElement("my-element");
+        const customElement = document.createElement("my-element2");
         customElement.setAttribute("data-name", "John");
         root.appendChild(template);
         root.appendChild(customElement);
@@ -39,6 +39,8 @@ describe("registerTemplates", () => {
         expect(() => {
             const state = createState();
             registerTemplates(root, state, reactiveNodes);
-        }).toThrowError("Template my-element should have a single child");
+        }).toThrowError(
+            "Template my-element2 should have a single HTML Element child"
+        );
     });
 });

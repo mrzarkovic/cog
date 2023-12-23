@@ -178,27 +178,6 @@ describe("cog", () => {
         });
     });
 
-    test("update text node custom element", async () => {
-        const root = document.createElement("div");
-        const template = document.createElement("template");
-        template.id = "my-template9";
-        template.innerHTML = "{{greeting}}";
-        const myElement = document.createElement("my-template9");
-        root.appendChild(template);
-        root.appendChild(myElement);
-        document.body.appendChild(root);
-
-        const cog = init();
-        const greeting = cog.variable("greeting", "Hello World!");
-        cog.render(root);
-
-        greeting.value = "Hello Me!";
-
-        await waitFor(() => {
-            expect(getByText(root, "Hello Me!")).toBeInTheDocument();
-        });
-    });
-
     test("update child custom elements of custom element", async () => {
         const root = document.createElement("div");
         const template = document.createElement("template");

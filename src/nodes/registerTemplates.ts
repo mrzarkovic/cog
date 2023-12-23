@@ -29,7 +29,7 @@ export function registerTemplates(
         if (name) {
             templates[i].innerHTML = sanitizeHtml(templates[i].innerHTML);
 
-            if (templates[i].content.children.length === 0) {
+            if (templates[i].content.children.length !== 1) {
                 throw new Error(
                     `Template ${name} should have a single HTML Element child`
                 );
