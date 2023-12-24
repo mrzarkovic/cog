@@ -160,12 +160,21 @@ function handleChildrenAddition(
 }
 
 function handleChildrenRemoval(
-    originalNode: CogHTMLElement,
-    removeChildren: HTMLElement[]
+    removeChildren: HTMLElement[],
+    reactiveNodes: ReactiveNodesList
 ) {
+    const fragment = document.createDocumentFragment();
+
     for (let i = 0; i < removeChildren.length; i++) {
-        originalNode.removeChild(removeChildren[i]);
+        if ((removeChildren[i] as CogHTMLElement).cogAnchorId) {
+            reactiveNodes.remove(
+                (removeChildren[i] as CogHTMLElement).cogAnchorId
+            );
+        }
+        fragment.appendChild(removeChildren[i]);
     }
+
+    fragment.textContent = "";
 }
 
 function handleNodeChanges(
@@ -209,7 +218,7 @@ function handleNodeChanges(
             } else if (addChildren.length) {
                 handleChildrenAddition(originalNode, addChildren);
             } else if (removeChildren.length) {
-                handleChildrenRemoval(originalNode, removeChildren);
+                handleChildrenRemoval(removeChildren, reactiveNodes);
             }
         }
     }

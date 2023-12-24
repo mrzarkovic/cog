@@ -9,7 +9,6 @@ import {
     Expression,
     TemplateName,
 } from "./types";
-import { cleanReactiveNodesList } from "./nodes/cleanReactiveNodesList";
 
 export function createReactiveNodes(): ReactiveNodesList {
     return {
@@ -29,13 +28,15 @@ export function createReactiveNodes(): ReactiveNodesList {
         update(id: number, property: keyof ReactiveNode, value: unknown) {
             this.list[this.index[id]][property] = value as never;
         },
-        clean() {
-            this.list = cleanReactiveNodesList(this.list);
+        remove(id: number) {
+            const index = this.index[id];
+            this.list.splice(index, 1);
             this.index = this.list.reduce((index, item, i) => {
                 index[item.id] = i;
                 return index;
             }, {} as ReactiveNodeIndex);
         },
+
         id() {
             return this.lastId++;
         },

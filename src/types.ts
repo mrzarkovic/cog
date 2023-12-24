@@ -133,7 +133,7 @@ export type ReactiveNodesList = {
         property: keyof ReactiveNode,
         value: ReactiveNode[keyof ReactiveNode]
     ) => void;
-    clean: () => void;
+    remove: (id: number) => void;
     id: () => number;
     new: (
         id: ReactiveNodeId,
