@@ -72,7 +72,11 @@ export type StateObject = {
         template: TemplateName,
         stateKey: StateKey,
         value: unknown,
-        proxy?: (name: StateKey, value: unknown[]) => unknown[]
+        proxy?: (
+            name: StateKey,
+            value: unknown[],
+            template: string
+        ) => unknown[]
     ) => void;
     updateTemplateState(
         template: TemplateName,
@@ -102,7 +106,7 @@ export type TemplateState = {
 
 export type TemplateStateInitialValue = {
     value: unknown;
-    proxy?: (name: StateKey, value: unknown[]) => unknown[];
+    proxy?: (name: StateKey, value: unknown[], template: string) => unknown[];
 };
 
 export type StateKey = string;

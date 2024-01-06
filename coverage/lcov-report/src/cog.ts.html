@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.21% </span>
+                <span class="strong">44.68% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>42/95</span>
+                <span class='fraction'>42/94</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.21% </span>
+                <span class="strong">44.68% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>42/95</span>
+                <span class='fraction'>42/94</span>
             </div>
         
             
@@ -279,13 +279,24 @@
 <a name='L214'></a><a href='#L214'>214</a>
 <a name='L215'></a><a href='#L215'>215</a>
 <a name='L216'></a><a href='#L216'>216</a>
-<a name='L217'></a><a href='#L217'>217</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">15x</span>
@@ -305,12 +316,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -349,10 +357,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -360,6 +372,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -393,10 +410,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -503,6 +521,8 @@ import { reconcile } from "./nodes/reconcile";
 import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
 &nbsp;
+const frameDelay = 1000 / 60;
+&nbsp;
 export const init = (): Cog =&gt; {
     let stateFunctionExecuting: string | null = null;
     const reactiveNodes = createReactiveNodes();
@@ -521,13 +541,10 @@ export const init = (): Cog =&gt; {
             );
         });
 &nbsp;
-        // TODO: Figure this one out
-        // reactiveNodes.clean();
         state.clearUpdates();
     }
 &nbsp;
     let lastFrameTime = 0;
-    const frameDelay = 1000 / 60;
 &nbsp;
     function scheduleReRender() {
         if (updateStateTimeout !== null) {
@@ -564,7 +581,11 @@ export const init = (): Cog =&gt; {
 <span class="cstat-no" title="statement not covered" >            return result;</span>
         };
 &nbsp;
-    const getArrayValue = <span class="fstat-no" title="function not covered" >(n</span>ame: string, value: unknown[]) =&gt;
+    const arrayProxyConstructor = <span class="fstat-no" title="function not covered" >(</span>
+        name: string,
+        value: unknown[],
+        template: string
+    ) =&gt;
 <span class="cstat-no" title="statement not covered" >        new Proxy(value, {</span>
 <span class="fstat-no" title="function not covered" >            ge</span>t(target, propKey) {
                 const originalMethod = <span class="cstat-no" title="statement not covered" >target[</span>
@@ -572,11 +593,16 @@ export const init = (): Cog =&gt; {
                 ] as UnknownFunction;
 <span class="cstat-no" title="statement not covered" >                if (propKey === "push") {</span>
 <span class="cstat-no" title="statement not covered" >                    return <span class="fstat-no" title="function not covered" >(.</span>..args: unknown[]) =&gt; {</span>
-                        const parts = <span class="cstat-no" title="statement not covered" >stateFunctionExecuting?.split(".");</span>
+<span class="cstat-no" title="statement not covered" >                        originalMethod.apply(target, args);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >                        if (parts &amp;&amp; parts.length &gt; 1) {</span>
-                            const elementId = <span class="cstat-no" title="statement not covered" >Number(parts[1].split(":")[1]);</span>
-<span class="cstat-no" title="statement not covered" >                            state._registerStateUpdate(elementId, name);</span>
+<span class="cstat-no" title="statement not covered" >                        if (template) {</span>
+                            const cogId = <span class="cstat-no" title="statement not covered" >stateFunctionExecuting?.split(":")[1];</span>
+<span class="cstat-no" title="statement not covered" >                            if (!cogId) {</span>
+<span class="cstat-no" title="statement not covered" >                                throw new Error(</span>
+                                    "Can't use outside of a template"
+                                );
+                            }
+<span class="cstat-no" title="statement not covered" >                            state._registerStateUpdate(Number(cogId), name);</span>
                         } else {
 <span class="cstat-no" title="statement not covered" >                            state.value[name].computants.forEach(</span>
 <span class="fstat-no" title="function not covered" >                                (c</span>omputant) =&gt; {
@@ -587,7 +613,7 @@ export const init = (): Cog =&gt; {
                         }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >                        scheduleReRender();</span>
-<span class="cstat-no" title="statement not covered" >                        return originalMethod.apply(target, args);</span>
+<span class="cstat-no" title="statement not covered" >                        return;</span>
                     };
                 }
 <span class="cstat-no" title="statement not covered" >                return originalMethod;</span>
@@ -608,14 +634,15 @@ export const init = (): Cog =&gt; {
         }
 &nbsp;
         <span class="missing-if-branch" title="if path not taken" >I</span>if (template) {
-            let valueProxy = <span class="cstat-no" title="statement not covered" >undefined;</span>
-<span class="cstat-no" title="statement not covered" >            if (Array.isArray(value)) {</span>
-<span class="cstat-no" title="statement not covered" >                valueProxy = getArrayValue;</span>
-            }
-<span class="cstat-no" title="statement not covered" >            state.initializeTemplateState(template, name, value, valueProxy);</span>
+<span class="cstat-no" title="statement not covered" >            state.initializeTemplateState(</span>
+                template,
+                name,
+                value,
+                Array.isArray(value) ? arrayProxyConstructor : undefined
+            );
         } else {
             <span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(value)) {
-<span class="cstat-no" title="statement not covered" >                value = getArrayValue(name, value) as T;</span>
+<span class="cstat-no" title="statement not covered" >                value = arrayProxyConstructor(name, value, "") as T;</span>
             }
             state.initializeGlobalState(name, value);
         }
@@ -669,7 +696,7 @@ export const init = (): Cog =&gt; {
                 <span class="missing-if-branch" title="if path not taken" >I</span>if (template) {
                     const cogId = <span class="cstat-no" title="statement not covered" >stateFunctionExecuting?.split(":")[1];</span>
 <span class="cstat-no" title="statement not covered" >                    if (!cogId) {</span>
-<span class="cstat-no" title="statement not covered" >                        throw new Error("Can't call outside of a template");</span>
+<span class="cstat-no" title="statement not covered" >                        throw new Error("Can't use outside of a template");</span>
                     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >                    state.updateTemplateState(</span>
@@ -687,7 +714,7 @@ export const init = (): Cog =&gt; {
                 <span class="missing-if-branch" title="if path not taken" >I</span>if (template) {
                     const cogId = <span class="cstat-no" title="statement not covered" >stateFunctionExecuting?.split(":")[1];</span>
 <span class="cstat-no" title="statement not covered" >                    if (!cogId) {</span>
-<span class="cstat-no" title="statement not covered" >                        throw new Error("Can't call outside of a template");</span>
+<span class="cstat-no" title="statement not covered" >                        throw new Error("Can't use outside of a template");</span>
                     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >                    state.updateTemplateState(</span>
@@ -718,7 +745,7 @@ export const { variable, render } = init();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2023-12-23T21:16:08.061Z
+                at 2024-01-06T14:15:06.612Z
             </div>
         <script src="../prettify.js"></script>
         <script>

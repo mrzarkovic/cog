@@ -37,7 +37,11 @@ export function createState(): StateObject {
                     const proxy =
                         this.templates[template].initial[stateKey].proxy;
                     if (proxy) {
-                        value = proxy(stateKey, (value as unknown[]).slice(0));
+                        value = proxy(
+                            stateKey,
+                            (value as unknown[]).slice(0),
+                            template
+                        );
                     }
                     if (value instanceof Function) {
                         const originalFunction = value as UnknownFunction;

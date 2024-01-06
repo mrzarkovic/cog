@@ -8,15 +8,19 @@ const names = variable("names", ["Alice", "Bob", "Carol"]);
 const count = variable("count", 0);
 const checked = variable("checked", true);
 
+variable(
+    "increment",
+    () => {
+        count.value++;
+        names.value.push(generateRandomString());
+    },
+    "my-increment"
+);
+
 variable("isOk", () => count.value % 2 === 0);
 
 window.toggleChecked = () => {
     checked.value = !checked.value;
-};
-
-window.increment = () => {
-    count.value++;
-    names.value.push(generateRandomString());
 };
 
 window.decrement = () => {

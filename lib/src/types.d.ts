@@ -51,7 +51,7 @@ export type StateObject = {
     get value(): State;
     registerTemplateState(template: TemplateName, elementId: ReactiveNodeId): void;
     getTemplateState(template: TemplateName): TemplateState;
-    initializeTemplateState: (template: TemplateName, stateKey: StateKey, value: unknown, proxy?: (name: StateKey, value: unknown[]) => unknown[]) => void;
+    initializeTemplateState: (template: TemplateName, stateKey: StateKey, value: unknown, proxy?: (name: StateKey, value: unknown[], template: string) => unknown[]) => void;
     updateTemplateState(template: TemplateName, elementId: ReactiveNodeId, stateKey: StateKey, value: unknown): void;
     initializeGlobalState: <T>(stateKey: StateKey, value: T) => void;
     updateGlobalState: <T>(stateKey: StateKey, value: T) => void;
@@ -68,7 +68,7 @@ export type TemplateState = {
 };
 export type TemplateStateInitialValue = {
     value: unknown;
-    proxy?: (name: StateKey, value: unknown[]) => unknown[];
+    proxy?: (name: StateKey, value: unknown[], template: string) => unknown[];
 };
 export type StateKey = string;
 export type State = Record<StateKey, StateValue>;
@@ -95,7 +95,7 @@ export type ReactiveNodesList = {
     get: (id: number) => ReactiveNode;
     add: (item: ReactiveNode) => void;
     update: (index: number, property: keyof ReactiveNode, value: ReactiveNode[keyof ReactiveNode]) => void;
-    clean: () => void;
+    remove: (id: number) => void;
     id: () => number;
     new: (id: ReactiveNodeId, parentId: ReactiveNodeId | null, attributes: Attribute[], templateName: TemplateName | null, expressions?: Expression[], template?: HTMLString, element?: HTMLElement | null, lastTemplateEvaluation?: CogHTMLElement | null, shouldUpdate?: boolean, newAttributes?: string[]) => ReactiveNode;
 };

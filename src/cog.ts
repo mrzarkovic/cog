@@ -6,6 +6,8 @@ import { reconcile } from "./nodes/reconcile";
 import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
 
+const frameDelay = 1000 / 60;
+
 export const init = (): Cog => {
     let stateFunctionExecuting: string | null = null;
     const reactiveNodes = createReactiveNodes();
@@ -28,7 +30,6 @@ export const init = (): Cog => {
     }
 
     let lastFrameTime = 0;
-    const frameDelay = 1000 / 60;
 
     function scheduleReRender() {
         if (updateStateTimeout !== null) {
@@ -65,7 +66,11 @@ export const init = (): Cog => {
             return result;
         };
 
-    const getArrayValue = (name: string, value: unknown[]) =>
+    const arrayProxyConstructor = (
+        name: string,
+        value: unknown[],
+        template: string
+    ) =>
         new Proxy(value, {
             get(target, propKey) {
                 const originalMethod = target[
@@ -73,11 +78,16 @@ export const init = (): Cog => {
                 ] as UnknownFunction;
                 if (propKey === "push") {
                     return (...args: unknown[]) => {
-                        const parts = stateFunctionExecuting?.split(".");
+                        originalMethod.apply(target, args);
 
-                        if (parts && parts.length > 1) {
-                            const elementId = Number(parts[1].split(":")[1]);
-                            state._registerStateUpdate(elementId, name);
+                        if (template) {
+                            const cogId = stateFunctionExecuting?.split(":")[1];
+                            if (!cogId) {
+                                throw new Error(
+                                    "Can't use outside of a template"
+                                );
+                            }
+                            state._registerStateUpdate(Number(cogId), name);
                         } else {
                             state.value[name].computants.forEach(
                                 (computant) => {
@@ -88,7 +98,7 @@ export const init = (): Cog => {
                         }
 
                         scheduleReRender();
-                        return originalMethod.apply(target, args);
+                        return;
                     };
                 }
                 return originalMethod;
@@ -109,14 +119,15 @@ export const init = (): Cog => {
         }
 
         if (template) {
-            let valueProxy = undefined;
-            if (Array.isArray(value)) {
-                valueProxy = getArrayValue;
-            }
-            state.initializeTemplateState(template, name, value, valueProxy);
+            state.initializeTemplateState(
+                template,
+                name,
+                value,
+                Array.isArray(value) ? arrayProxyConstructor : undefined
+            );
         } else {
             if (Array.isArray(value)) {
-                value = getArrayValue(name, value) as T;
+                value = arrayProxyConstructor(name, value, "") as T;
             }
             state.initializeGlobalState(name, value);
         }
@@ -170,7 +181,7 @@ export const init = (): Cog => {
                 if (template) {
                     const cogId = stateFunctionExecuting?.split(":")[1];
                     if (!cogId) {
-                        throw new Error("Can't call outside of a template");
+                        throw new Error("Can't use outside of a template");
                     }
 
                     state.updateTemplateState(
@@ -188,7 +199,7 @@ export const init = (): Cog => {
                 if (template) {
                     const cogId = stateFunctionExecuting?.split(":")[1];
                     if (!cogId) {
-                        throw new Error("Can't call outside of a template");
+                        throw new Error("Can't use outside of a template");
                     }
 
                     state.updateTemplateState(
