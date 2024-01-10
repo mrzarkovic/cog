@@ -1,7 +1,6 @@
 import { attributesToState } from "../attributes/attributesToState";
 import { getAttributes } from "../attributes/getAttributes";
 import { getLocalState } from "../attributes/getLocalState";
-import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import { extractTemplateExpressions } from "../html/evaluateTemplate";
 import { sanitizeHtml } from "../html/sanitizeHtml";
 import {
@@ -199,13 +198,6 @@ function registerChildReactiveNodes(
         parentId,
         templateName
     );
-
-    if (newElement.nodeType !== Node.TEXT_NODE) {
-        addAllEventListeners(
-            newElement.parentElement as HTMLElement,
-            localState
-        );
-    }
 
     newElement.cogAnchorId = elementId;
 }

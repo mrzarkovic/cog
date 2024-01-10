@@ -12,21 +12,21 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["ts-component-state"] = factory();
+		exports["ts-counter"] = factory();
 	else
-		root["ts-component-state"] = factory();
+		root["ts-counter"] = factory();
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./examples/src/ts-component-state.ts":
-/*!********************************************!*\
-  !*** ./examples/src/ts-component-state.ts ***!
-  \********************************************/
+/***/ "./examples/src/ts-counter.ts":
+/*!************************************!*\
+  !*** ./examples/src/ts-counter.ts ***!
+  \************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _src_cog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/cog */ \"./src/cog.ts\");\n\ndocument.addEventListener(\"DOMContentLoaded\", function () {\n  (0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.render)(document.getElementById(\"app\"));\n});\nconst count = (0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.variable)(\"count\", 0, \"my-counter\");\n(0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.variable)(\"increment\", () => count.value++, \"my-counter\");\n(0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.variable)(\"isEven\", () => count.value % 2 === 0, \"my-counter\");\n\n// global computed from global state\n// variable(\"isEven\", () => globalCount.value % 2 === 0);\n\n// template computed from global state\n// variable(\"isEven\", () => globalCount.value % 2 === 0, \"my-counter\");\n\n// global computed from template state not allowed\n// variable(\"isEven\", () => count.value % 2 === 0);\n\n//# sourceURL=webpack://@mzrk/cog/./examples/src/ts-component-state.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _src_cog__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/cog */ \"./src/cog.ts\");\n\ndocument.addEventListener(\"DOMContentLoaded\", function () {\n  (0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.render)(document.getElementById(\"app\"));\n});\nconst count = (0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.variable)(\"count\", 0);\n(0,_src_cog__WEBPACK_IMPORTED_MODULE_0__.variable)(\"increment\", () => {\n  count.set(count.value + 1);\n});\n\n//# sourceURL=webpack://@mzrk/cog/./examples/src/ts-counter.ts?");
 
 /***/ }),
 
@@ -410,7 +410,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./examples/src/ts-component-state.ts");
+/******/ 	var __webpack_exports__ = __webpack_require__("./examples/src/ts-counter.ts");
 /******/ 	
 /******/ 	return __webpack_exports__;
 /******/ })()

@@ -1,4 +1,5 @@
 import { convertAttributeName } from "../attributes/convertAttributeName";
+import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
 import {
     evaluateTemplate,
     extractTemplateExpressions,
@@ -78,6 +79,10 @@ export function registerReactiveNode(
     );
 
     originalElement.parentElement?.replaceChild(element, originalElement);
+
+    if (element.nodeType !== Node.TEXT_NODE) {
+        addAllEventListeners(element.parentElement as HTMLElement, state);
+    }
 
     return element;
 }

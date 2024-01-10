@@ -1,0 +1,23 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog Templates</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app" class="py-40 px-8 max-w-md mx-auto">
+            <div class="flex items-center">
+                <button data-on-click="increment()" class="btn btn-success">
+                    Increment {{ count }}
+                </button>
+            </div>
+        </div>
+        <script src="/examples/dist/ts-counter.js"></script>
+    </body>
+</html>
