@@ -17,7 +17,7 @@ export function assignDependents(
     elementId: number,
     expressions: Expression[],
     state: State,
-    attributes: Attribute[]
+    attributes: Attribute[],
 ) {
     expressions.map((expression) => {
         expression.dependencies.forEach((dependency) => {
@@ -26,7 +26,7 @@ export function assignDependents(
             }
             const attribute = attributes.find(
                 (attribute) =>
-                    convertAttributeName(attribute.name) === dependency
+                    convertAttributeName(attribute.name) === dependency,
             );
             if (attribute) {
                 if (!attribute.dependents) {
@@ -48,7 +48,7 @@ export function registerReactiveNode(
     state: State,
     attributes: Attribute[] = [],
     parentId: number | null = null,
-    templateName: string | null = null
+    templateName: string | null = null,
 ) {
     const refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
 
@@ -58,7 +58,7 @@ export function registerReactiveNode(
         refinedTemplate,
         expressions,
         state,
-        []
+        [],
     );
 
     const element = elementFromString(updatedContent);
@@ -74,11 +74,9 @@ export function registerReactiveNode(
             expressions,
             refinedTemplate,
             element,
-            element.cloneNode(true) as CogHTMLElement
-        )
+            element.cloneNode(true) as CogHTMLElement,
+        ),
     );
-
-    console.log(element);
 
     originalElement.parentElement?.appendChild(element);
 
