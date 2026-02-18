@@ -1,10 +1,10 @@
-import { Expression, State, StateKey } from "../types";
+import { createExpressionScope } from "../expressions/createExpressionScope";
 import { evaluateExpression } from "../expressions/evaluateExpression";
+import { sanitizeExpression } from "../expressions/sanitizeExpression";
+import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
+import { Expression, State, StateKey } from "../types";
 import { findNextTemplateExpression } from "./findNextTemplateExpression";
 import { htmlToText } from "./htmlToText";
-import { sanitizeExpression } from "../expressions/sanitizeExpression";
-import { createExpressionScope } from "../expressions/createExpressionScope";
-import { removeTagsAndAttributeNames } from "../html/removeTagsAndAttributeNames";
 
 export const evaluateTemplate = (
     template: string,

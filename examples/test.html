@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cog.js</title>
+        <meta
+            name="description"
+            content="Cog.js is a simple templating engine for JavaScript."
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.4.0/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div>{{ arr.length }}</div>
+
+            <div>
+                {{ arr.map(a => `
+                <div>${a}</div>
+                `) }}
+            </div>
+        </div>
+        <script src="/lib/cog.js"></script>
+        <script>
+            const arr = Array(10000)
+                .fill()
+                .map((v, i) => ++i);
+
+            // Get the variable factory method from the global Cog object
+            const { variable, render } = Cog;
+
+            // Initialize reactive variable 'count'
+            const counter = variable("count", 0);
+            const array = variable("arr", arr);
+
+            // Make increment available in global scope for onclick handler
+            window.increment = () => {
+                // Get count value and update it using count setter
+                counter.set(counter.value + 1);
+            };
+
+            document.addEventListener("DOMContentLoaded", function () {
+                render(document.getElementById("app"));
+            });
+        </script>
+    </body>
+</html>

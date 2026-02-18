@@ -78,7 +78,9 @@ export function registerReactiveNode(
         )
     );
 
-    originalElement.parentElement?.replaceChild(element, originalElement);
+    console.log(element);
+
+    originalElement.parentElement?.appendChild(element);
 
     if (element.nodeType !== Node.TEXT_NODE) {
         addAllEventListeners(element.parentElement as HTMLElement, state);

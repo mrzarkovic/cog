@@ -1,3 +1,5 @@
+import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
+import { removeAllEventListeners } from "../eventListeners/removeAllEventListeners";
 import {
     Attribute,
     ChangedAttribute,
@@ -9,17 +11,15 @@ import {
     State,
     StateObject,
 } from "../types";
-import { addAllEventListeners } from "../eventListeners/addAllEventListeners";
-import { removeAllEventListeners } from "../eventListeners/removeAllEventListeners";
 
+import { convertAttributeName } from "../attributes/convertAttributeName";
+import { getLocalState } from "../attributes/getLocalState";
+import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
+import { evaluateTemplate } from "../html/evaluateTemplate";
 import { compareNodes } from "./compareNodes";
 import { elementFromString } from "./elementFromString";
-import { evaluateTemplate } from "../html/evaluateTemplate";
 import { findCorrespondingNode } from "./findCorrespondingNode";
-import { handleBooleanAttribute } from "../attributes/handleBooleanAttribute";
 import { isCustomElement } from "./isCustomElement";
-import { getLocalState } from "../attributes/getLocalState";
-import { convertAttributeName } from "../attributes/convertAttributeName";
 
 function mergeAttributes(oldArray: Attribute[], newArray: Attribute[]) {
     const merged = oldArray.concat(newArray);
@@ -294,7 +294,6 @@ export const reconcile = (
         true
     ) as CogHTMLElement;
     const newElement = elementFromString(updatedContent);
-
     const changedNodes = compareNodes(oldElement, newElement);
 
     if (changedNodes.length > 0) {

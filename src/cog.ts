@@ -1,10 +1,10 @@
-import { type Cog, UnknownFunction, StateValue } from "./types";
-import { registerTemplates } from "./nodes/registerTemplates";
-import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
-import { registerNativeElements } from "./nodes/registerNativeElements";
-import { reconcile } from "./nodes/reconcile";
-import { createState } from "./createState";
 import { createReactiveNodes } from "./createReactiveNodes";
+import { createState } from "./createState";
+import { addAllEventListeners } from "./eventListeners/addAllEventListeners";
+import { reconcile } from "./nodes/reconcile";
+import { registerNativeElements } from "./nodes/registerNativeElements";
+import { registerTemplates } from "./nodes/registerTemplates";
+import { StateValue, UnknownFunction, type Cog } from "./types";
 
 const frameDelay = 1000 / 60;
 
