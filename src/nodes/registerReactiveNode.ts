@@ -51,20 +51,15 @@ export function registerReactiveNode(
     templateName: string | null = null,
 ) {
     const refinedTemplate = template.replace(/>\s*([\s\S]*?)\s*</g, ">$1<");
-
     const expressions = extractTemplateExpressions(refinedTemplate, state);
-
     const updatedContent = evaluateTemplate(
         refinedTemplate,
         expressions,
         state,
         [],
     );
-
     const element = elementFromString(updatedContent);
-
     assignDependents(elementId, expressions, state, attributes);
-
     reactiveNodes.add(
         reactiveNodes.new(
             elementId,
@@ -77,12 +72,9 @@ export function registerReactiveNode(
             element.cloneNode(true) as CogHTMLElement,
         ),
     );
-
-    originalElement.parentElement?.appendChild(element);
-
+    originalElement.parentElement?.replaceChild(element, originalElement);
     if (element.nodeType !== Node.TEXT_NODE) {
         addAllEventListeners(element.parentElement as HTMLElement, state);
     }
-
     return element;
 }

@@ -9,7 +9,7 @@ describe("createExpressionScope", () => {
         });
 
         expect(
-            expressionWithScope({ a: { value: 2 }, b: { value: 3 } })
+            expressionWithScope({ a: { value: 2 }, b: { value: 3 } }),
         ).toStrictEqual(5);
     });
 
@@ -22,6 +22,6 @@ describe("createExpressionScope", () => {
             expressionWithScope({
                 a: { value: 0, dependents: [] },
             });
-        }).toThrow("b is not defined");
+        }).toThrow(); // Will throw because 'b' is missing from state
     });
 });

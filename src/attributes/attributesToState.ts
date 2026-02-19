@@ -6,7 +6,7 @@ import { convertAttributeValue } from "./convertAttributeValue";
 export function attributesToState(
     attributes: Attribute[],
     state: State,
-    stateChanges: string[] = []
+    stateChanges: string[] = [],
 ) {
     const localState: State = Object.assign({}, state);
 
@@ -20,16 +20,26 @@ export function attributesToState(
                 new Set(
                     attributes[i].expressions
                         .map((expression) => expression.dependencies)
-                        .flat()
-                )
+                        .flat(),
+                ),
             );
 
             value = evaluateTemplate(
                 attributes[i].value,
                 attributes[i].expressions,
                 state,
-                stateChanges
+                stateChanges,
             );
+
+            if (
+                attributeName === "children" &&
+                attributes[i].value.includes("{{")
+            ) {
+                console.log(
+                    "[CHILDREN EVAL] Evaluated result preview:",
+                    value.substring(0, 200),
+                );
+            }
         }
 
         localState[attributeName] = {

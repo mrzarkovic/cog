@@ -23,6 +23,7 @@
                 <div>
                     <x-child
                         >some text
+                        <!-- This specifically doesnt work after the refactor, not updated with count provided by the parent -->
                         <div>{{dataParent}}</div>
                         <span>other</span>
                     </x-child>

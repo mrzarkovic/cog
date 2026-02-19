@@ -10,7 +10,7 @@ export const evaluateTemplate = (
     template: string,
     expressions: Expression[],
     state: State,
-    stateChanges: string[] = []
+    stateChanges: string[] = [],
 ): string => {
     let restOfContent = template;
     let updatedContent = "";
@@ -23,13 +23,20 @@ export const evaluateTemplate = (
         let evaluated = expressions[i].evaluated;
 
         const intersection = expressions[i].dependencies.filter((value) =>
-            stateChanges.includes(value)
+            stateChanges.includes(value),
         );
 
         if (intersection.length || evaluated === null) {
-            const expressionWithScope = createExpressionScope(value, state);
-            evaluated = evaluateExpression(expressionWithScope, state);
-            expressions[i].evaluated = evaluated;
+            try {
+                const expressionWithScope = createExpressionScope(value, state);
+                evaluated = evaluateExpression(expressionWithScope, state);
+                expressions[i].evaluated = evaluated;
+            } catch (error) {
+                // Re-throw validation errors with context
+                throw new Error(
+                    `Failed to evaluate expression "${value}": ${(error as Error).message}`,
+                );
+            }
         }
 
         updatedContent += `${before}${evaluated}`;
@@ -47,7 +54,7 @@ export const evaluateTemplate = (
  */
 export const extractTemplateExpressions = (
     template: string,
-    state: State
+    state: State,
 ): Expression[] => {
     const expressions = [];
     let restOfContent = String(template);
@@ -72,13 +79,13 @@ export const extractTemplateExpressions = (
             .filter((wordFromExpression) =>
                 uniqueIndex[wordFromExpression]
                     ? false
-                    : (uniqueIndex[wordFromExpression] = true)
+                    : (uniqueIndex[wordFromExpression] = true),
             )
             .filter((wordFromExpression) => state[wordFromExpression])
             .forEach((dependency) => {
                 if (state[dependency].dependencies.length) {
                     state[dependency].dependencies.forEach((dep: StateKey) =>
-                        dependencies.add(dep)
+                        dependencies.add(dep),
                     );
                 } else {
                     dependencies.add(dependency);

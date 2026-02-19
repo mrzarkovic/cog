@@ -17,7 +17,7 @@ import { registerReactiveNode } from "./registerReactiveNode";
 export function registerTemplates(
     rootElement: Node,
     state: StateObject,
-    reactiveNodes: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList,
 ) {
     const templates = findNodes<HTMLTemplateElement>(rootElement, "template");
     const fragment = document.createDocumentFragment();
@@ -30,7 +30,7 @@ export function registerTemplates(
 
             if (templates[i].content.children.length !== 1) {
                 throw new Error(
-                    `Template ${name} should have a single HTML Element child`
+                    `Template ${name} should have a single HTML Element child`,
                 );
             }
 
@@ -47,7 +47,7 @@ function defineCustomElement(
     name: string,
     template: HTMLTemplateElement,
     state: StateObject,
-    reactiveNodes: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList,
 ) {
     function CustomElement() {
         return Reflect.construct(HTMLElement, [], CustomElement);
@@ -59,7 +59,7 @@ function defineCustomElement(
     CustomElement.prototype.connectedCallback = registerCustomElement(
         template,
         state,
-        reactiveNodes
+        reactiveNodes,
     );
 
     customElements.define(name, CustomElement as never);
@@ -95,8 +95,9 @@ function getCustomElementAttributes(element: HTMLElement, state: State) {
     const attributes = getAttributes(element, state);
     const childrenExpressions = extractTemplateExpressions(
         element.innerHTML,
-        state
+        state,
     );
+
     attributes.push({
         name: "children",
         value: element.innerHTML,
@@ -111,7 +112,7 @@ function getCustomElementAttributes(element: HTMLElement, state: State) {
 function registerCustomElement(
     template: HTMLTemplateElement,
     state: StateObject,
-    reactiveNodes: ReactiveNodesList
+    reactiveNodes: ReactiveNodesList,
 ) {
     return function (this: HTMLElement) {
         const templateName = this.tagName.toLowerCase();
@@ -126,12 +127,12 @@ function registerCustomElement(
             parentId,
             [],
             state.value,
-            reactiveNodes.list
+            reactiveNodes.list,
         );
 
         const refinedTemplate = addParentIdToChildren(
             template.innerHTML,
-            elementId
+            elementId,
         );
 
         const attributes = getCustomElementAttributes(this, parentState);
@@ -140,7 +141,7 @@ function registerCustomElement(
         tempDiv.innerHTML = refinedTemplate;
 
         reactiveNodes.add(
-            reactiveNodes.new(elementId, parentId, attributes, templateName)
+            reactiveNodes.new(elementId, parentId, attributes, templateName),
         );
 
         const elements = findReactiveNodes(tempDiv);
@@ -154,13 +155,11 @@ function registerCustomElement(
                 attributes,
                 parentState,
                 reactiveNodes,
-                state
+                state,
             );
         }
-
         const contextEl = tempDiv.firstChild as CogHTMLElement;
         contextEl.cogAnchorId = elementId;
-
         this.parentElement?.replaceChild(contextEl, this);
     };
 }
@@ -172,7 +171,7 @@ function registerChildReactiveNodes(
     attributes: Attribute[],
     parentState: State,
     reactiveNodes: ReactiveNodesList,
-    state: StateObject
+    state: StateObject,
 ) {
     const elementId = reactiveNodes.id();
     const template = element.outerHTML;
@@ -185,7 +184,7 @@ function registerChildReactiveNodes(
 
     const localState = attributesToState(
         attributes,
-        Object.assign({}, parentState, templateState)
+        Object.assign({}, parentState, templateState),
     );
 
     const newElement = registerReactiveNode(
@@ -196,7 +195,7 @@ function registerChildReactiveNodes(
         localState,
         attributes,
         parentId,
-        templateName
+        templateName,
     );
 
     newElement.cogAnchorId = elementId;
