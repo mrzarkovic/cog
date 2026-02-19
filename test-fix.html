@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Cog Fixes</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+            }
+            .test {
+                border: 1px solid #ccc;
+                padding: 15px;
+                margin: 10px 0;
+            }
+            .test h3 {
+                margin-top: 0;
+            }
+            button {
+                padding: 5px 10px;
+                margin: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Cog Expression Fix Tests</h1>
+
+        <div class="test">
+            <h3>Test 1: Counter Updates in Nested Children</h3>
+            <div id="app1">
+                <template id="x-child">
+                    <div>
+                        <span>Child received count: {{ dataParent }}</span>
+                    </div>
+                </template>
+
+                <template id="x-parent">
+                    <div>
+                        <p>Parent count: {{ count }}</p>
+                        <x-child data-parent="{{ count }}"></x-child>
+                    </div>
+                </template>
+
+                <button onclick="increment1()">Increment</button>
+                <x-parent></x-parent>
+            </div>
+        </div>
+
+        <div class="test">
+            <h3>Test 2: Array.map() with Expressions</h3>
+            <div id="app2">
+                <button onclick="addTodo()">Add Todo</button>
+                <div>
+                    {{ todos.map((todo, i) => `
+                    <div>
+                        <span>${i + 1}. ${todo.text}</span>
+                    </div>
+                    `).join('') }}
+                </div>
+            </div>
+        </div>
+
+        <div class="test">
+            <h3>Test 3: Nested Children with Multiple State Variables</h3>
+            <div id="app3">
+                <template id="y-child">
+                    <div>
+                        <p>Message: {{ message }}</p>
+                        <p>Count: {{ count }}</p>
+                        <p>Data: {{ data }}</p>
+                    </div>
+                </template>
+
+                <button onclick="increment3()">Increment</button>
+                <button onclick="changeMessage()">Change Message</button>
+                <y-child
+                    message="{{ greeting }}"
+                    count="{{ counter }}"
+                    data="{{ info }}"
+                >
+                </y-child>
+            </div>
+        </div>
+
+        <script src="/lib/cog.js"></script>
+        <script>
+            // Test 1
+            const { variable: var1, render: render1 } = Cog.init();
+            const count1 = var1("count", 0);
+            window.increment1 = () => {
+                count1.value++;
+            };
+            document.addEventListener("DOMContentLoaded", () => {
+                render1(document.getElementById("app1"));
+            });
+
+            // Test 2
+            const { variable: var2, render: render2 } = Cog.init();
+            const todos = var2("todos", [
+                { text: "First todo" },
+                { text: "Second todo" },
+            ]);
+            window.addTodo = () => {
+                todos.set([
+                    ...todos.value,
+                    { text: `Todo ${todos.value.length + 1}` },
+                ]);
+            };
+            document.addEventListener("DOMContentLoaded", () => {
+                render2(document.getElementById("app2"));
+            });
+
+            // Test 3
+            const { variable: var3, render: render3 } = Cog.init();
+            const greeting = var3("greeting", "Hello");
+            const counter3 = var3("counter", 0);
+            const info = var3("info", "Some data");
+            window.increment3 = () => {
+                counter3.value++;
+            };
+            window.changeMessage = () => {
+                greeting.set(greeting.value === "Hello" ? "Goodbye" : "Hello");
+            };
+            document.addEventListener("DOMContentLoaded", () => {
+                render3(document.getElementById("app3"));
+            });
+        </script>
+    </body>
+</html>

@@ -30,16 +30,6 @@ export function attributesToState(
                 state,
                 stateChanges,
             );
-
-            if (
-                attributeName === "children" &&
-                attributes[i].value.includes("{{")
-            ) {
-                console.log(
-                    "[CHILDREN EVAL] Evaluated result preview:",
-                    value.substring(0, 200),
-                );
-            }
         }
 
         localState[attributeName] = {

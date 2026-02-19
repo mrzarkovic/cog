@@ -12,25 +12,45 @@ function hashExpression(expression: string): string {
     return `expr_${Math.abs(hash).toString(36)}`;
 }
 
-const functionCache: Record<string, (state: State) => unknown> = {};
+// Two-level cache: expression -> state shape -> compiled function
+const functionCache: Record<string, Record<string, Function>> = {};
 
-export const createExpressionScope = (expression: string, state: State) => {
+export const createExpressionScope = (expression: string, _state: State) => {
     // Validate expression for security before compiling
     validateExpression(expression);
 
-    // Use cache key based on expression AND state keys to handle different state shapes
-    const stateKeysHash = hashExpression(Object.keys(state).sort().join(","));
-    const cacheKey = `${hashExpression(expression)}_${stateKeysHash}`;
+    // Cache key based on expression only
+    const expressionKey = hashExpression(expression);
 
-    if (!functionCache[cacheKey]) {
-        const functionBody = `return (state) => {${Object.keys(state)
-            .map(
-                (variable) => `const ${variable} = state["${variable}"].value;`,
-            )
-            .join("\n")} return ${expression}}`;
-
-        functionCache[cacheKey] = Function(functionBody)();
+    // Initialize cache for this expression if it doesn't exist
+    if (!functionCache[expressionKey]) {
+        functionCache[expressionKey] = {};
     }
 
-    return functionCache[cacheKey];
+    // Return a function that compiles with the actual state shape at runtime
+    return (actualState: State) => {
+        // Create a state shape key based on the current state keys
+        const stateKeys = Object.keys(actualState).sort();
+        const stateShapeKey = stateKeys.join(",");
+
+        // Check if we have a cached function for this expression + state shape combination
+        if (!functionCache[expressionKey][stateShapeKey]) {
+            // Create and cache a new function for this specific state shape
+            const params = stateKeys;
+            const functionBody = `return ${expression}`;
+
+            functionCache[expressionKey][stateShapeKey] = Function(
+                ...params,
+                functionBody,
+            );
+        }
+
+        // Extract state values in the same order as the parameters
+        const args = stateKeys.map((key) => actualState[key].value);
+
+        // Call the cached function with the extracted values
+        return (functionCache[expressionKey][stateShapeKey] as Function)(
+            ...args,
+        );
+    };
 };
