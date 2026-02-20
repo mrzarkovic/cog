@@ -12,6 +12,7 @@ import {
 } from "../types";
 import { elementFromString } from "./elementFromString";
 import { findNodes, findReactiveNodes } from "./findNodes";
+import { isCustomElement } from "./isCustomElement";
 import { registerReactiveNode } from "./registerReactiveNode";
 
 export function registerTemplates(
@@ -63,6 +64,17 @@ function defineCustomElement(
     );
 
     customElements.define(name, CustomElement as never);
+}
+
+function isInsideCustomElement(element: HTMLElement, root: Node): boolean {
+    let current = element.parentElement;
+    while (current && current !== root) {
+        if (isCustomElement(current as HTMLElement)) {
+            return true;
+        }
+        current = current.parentElement;
+    }
+    return false;
 }
 
 function addParentId(element: HTMLElement, parentId: number) {
@@ -144,7 +156,9 @@ function registerCustomElement(
             reactiveNodes.new(elementId, parentId, attributes, templateName),
         );
 
-        const elements = findReactiveNodes(tempDiv);
+        const elements = findReactiveNodes(tempDiv).filter(
+            (el) => !isInsideCustomElement(el, tempDiv),
+        );
 
         for (let i = 0; i < elements.length; i++) {
             const element = elements[i];

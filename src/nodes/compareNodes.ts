@@ -4,7 +4,7 @@ import { isCustomElement } from "./isCustomElement";
 
 export function compareTextNodes(
     oldNode: HTMLElement,
-    newNode: HTMLElement
+    newNode: HTMLElement,
 ): ChangedNode[] {
     if (oldNode.textContent !== newNode.textContent) {
         return [
@@ -19,13 +19,13 @@ export function compareTextNodes(
 
 export function compareChildNodes(
     oldNode: HTMLElement,
-    newNode: HTMLElement
+    newNode: HTMLElement,
 ): ChangedNode[] {
     const toBeRemoved: HTMLElement[] = [];
     const toBeAdded: HTMLElement[] = [];
     const nodesLength = Math.max(
         oldNode.childNodes.length,
-        newNode.childNodes.length
+        newNode.childNodes.length,
     );
     let changedChildren: ChangedNode[] = [];
 
@@ -40,13 +40,19 @@ export function compareChildNodes(
             if (oldChild.textContent?.trim() !== newChild.textContent?.trim()) {
                 return [{ node: newNode, content: newNode.innerHTML }];
             }
+        } else if (
+            oldChild &&
+            newChild &&
+            oldChild.nodeType !== newChild.nodeType
+        ) {
+            return [{ node: newNode, content: newNode.innerHTML }];
         } else if (!oldChild) {
             toBeAdded.push(newChild);
         } else if (!newChild) {
             toBeRemoved.push(oldChild);
         } else {
             changedChildren = changedChildren.concat(
-                compareNodes(oldChild, newChild)
+                compareNodes(oldChild, newChild),
             );
         }
     }
@@ -63,7 +69,7 @@ export function compareChildNodes(
 
 export function compareCustomElementChildren(
     oldElement: HTMLElement,
-    newElement: HTMLElement
+    newElement: HTMLElement,
 ): ChangedNode[] {
     if (oldElement.innerHTML !== newElement.innerHTML) {
         return [{ node: newElement, content: newElement.innerHTML }];
@@ -73,10 +79,20 @@ export function compareCustomElementChildren(
 
 export function compareNodes(
     oldNode: HTMLElement,
-    newNode: HTMLElement
+    newNode: HTMLElement,
 ): ChangedNode[] {
-    if (oldNode.nodeType === Node.TEXT_NODE) {
+    if (
+        oldNode.nodeType === Node.TEXT_NODE ||
+        newNode.nodeType === Node.TEXT_NODE
+    ) {
         return compareTextNodes(oldNode, newNode);
+    }
+
+    if (
+        oldNode.nodeType !== Node.ELEMENT_NODE ||
+        newNode.nodeType !== Node.ELEMENT_NODE
+    ) {
+        return [];
     }
 
     const changedAttributes = getChangedAttributes(oldNode, newNode);
@@ -92,7 +108,7 @@ export function compareNodes(
 
     if (isCustomElement(oldNode)) {
         return changedChildren.concat(
-            compareCustomElementChildren(oldNode, newNode)
+            compareCustomElementChildren(oldNode, newNode),
         );
     }
 

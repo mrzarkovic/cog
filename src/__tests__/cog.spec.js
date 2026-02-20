@@ -45,7 +45,7 @@ describe("cog", () => {
 
         await waitFor(() => {
             expect(errorPromise).rejects.toThrow(
-                "Template my-template3 should have a single child"
+                "Template my-template3 should have a single child",
             );
         });
     });
@@ -148,7 +148,7 @@ describe("cog", () => {
 
         await waitFor(() => {
             expect(
-                getByTestId(root, "container-add-children").children.length
+                getByTestId(root, "container-add-children").children.length,
             ).toBe(5);
         });
     });
@@ -173,7 +173,7 @@ describe("cog", () => {
 
         await waitFor(() => {
             expect(
-                getByTestId(root, "container-remove-children").children.length
+                getByTestId(root, "container-remove-children").children.length,
             ).toBe(1);
         });
     });
@@ -200,6 +200,41 @@ describe("cog", () => {
 
         await waitFor(() => {
             expect(getByText(root, "Hello World!")).toBeInTheDocument();
+        });
+    });
+
+    test("update prop-drilled children in nested custom element", async () => {
+        const root = document.createElement("div");
+        const childTemplate = document.createElement("template");
+        childTemplate.id = "x-inner";
+        childTemplate.innerHTML =
+            '<div><span class="label">Inner:</span><span data-testid="inner-content">{{ children }}</span></div>';
+
+        const parentTemplate = document.createElement("template");
+        parentTemplate.id = "x-outer";
+        parentTemplate.innerHTML =
+            "<div><x-inner><span>{{dataValue}}</span></x-inner></div>";
+
+        const usage = document.createElement("x-outer");
+        usage.setAttribute("data-value", "{{ count }}");
+
+        root.appendChild(childTemplate);
+        root.appendChild(parentTemplate);
+        root.appendChild(usage);
+        document.body.appendChild(root);
+
+        const cog = init();
+        const count = cog.variable("count", 1);
+        cog.render(root);
+
+        await waitFor(() => {
+            expect(getByTestId(root, "inner-content").textContent).toBe("1");
+        });
+
+        count.value = 2;
+
+        await waitFor(() => {
+            expect(getByTestId(root, "inner-content").textContent).toBe("2");
         });
     });
 
